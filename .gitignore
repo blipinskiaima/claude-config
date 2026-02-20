@@ -1,0 +1,30 @@
+# Credentials & secrets
+.credentials.json
+
+# Session & ephemeral data
+history.jsonl
+cache/
+debug/
+downloads/
+file-history/
+ide/
+paste-cache/
+plans/
+session-env/
+shell-snapshots/
+stats-cache.json
+statsig/
+tasks/
+telemetry/
+todos/
+backups/
+plugins/
+
+# Projects: ignore session logs, keep memory/
+projects/**/*.jsonl
+projects/**/subagents/
+projects/**/sessions-index.json
+projects/**/tool-results/
+
+# Machine-specific settings
+settings.local.json
