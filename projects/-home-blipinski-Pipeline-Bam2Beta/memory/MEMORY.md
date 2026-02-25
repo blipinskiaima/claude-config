@@ -2,11 +2,12 @@
 
 ## Key Facts
 
-- Current version: V1.0.1 (tag V1.0.0 qualifie, V1.0.1 en dev)
+- Current version: V1.0.1 (tag V1.0.1, qualifie sur Healthy_826 le 2026-02-25)
 - Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest`
 - Raima package version: 0.4.3 (0.4.5 contient `depth_per_region` non exportee, casse le CNV)
 - Pipeline modules: MERGE, BETA (EPIC), BETA_28M (Loyfer), FRAG, CNV, SCORE, QC
-- Prod profile enables: MERGE + BETA + FRAG + CNV + SCORE
+- Prod profile enables: MERGE + BETA + FRAG + CNV
+- Retry strategy: doublement CPU/RAM par tentative, max 10, plafond cpus_max/memory_max
 
 ## Verified Findings
 
@@ -29,6 +30,8 @@
 - BED files en `/scratch/dependencies/bed/` ciblent chr1-22+X+Y uniquement
 - CNV utilise des bins de 100kb avec filtres de longueur de reads configurable
 - Le champ `mVAF` a ete renomme `TF` (tumor fraction) dans commit 7837cd0
+- `raima_score_loyfer.R` : `max_read_len` conditionnel (solid=Inf, liquid=1000) via `--type` param
+- `params.cpu`/`params.memory` remplaces par `params.cpus_max`/`params.memory_max` en V1.0.1
 
 ## User Preferences
 
