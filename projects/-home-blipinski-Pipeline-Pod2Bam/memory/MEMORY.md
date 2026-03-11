@@ -91,6 +91,35 @@
 - BAM anciens : `s3://aima-bam-data/data/CGFL/liquid/{sample}_rebasecalled_{VERSION}/`
 - Test DEV : `s3://aima-bam-data/processed/Pod2Bam/DEV/`
 
+## Production batch FR (2026-03-11) — TERMINÉ
+- **10/10 runs** traités, **0 erreur**, tous sync S3 vérifiés OK (fichiers + taille identiques)
+- **Durée totale** : ~21h (20:22 → 17:20), moyenne ~2h31/run
+- **Ratio basecall** : ~5.5 min/Go de POD5 sur H100
+- **Smart scheduling** : fonctionne parfaitement (prefetch, GPU handoff, finalize background)
+- **Log global** : `s3://aima-bam-data/processed/Pod2Bam/RetD/Pod2Bam_20260310_202241.log`
+- **Bug connu non corrigé** : `EXIT_CODE=0` hardcodé dans finalize() ligne 72 — à corriger avant batch WS
+- **Résultats locaux** supprimés après vérification sync S3
+- **Vérification sync** : `find -type f | wc -l` + `du -sb` local vs `aws s3 ls --recursive --summarize` S3
+
+### Prochaine étape : batch WS (13 runs)
+- Décommenter RUNS_WS dans Pod2Bam.sh, commenter RUNS_FR
+- Corriger le bug EXIT_CODE dans finalize() avant lancement
+- Serveur FR libre et nettoyé (scratch 4%)
+
+### Timings par run (basecall + demux + align + sort + upload)
+| Run | POD5 | Durée |
+|-----|------|-------|
+| PBE25131 | 88 Go | 44 min |
+| PBA88487 | 311 Go | 2h19 |
+| PBA89966 | 321 Go | 2h25 |
+| PBA39351 | 451 Go | 3h49 |
+| PAY45185 | 303 Go | 2h29 |
+| PBE05840 | 330 Go | 2h37 |
+| PBA39359 | 436 Go | 3h34 |
+| PAY45111 | 565 Go | ~2h33 |
+| PBE96775 | 622 Go | ~4h57 |
+| PBE35117 | 643 Go | ~4h41 |
+
 ## Tests terminés (2026-03-10)
 - **Test 2** : V0.9.6_V5.0.0 standard PBE29634 — terminé, résultats en local
 - **Test 3** : V0.9.6_V5.0.0 Q9 PBE29634 — terminé, résultats en local
