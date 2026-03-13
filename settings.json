@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "Read",
@@ -89,8 +92,5 @@
     "example-skills@anthropic-agent-skills": true,
     "context7@claude-plugins-official": true
   },
-  "autoUpdatesChannel": "latest",
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  }
+  "autoUpdatesChannel": "latest"
 }

@@ -29,7 +29,7 @@
 ## Script de production Pod2Bam.sh (2026-03-10)
 - **Smart scheduling** : prefetch POD5 (max 3 locaux) + GPU handoff via trace file + finalize background
 - **23 runs** split en 2 groupes : RUNS_FR (10 runs) et RUNS_WS (13 runs, en commentaire)
-- **4 runs retirés** (POD5 absents sur S3) : 877aac92 (Colon_21-24), 05ab4dea (Colon_17-20), b4caa48f (Colon_13-16), f181e139 (Colon_9-12)
+- **4 runs retirés du batch principal** → 3 traités dans batch Colon (voir `memory/batch-colon.md`), 1 manquant (877aac92)
 - RUNS_FR en variable active, RUNS_WS en commentaire — décommenter pour le 2e serveur
 - **S3 output** : `s3://aima-bam-data/processed/Pod2Bam/RetD/{RUN_ID}/{VERSION}/`
 - **Local output** : `/scratch/results/{RUN_ID}/{VERSION}/` (persiste après sync)
@@ -124,6 +124,12 @@
 - **Test 2** : V0.9.6_V5.0.0 standard PBE29634 — terminé, résultats en local
 - **Test 3** : V0.9.6_V5.0.0 Q9 PBE29634 — terminé, résultats en local
 - NB : ces tests utilisent l'ancien code (map-ont, anciens noms de process)
+
+## Batch Colon (2026-03-12) — voir `memory/batch-colon.md`
+- 4 runs (f181e139, b4caa48f, 05ab4dea_rep1, 05ab4dea_rep2) — terminé 23:32, ~11h35
+- Script `Pod2Bam_colon.sh` avec `S3_POD5_MAP` pour chemins POD5 custom
+- S3 sync vérifié OK (386 fichiers), résultats locaux nettoyés
+- 877aac92 (Colon_21-24) : POD5 absents sur S3, non traité
 
 ## Autres projets
 - **Bam2Beta** : BAM → modkit → RAIMA. Containers `blipinskiaima/bam2beta:latest`, `blipinskiaima/raima:latest`
