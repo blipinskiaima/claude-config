@@ -129,7 +129,13 @@
 - 4 runs (f181e139, b4caa48f, 05ab4dea_rep1, 05ab4dea_rep2) — terminé 23:32, ~11h35
 - Script `Pod2Bam_colon.sh` avec `S3_POD5_MAP` pour chemins POD5 custom
 - S3 sync vérifié OK (386 fichiers), résultats locaux nettoyés
-- 877aac92 (Colon_21-24) : POD5 absents sur S3, non traité
+- 877aac92 (Colon_21-24) : complété 2026-03-19 (rep1+rep2, POD5 copiés manuellement)
+
+## Batch 3b1c780b_sub (2026-03-19) — voir `memory/batch-3b1c780b-sub.md`
+- Run 3b1c780b, subset Breast_1 + Lung_10 en V4.3.0 et V0.7.4_V4.3.0
+- S3 output : `s3://.../3b1c780b_sub/V4.3.0/` et `V0.7.4_V4.3.0/`
+- Dorado 0.7.4 : demux 10x plus lent, basecall 2x plus lent, VRAM 48-68G vs 29G
+- Image `pod2bam:0.7.4` buildée sur le serveur (Dockerfile.0.7.4)
 
 ## Autres projets
 - **Bam2Beta** : BAM → modkit → RAIMA. Containers `blipinskiaima/bam2beta:latest`, `blipinskiaima/raima:latest`

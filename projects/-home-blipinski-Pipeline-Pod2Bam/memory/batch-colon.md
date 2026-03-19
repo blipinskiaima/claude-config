@@ -44,9 +44,15 @@ type: project
 - **Résultats locaux** : nettoyés (disk 1%)
 - **S3 sync vérifié** : 386 fichiers, counts match local vs S3
 
-### Run manquant
+### Run 877aac92 (Colon_21-24) — complété 2026-03-19
 
-- **877aac92 (Colon_21-24)** : POD5 absents sur S3, non traité. À investiguer.
+- POD5 copiés manuellement en local (pas sur S3)
+- Script `Pod2Bam_877aac92.sh` — pas de prefetch, `LOCAL_POD5_MAP` direct
+- 2 runs : rep1 (158G, 70 POD5) + rep2 (168G, 81 POD5)
+- Durée totale : ~2h (11:56 → 13:59)
+- S3 sync vérifié OK : rep1 (83 files, 44G), rep2 (93 files, 47G)
+- S3 output : `s3://.../RetD/...877aac92=moche_rep1/V0.9.6_V5.0.0/` et `_rep2/`
+- S3 global log : `Pod2Bam_877aac92_Pod2Bam_20260319_115629.log`
 
 **Why:** Ces 4 runs étaient les runs "moche" retirés du batch principal (POD5 dans des chemins non-standard sur S3).
-**How to apply:** Si re-run nécessaire, utiliser `Pod2Bam_colon.sh` avec les S3_POD5_MAP. Le run 877aac92 reste à résoudre.
+**How to apply:** Tous les runs Colon sont maintenant traités.
