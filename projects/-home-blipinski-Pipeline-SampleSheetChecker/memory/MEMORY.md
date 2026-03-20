@@ -87,6 +87,7 @@
 - `samplesheet3.tsv`: 32 samples (Healthy_27-58)
 - `samplesheet_test_basecall.tsv`: 7 samples (Healthy_11/12/14/23/25/26/34) — test pod5
 - `ss4.tsv`: sample sheet supplementaire
+- `samplesheet_0903.tsv`: 153 samples — consolidation complète (Colon, Healthy, TNE, Nuclear)
 
 ## Upload Speed Monitoring
 - R/ggplot2 graph: `upload_speed.png`, data in `/tmp/upload_speed_week.csv`
