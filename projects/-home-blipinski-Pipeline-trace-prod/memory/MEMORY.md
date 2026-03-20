@@ -96,11 +96,24 @@
 - metadata_HCL: spreadsheet `1XcWPn3_PT1atR-i5DmOM1t0ldgb5_PnxhQUwNUxWpQg`, worksheet "VAF"
 - Fetch: `fetch-gsheet metadata_CGFL` / `fetch-gsheet metadata_HCL`
 
-## Scripts utilitaires
-- [pod5_verification_gen.py](../../reference_pod5_verification.md) — génère `pod5_verification.tsv` (vérification croisée POD5 AWS/SCW pour CGFL, filtre rebasecalled)
-- `hcl_verification_gen.py` — génère `hcl_verification.tsv` (vérification croisée POD5/BAM raw↔S3 pour HCL)
-- `hcl_correspondance_rapports.tsv` — correspondance 66 runs NANO Dir / Run Number / Adresse Rapport
+## Scripts utilitaires (dev/)
+- `dev/pod5_verification_gen.py` — génère `pod5_verification.tsv` (vérification croisée POD5 AWS/SCW pour CGFL, filtre rebasecalled)
+- `dev/hcl_verification_gen.py` — génère `hcl_verification.tsv` (vérification croisée POD5/BAM raw↔S3 pour HCL)
+- `dev/hcl_correspondance_rapports.tsv` — correspondance 66 runs NANO Dir / Run Number / Adresse Rapport
 - `rapport/` — 36 rapports HTML Dorado copiés depuis SCW
+
+## BETA_28M Check Tolerance (mars 2026)
+- `check_beta_28m()` accepte 44 ou 45 fichiers dans BETA_28M
+- 45 fichiers OK seulement si exactement 1 fichier ghost de 0 bytes (marqueur dossier S3 matérialisé sur NFS)
+- Les 2 flags `--combine-mods` + `--combine-strands` dans le log chr22 restent obligatoires
+- `_s3_ls_lines()` extraite de `_s3_ls_count()` pour inspecter les tailles individuelles
+- `_has_single_ghost()` méthode statique sur BaseChecker pour détecter le ghost côté S3
+- Audit mars 2026 : 0 sample avec 45 fichiers (tolérance préventive), 35 HCL sans combine flags (anciens rebasecalled)
+
+## CLI Defaults (mars 2026)
+- Jobs par défaut passé de 4 à 12 pour `check`, `update-column`, `probs`
+- `update-column --sample` accepte maintenant multiple samples (`-s sample1 -s sample2`)
+- `_update_pod5_storage()` et `_update_bam_sizes()` supportent le filtrage par samples via `sample_filter`
 
 ## HCL Verification (mars 2026)
 - [Détails complets](project_hcl_verification.md)
