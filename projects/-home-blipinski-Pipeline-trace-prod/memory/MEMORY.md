@@ -19,41 +19,91 @@
 - `CREATE TABLE AS SELECT` loses PK/FK — always use DDL + INSERT INTO SELECT
 - European decimal conversion: comma→dot + KO/NA→NULL before insert
 - DuckDB single writer lock — cannot run concurrent queries during update-column
+- `update-column` runs must be **sequential** (not parallel) due to single writer lock
 
-## mVAF Filtered Columns
-- `mvaf_v1_ft092`, `mvaf_v1_ft095` — thresholds 0.92 and 0.95
-- Checker: `get_mvaf_filter()` in BaseChecker
-- Added to: schema, mappings, NUMERIC_COLUMNS, headers, COLUMN_CHECKERS
+## Export GSheet Column Order (liquid)
+- Removed 6 individual rarefaction columns (20M..1M), replaced by single "Rarefaction" (computed at export)
+- Removed "QC" column from both liquid and solid exports
+- "Taille BAM (GiB)" réintégrée dans l'export (calculée via NFS stat, entier GiB)
+- "BEDMETH EPICS" moved right after "BAM"
+- "Dorado Model" moved before "Version Dorado Model"
+- Rarefaction logic: OK if all thresholds ≤ nb_reads_total are OK, KO if any isn't, OK if no applicable threshold (< 1M reads)
+
+## Rarefaction Consolidation (display-only)
+- `_RAREFACTION_THRESHOLDS = {"20M": 20, "15M": 15, "10M": 10, "5M": 5, "2M": 2, "1M": 1}`
+- Implemented in both `GSheetsService._consolidated_rarefaction()` and `DuckDBService._consolidated_rarefaction()`
+- NOT stored in DB — computed at export time from `nb_reads_total` + `threshold_*` columns
+
+## Date Done Bug Fix (update-column)
+- `update-column date_done` was failing: checker returns DD-MM-YYYY but DuckDB DATE column expects YYYY-MM-DD
+- `_parse_date()` conversion only existed in `upsert_sample()` path, not in `update-column` path
+- Fixed in `check_samples.py` update_column(): added date format conversion for `column == 'date_done'`
+
+## BAM Metadata Extraction
+- `BAMExtractor._extract_with_samtools()`: timeout increased 10s → 30s, added 1 retry on timeout
+- Columns extracted by `check`: dorado_model, dorado_model_version, run_id, barcode, taille_bam
+- Columns NOT extracted by `check`: reads_per_flowcell, samples_per_run (aggregate, via `update-column`)
+- Barcode extraction: from BAM filename (`barcode\d+` regex), NOT from RG header
+- **Rebasecalled samples** have no barcode in filename or RG header → barcode stays NA
+  - Workaround: extract from Pod2Bam align logs at `/mnt/aima-bam-data/processed/Pod2Bam/RetD/{run}/*/align/{sample}.log`
+  - Log line `command: dorado aligner ... {run_id}_barcode{N}.bam` contains the barcode
+  - 36 rebasecalled barcodes recovered this way (CGFL liquid, mars 2026)
+  - 82 older rebasecalled (V4.3.0/V4.2.0) have no Pod2Bam logs → barcode remains NA
 
 ## POD5 Storage System (bam_metadata)
-- Columns: `stockage_pod5` (AWS/SCW/AWS+SCW/NULL), `sample_type_pod5`, `taille_pod5`, `pod5_adresse`
-- Update: `update-column stockage_pod5` → updates all 4 columns together
+- Columns: `stockage_pod5`, `sample_type_pod5`, `taille_pod5`, `pod5_adresse`, `nb_pod5`, `pod5_completude`
+- Update: `update-column stockage_pod5` → updates all 6 columns together
 - Dispatch: COLUMN_CHECKERS type='storage' → `_update_pod5_storage()`
+- `check` ne lance plus `_update_pod5_storage()` — uniquement via `update-column`
+- `taille_pod5` calculée via `aws s3 ls --summarize` (entier GiB, cache `_s3_size_gib()`)
+- `pod5_completude` = `round(nb_pod5 / (max_index + 1) * 100)` — détecte fichiers POD5 manquants
+  - > 100% = multi-run mixing (indices de flowcells différents dans même dossier)
+- `taille_bam` calculée via `aws s3 ls --summarize --profile=scw` sur le merged BAM S3 (entier GiB)
+- `nb_bam` + `bam_completude` calculés via `aws s3 ls --recursive --profile=scw` sur BAM raw
+- `bam_completude` = nb_bam / (max_index + 1) × 100, special case: 1 BAM = 100%
+- "Nb POD5" et "Nb BAM" retirés de l'export GSheet (colonnes internes uniquement)
+- "Complétude BAM" ajoutée à l'export GSheet
 
 ### S3 Structure
 - Bucket: `aima-pod-data`, 2 providers (AWS profil `aws`, SCW profil `scw`)
+- AWS path: `s3://aima-pod-data/CGFL/liquid/{run}/`
+- SCW path: `s3://aima-pod-data/data/CGFL/liquid/{run}/` (same but with `data/` prefix)
 - CGFL formats: `pod5_pass/{sample}/`, `pod5/` flat, `pod5_repN/`, racine `.pod5`
 - CGFL matching: run_id[:8] → S3 hash, fallback sample_name dans pod5_pass/
 - HCL: dossiers `{sample_name}/` avec POD5 directement dedans
+- HCL raw NANO: `/mnt/aima-bam-data/data/HCL/raw/NANO{NN}_{YY}_N{X}/no_sample_id/{run_id}/`
 - Dedup (`_dedup_cgfl_folders()`): `=OK` > original > `=moche`
+
+### POD5 Verification (mars 2026)
+- CGFL liquid: 462 detected, 112 not (104 Lung_Alc + 8 Colon rep without POD5 address)
+- AWS+SCW: tailles identiques 148/148, nombre diff de 1 (fichier metadata extra côté AWS)
+- Concordance gsheet CGFL (Sample name / Run number): 285/293 oui, 8 non (Colon_17-20_rep sans adresse DB)
+- POD5 index contiguity: AWS 89/93 runs 100%, SCW 33/36 runs 100%
+- 3 runs ~74% (mars 2025, anciens), 1 run 98.6% (7 indices manquants)
 
 ### Dorado Model Split
 - `dorado_model` + `dorado_model_version` — split sur `@` dans BAMExtractor._parse_rg_line
 - gsheet "dorado version" = software version (ex: 7.6.7), DB = model version (ex: v4.3.0)
 
 ## Sample Counts (liquid CGFL, mars 2026)
-- 519 total, 394 AWS, 21 SCW, 104 NULL (anciens Lung_Alc sans POD5 sur S3)
-- 114 non-Lung_Alc AWS avec dorado model v4.3.0 → 27 adresses POD5 uniques
-- 272 non-Lung_Alc AWS toutes versions → 66 adresses POD5 uniques
-- 94 adresses POD5 uniques total AWS (vs ~96 dossiers physiques S3, delta = dedup =moche)
-- POD5 moyen: 153.70 GiB global, 179.67 GiB HCL
-- BAM moyen: ~8.66 GiB (seulement 8 samples renseignés, update-column taille_bam à compléter)
+- 628 in DB (mars 2026, après ajout rebasecalled V5.0.0)
+- Stockage: 285 AWS, 148 AWS+SCW, 37 SCW, 104 NULL (anciens Lung_Alc)
+- 93 unique AWS addresses, 36 unique SCW addresses
 
 ## GSheet Config
 - Config: `database/gsheets_config.json`
 - metadata_CGFL: spreadsheet `1v1KUuCoMQV4Qk5jfbHLxhrUK6q_FETLiH8TuCQMdNxA`, worksheet "VAF"
 - metadata_HCL: spreadsheet `1XcWPn3_PT1atR-i5DmOM1t0ldgb5_PnxhQUwNUxWpQg`, worksheet "VAF"
 - Fetch: `fetch-gsheet metadata_CGFL` / `fetch-gsheet metadata_HCL`
+
+## Scripts utilitaires
+- [pod5_verification_gen.py](../../reference_pod5_verification.md) — génère `pod5_verification.tsv` (vérification croisée POD5 AWS/SCW pour CGFL, filtre rebasecalled)
+- `hcl_verification_gen.py` — génère `hcl_verification.tsv` (vérification croisée POD5/BAM raw↔S3 pour HCL)
+- `hcl_correspondance_rapports.tsv` — correspondance 66 runs NANO Dir / Run Number / Adresse Rapport
+- `rapport/` — 36 rapports HTML Dorado copiés depuis SCW
+
+## HCL Verification (mars 2026)
+- [Détails complets](project_hcl_verification.md)
 
 ## Conventions
 - Valid combos: liquid×(CGFL|HCL), solid×CGFL only

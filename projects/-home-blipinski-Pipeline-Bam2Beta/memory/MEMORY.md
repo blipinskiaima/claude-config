@@ -17,6 +17,19 @@
   - Scores raima, CNV, fragmentomics, QC metrics: tous identiques
   - See [test-results.md](test-results.md) for details
 
+- **BAM merge verification** (2026-03-13): le merge (samtools cat + sort) ne perd aucune donnee ni metadonnee
+  - 3/3 PASS : Breast_1 (CGFL liquid, 44 BAM), Nuclear_4 (HCL liquid, 433 BAM), Colon_0001N8M (CGFL solid, 129 BAM)
+  - Reads : Δ=0 flagstat sur toutes les metriques. Metadonnees : 0 @RG/@PG absent, @SQ identiques
+  - Headers intra-horaires : 44/44 identiques (verification exhaustive Breast_1)
+  - BAM horaires 100% redondants avec le merge
+  - See [bam-merge-verification.md](bam-merge-verification.md) for details
+
+- **Volumetrie S3** (2026-03-13): quantification complete des buckets
+  - BAM horaires : 30.67 To (supprimables). BAM merges : 18.62 To. RetD complet : 24.86 To
+  - POD5 SCW : 75.12 To. POD5 AWS : 66.76 To. Doublons : 11.81 To
+  - Total stockage S3 : ~186 To. Economies possibles : ~42.5 To (BAM horaires + doublons POD5)
+  - See [s3-volumetry.md](s3-volumetry.md) for details
+
 ## Debugging Insights
 
 - **raima 0.4.5 casse Raima_process_CNV** : `depth_per_region` n'est pas exportee dans 0.4.5. Fix: utiliser raima 0.4.3 dans le Dockerfile.
@@ -39,3 +52,7 @@
 - Utilise skills Claude Code (test_bam2beta, save-code, etc.)
 - Prefere les reponses concises avec tableaux de comparaison
 - Travaille depuis ~/Run ou ~/Run2 pour les runs Nextflow
+
+## Feedback
+
+- [S3 Never Delete](feedback_s3_no_delete.md) - NEVER delete anything from S3 buckets
