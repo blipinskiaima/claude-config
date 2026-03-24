@@ -13,18 +13,21 @@ Boris Blipinski est **Bioinformaticien** chez **AIMA Diagnostics**, startup de d
 - `~/boris_notes_extract.txt` — 2590 lignes, ~75 entrées daily standup (sept 2025 – mars 2026). Format : `# JJ mois. AAAA` puis listes `[x]`/`[ ]`/`~~strikethrough~~`.
 - `~/Notes_Team_Meetings.txt` — Réunions d'équipe 2026
 - `~/Notes_Team_Meetings (1).txt` — Réunions d'équipe 2025
+- `~/Notes_Team_Meetings (2).txt` — Réunions d'équipe janv-mars 2026 (format structuré par personne)
 
 ### Projets Pipeline
-14 projets dans `~/Pipeline/`, tous avec Boris comme auteur unique :
+16 projets dans `~/Pipeline/`, tous avec Boris comme auteur unique :
 
 | Projet | Type | État | Complexité |
 |--------|------|------|------------|
-| Bam2Beta | Pipeline Nextflow méthylation ONT | Production V1.0.1 | Très élevée (34 processus) |
+| Bam2Beta | Pipeline Nextflow méthylation ONT | Production V1.0.2 | Très élevée (34 processus) |
 | Pod2Bam | Pipeline re-basecalling GPU | Production V0.1.0 | Moyenne |
 | Aima-Tower | Dashboard monitoring Dash/Plotly | Production V2.2.0 | Élevée |
 | trace-prod | CLI tracking R&D (DuckDB) | Production | Élevée |
 | trace-platform | CLI tracking clients (DuckDB) | Production V0.1.0 | Moyenne-haute |
 | trace-workflow | Cache daemon Seqera (DuckDB) | Production | Moyenne-haute |
+| IA | Pipeline ML détection ctDNA | Production (Phase 1+2 done) | Élevée |
+| ichorCNA | Pipeline CNV fraction tumorale | En cours (0/1000) | Moyenne |
 | Watchmaker | Pipeline TAPS+ Illumina | Dev V1.0.0 | Moyenne |
 | Methylseq | Fork nf-core bisulfite | Dev/Recherche | Très élevée |
 | short-read | Benchmark 4 pipelines | Recherche | Moyenne |
@@ -37,5 +40,5 @@ Boris Blipinski est **Bioinformaticien** chez **AIMA Diagnostics**, startup de d
 
 - Boris prend ses notes en français, les README/code sont souvent en anglais
 - Daily notes : `[x]` ou `~~strikethrough~~` = tâche complétée, `[ ]` = en cours/todo
-- Stack principal : Nextflow DSL2, Python (Click, DuckDB, Dash), R (raima), Docker, AWS S3/Scaleway S3
+- Stack principal : Nextflow DSL2, Python (Click, DuckDB, Dash, scikit-learn), R (raima, ichorCNA), Docker, AWS S3/Scaleway S3
 - Langue de conversation préférée : français

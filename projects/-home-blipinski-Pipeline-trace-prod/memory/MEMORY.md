@@ -118,6 +118,33 @@
 ## HCL Verification (mars 2026)
 - [Détails complets](project_hcl_verification.md)
 
+## IchorCNA Column (mars 2026)
+- Column: `ichorcna_score` in `retd_suivis` — VARCHAR, NOT in STATUS_COLUMNS
+- Value: tumor fraction with comma decimal (ex: "0,01271") or "KO" if absent
+- Source: `{sample_dir}/ichorCNA/{sample}.params.txt`, line 2, col 2 (tab-separated)
+- S3 read-only via `_s3_read_text()`, fallback NFS
+- [STATUS_COLUMNS gotcha](feedback_status_columns.md)
+
+## mVAF v1.2 Column (mars 2026)
+- Column: `mvaf_v12` in `retd_suivis` — VARCHAR, NOT in STATUS_COLUMNS
+- Value: raima score v1.2 with comma decimal (ex: "0,0105373") or "KO" if absent
+- Source: `{sample_dir}/BETA/{sample}.merged.epic.raima_score.V1.2.tsv`, line 2, col 2 (tab-separated)
+- S3 read-only via `_s3_read_text()`, fallback NFS
+- Export position: between "mVAF v1" and "mVAF v2"
+
+## Barcode Fallback via bam_list.txt (mars 2026)
+- When no `.bam` files in `origin_dir`, `BAMExtractor._barcode_from_bam_list()` reads `{sample}_bam_list.txt`
+- Extracts barcode from first line filename (regex `barcode\d+`)
+- S3-first via `_s3_read_text()`, fallback NFS
+- For rebasecalled samples: barcode copied from original sample (same run = same barcode)
+- HCL rebasecalled POD5 columns also copied from original (same POD5 data)
+
+## BAM Completude Fallback via bam_list.txt (mars 2026)
+- When `_update_bam_sizes()` finds no BAM on S3, `_bam_count_from_list()` reads `{sample}_bam_list.txt`
+- Counts `.bam` lines and extracts max index from filename (`_{N}.bam` suffix)
+- Completude = count / (max_index + 1) × 100
+- Affects Bladder_Blood samples where BAM raw no longer on S3 (only txt files remain)
+
 ## Conventions
 - Valid combos: liquid×(CGFL|HCL), solid×CGFL only
 - Status: OK, KO, WARNING
