@@ -6,24 +6,30 @@
 - **tmux pour les longs jobs** : l'utilisateur lance lui-même dans tmux
 - **POD5 index 0** : toujours utiliser `_0.pod5` pour les tests
 
-## Décisions pipeline (mis à jour 2026-03-10)
+## Décisions pipeline (mis à jour 2026-03-25, V0.2.0)
 - **Simplex** : `dorado basecaller --reference --kit-name SQK-NBD114-24 --trim all`
-- **Multiplex Pipeline B** : `basecall --trim adapters --min-qscore 9` → `demux --no-trim` → `aligner` (lr:hq défaut) → `sort+index`
-- **publishDir local + aws s3 sync** : Nextflow publie en local, script bash fait `aws s3 sync --profile=scw` après
+- **Multiplex Pipeline B** : `basecall --trim adapters --min-qscore 9` → `demux` (trim par défaut) → `aligner --threads` (lr:hq) → `sort+index`
+- **Trim gate terminé** : trim réduit mapping rate ~5pts, 0 perte primary reads → voir `memory/trim-investigation.md`
+- **--BASECALL false** : skip basecall, réutilise BAM existant dans `{output}/basecall/` (pattern Bam2Beta --MERGE)
+- **docker_nogpu** : profil Docker sans GPU pour demux/align/sort sans basecall
+- **publishDir V0.2.0** : `demux_trimmed/`, `align_trimmed/` — ne jamais écraser `demux/`, `align/` existants
+- **--threads** : ajouté à `dorado demux` (16 cpus) et `dorado aligner` (4 cpus)
 - **Nommage** : `{ID}.basecall.bam`, `{ID}_barcode*.bam`, `{ID}.bam` + `.bai`, `{ID}.log`
 - Docker : `sg docker -c "..."`, `nohup` obligatoire pour longs jobs
 - AWS CLI : `--profile=scw --endpoint-url https://s3.fr-par.scw.cloud`
 - **Choix documentés dans README.md** (section "Choix de configuration du pipeline")
 
-## Arborescence output (mis à jour 2026-03-10)
+## Arborescence output (mis à jour 2026-03-25, V0.2.0)
 ```
-{LOCAL_OUTPUT}/
-├── basecall/    → {ID}.basecall.bam + .basecall.log
-├── demux/       → {ID}_barcode01-96.bam + _unclassified + _mixed + .demux.log
-├── align/
-│   ├── {sample}.log (x N)
-│   └── {sample}/    → {sample}.bam + .bam.bai (x N)
-└── log/         → Pod2Bam_report.html, _trace.txt, _timeline.html, _dag.html, nextflow.log, Pod2Bam.log
+{OUTPUT}/
+├── basecall/          → {ID}.basecall.bam + .basecall.log (inchangé)
+├── demux/             → V0.1.0 (--no-trim) — NE PAS ÉCRASER
+├── align/             → V0.1.0 (--no-trim) — NE PAS ÉCRASER
+├── demux_trimmed/     → V0.2.0 (trim par défaut)
+├── align_trimmed/     → V0.2.0 (trim par défaut)
+│   ├── {sample}.log
+│   └── {sample}/      → {sample}.bam + .bam.bai
+└── log/               → reports Nextflow
 ```
 
 ## Script de production Pod2Bam.sh (2026-03-10)
@@ -130,6 +136,12 @@
 - Script `Pod2Bam_colon.sh` avec `S3_POD5_MAP` pour chemins POD5 custom
 - S3 sync vérifié OK (386 fichiers), résultats locaux nettoyés
 - 877aac92 (Colon_21-24) : complété 2026-03-19 (rep1+rep2, POD5 copiés manuellement)
+
+## Investigation Trim Demux (2026-03-24) — voir `memory/trim-investigation.md`
+- Test impact retrait `--no-trim` au demux sur l'alignement (secondary/supplementary)
+- Script `trim_gate_test.sh`, données dans `/scratch/trim_gate/`
+- Run 3b1c780b_sub, V4.3.0, Lung_10 + Breast_1
+- Comparaison flagstat condition trim vs BAMs existants (baseline notrim)
 
 ## Batch 3b1c780b_sub (2026-03-19) — voir `memory/batch-3b1c780b-sub.md`
 - Run 3b1c780b, subset Breast_1 + Lung_10 en V4.3.0 et V0.7.4_V4.3.0

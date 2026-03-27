@@ -4,7 +4,7 @@
 
 - Current version: V1.1.1 (tag V1.1.1, qualifie sur Healthy_826 le 2026-03-24)
 - Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest`
-- Raima package version: 0.4.3 (0.4.5 contient `depth_per_region` non exportee, casse le CNV)
+- Raima package version: 0.4.13 (0.4.5 contenait `depth_per_region` non exportee, 0.4.13 retrocompatible verifie)
 - Pipeline modules: MERGE, BETA (EPIC), BETA_28M (Loyfer), FRAG, CNV, ICHORCNA, SCORE, QC
 - Prod profile enables: MERGE + BETA + FRAG + CNV
 - Retry strategy: doublement CPU/RAM par tentative, max 10, plafond cpus_max/memory_max
