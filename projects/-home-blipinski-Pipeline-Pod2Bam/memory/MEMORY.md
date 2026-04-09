@@ -149,6 +149,15 @@
 - Dorado 0.7.4 : demux 10x plus lent, basecall 2x plus lent, VRAM 48-68G vs 29G
 - Image `pod2bam:0.7.4` buildée sur le serveur (Dockerfile.0.7.4)
 
+## Sample list courante (2026-04-07)
+- Voir `sample_list_current.md` — 33 samples (20 Lung_Alc, 11 Colon, Breast_1, Lung_10)
+
+## Re-trim Colon CGFL (2026-04-08) — voir `memory/retrim-colon-cgfl.md`
+- 12 Colon_*_rep* liquid CGFL NO_TRIM détectés (adaptateur LA ONT visible)
+- 3 TSV créés dans `tables/` (962143e5 rep1/rep2, 2347816e rep1)
+- Script `dev/Pod2Bam_retrim_colon_cgfl.sh` — V0.9.6_V5.0.0, sliding window MAX_LOCAL=3, prêt à lancer
+- Méthode détection : `samtools view | head -50 | grep TTGCTAAGGTTAA` sur `/mnt/...merged.bam`
+
 ## Autres projets
 - **Bam2Beta** : BAM → modkit → RAIMA. Containers `blipinskiaima/bam2beta:latest`, `blipinskiaima/raima:latest`
 - **Investigation RAIMA V5.x** : seuil modkit chute ~0.96→~0.78. Fix : `--filter-threshold C:0.965`
