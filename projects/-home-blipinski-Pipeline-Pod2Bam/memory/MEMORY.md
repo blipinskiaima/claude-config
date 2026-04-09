@@ -152,11 +152,16 @@
 ## Sample list courante (2026-04-07)
 - Voir `sample_list_current.md` — 33 samples (20 Lung_Alc, 11 Colon, Breast_1, Lung_10)
 
-## Re-trim Colon CGFL (2026-04-08) — voir `memory/retrim-colon-cgfl.md`
-- 12 Colon_*_rep* liquid CGFL NO_TRIM détectés (adaptateur LA ONT visible)
-- 3 TSV créés dans `tables/` (962143e5 rep1/rep2, 2347816e rep1)
-- Script `dev/Pod2Bam_retrim_colon_cgfl.sh` — V0.9.6_V5.0.0, sliding window MAX_LOCAL=3, prêt à lancer
+## Re-trim Colon CGFL (2026-04-09 TERMINÉ) — voir `memory/retrim-colon-cgfl.md`
+- **5 runs re-basecallés V0.9.6_V5.0.0** (2 _OK subset + 3 full dataset), 20 BAMs produits
+- Durée batch : ~5h30, tous pipelines exit=0, sync S3 OK
+- 5 TSV dans `tables/` (rep1, rep2, rep1_OK, rep2_OK, 2347816e_rep1)
 - Méthode détection : `samtools view | head -50 | grep TTGCTAAGGTTAA` sur `/mnt/...merged.bam`
+- Préfixes S3 `= OK/` = subset du dataset (BAMs ~6x plus petits), préfixes sans `= OK` = full dataset
+
+## Scaleway S3 — gotchas (2026-04-09)
+- **`aws s3 sync` skip silencieusement des fichiers** (3-5 sur 23-90, aléatoire) → TOUJOURS retry en loop jusqu'à `local_count == s3_count`. Pattern dans `dev/Pod2Bam_retrim_colon_cgfl.sh:prefetch()`
+- **Préfixe bucket `aima-pod-data`** : les POD5 CGFL sont sous `data/CGFL/liquid/...` et NON `CGFL/liquid/...`. Toujours vérifier avec `aws s3 ls` avant de coder un path
 
 ## Autres projets
 - **Bam2Beta** : BAM → modkit → RAIMA. Containers `blipinskiaima/bam2beta:latest`, `blipinskiaima/raima:latest`

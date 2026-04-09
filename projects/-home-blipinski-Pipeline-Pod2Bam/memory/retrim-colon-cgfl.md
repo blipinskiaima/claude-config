@@ -1,84 +1,70 @@
 ---
-name: Colon CGFL liquid — 12 samples NO_TRIM à re-traiter
-description: 12 Colon_*_rep* liquid CGFL avec adaptateur ONT non trimmé, POD5 en Glacier dégelés, tables barcode créées
+name: Colon CGFL liquid — 5 runs re-basecallés V5.0.0 (TERMINÉ)
+description: 5 runs Colon CGFL re-basecallés V0.9.6_V5.0.0 (2 _OK subset + 3 full dataset), 20 BAMs produits
 type: project
 originSessionId: 2b9dcc8a-acfe-4021-8624-386dfb8960d0
 ---
-## Contexte (2026-04-08)
 
-Scan trim sur 1148 BAMs `*.merged.bam` via `samtools view | head -50 | grep TTGCTAAGGTTAA` (motif adaptateur LA ONT). 12 samples liquid CGFL identifiés NO_TRIM (adaptateur encore présent dans les reads) → à re-basecaller/re-trimmer.
+## Statut : TERMINÉ 2026-04-09
 
-**Why:** les BAMs MinKNOW de ces runs n'ont pas eu `dorado trim`/`demux` avec trim activé, contrairement à la majorité. Impact suspecté sur alignement (secondary/supplementary), cf `memory/trim-investigation.md`.
+5 runs Colon CGFL re-basecallés avec pipeline V0.2.0 (trim gate actif). Tous les résultats sync S3 OK.
 
-**How to apply:** utiliser les 3 TSV barcode sheets créés dans `tables/` pour lancer Pod2Bam sur ces runs quand le restore Glacier sera terminé.
+## Les 5 runs traités
 
-## Les 12 samples NO_TRIM + mapping POD5 S3
-
-| Sample | Run ID | Barcode | POD5 S3 subdir |
+| Run ID | S3 préfixe | POD5 | Samples |
 |---|---|---|---|
-| Colon_17_rep1 | 962143e5 | barcode19 | `962143e5 = OK/pod5_rep1/` |
-| Colon_18_rep1 | 962143e5 | barcode28 | `962143e5 = OK/pod5_rep1/` |
-| Colon_19_rep1 | 962143e5 | barcode30 | `962143e5 = OK/pod5_rep1/` |
-| Colon_20_rep1 | 962143e5 | barcode32 | `962143e5 = OK/pod5_rep1/` |
-| Colon_17_rep2 | 674c0e00 | barcode19 | `962143e5 = OK/pod5_rep2/` |
-| Colon_18_rep2 | 674c0e00 | barcode28 | `962143e5 = OK/pod5_rep2/` |
-| Colon_19_rep2 | 674c0e00 | barcode30 | `962143e5 = OK/pod5_rep2/` |
-| Colon_20_rep2 | 674c0e00 | barcode32 | `962143e5 = OK/pod5_rep2/` |
-| Colon_21_rep1 | 2347816e | barcode22 | `2347816e=OK/pod5_rep1/` |
-| Colon_22_rep1 | 2347816e | barcode23 | `2347816e=OK/pod5_rep1/` |
-| Colon_23_rep1 | 2347816e | barcode27 | `2347816e=OK/pod5_rep1/` |
-| Colon_24_rep1 | 2347816e | barcode29 | `2347816e=OK/pod5_rep1/` |
+| `962143e5_pod5_rep1_OK` | `...962143e5 = OK/pod5_rep1/` | 23 / 62G | Colon_17-20_rep1 (subset) |
+| `962143e5_pod5_rep2_OK` | `...962143e5 = OK/pod5_rep2/` | 37 / 62G | Colon_17-20_rep2 (subset) |
+| `2347816e_pod5_rep1` | `...2347816e=OK/pod5_rep1/` | 90 / 469G | Colon_21-24_rep1 |
+| `962143e5_pod5_rep1` | `...962143e5/pod5_rep1/` | 66 / 308G | Colon_17-20_rep1 (full) |
+| `962143e5_pod5_rep2` | `...962143e5/pod5_rep2/` | 50 / 144G | Colon_17-20_rep2 (full) |
 
-Bucket : `s3://aima-pod-data/CGFL/liquid/`
+**Important** : les préfixes `= OK/` contiennent un **sous-ensemble** du dataset (BAMs ~6x plus petits), les préfixes sans `= OK` contiennent le **full dataset**. On traite les deux pour comparer.
 
-Note : les rep2 de Colon_17-20 sont un run **différent** (674c0e00, flowcell PBE78709) mais leurs POD5 sont stockés sous le préfixe 962143e5 dans un sous-dossier `pod5_rep2/`.
+## Bug S3 sync Scaleway — FIX dans prefetch()
 
-## Samples déjà TRIMMED (pas besoin de retraiter)
+**Why:** `aws s3 sync` sur Scaleway skip silencieusement des fichiers (observé 3-5 manquants sur 23-90, de façon aléatoire). Cause probable : race condition pendant sync multipart ou eventually-consistent listing.
 
-- **Colon_21/22/23/24_rep2** (run c73e2cf4, POD5 dans `2347816e=OK/pod5_rep2/`) → déjà TRIMMED (0/50). Sont dégelés quand même car le restore prend tout le préfixe.
+**How to apply:** `prefetch()` dans `dev/Pod2Bam_retrim_colon_cgfl.sh` retry le sync jusqu'à 5 fois tant que `local_count < s3_count`. Reproductible sur plusieurs runs : 2 tentatives suffisent généralement.
 
-## Restore Glacier
+## Bug S3 path — fix
 
-Script : `restore_glacier_cgfl.sh`. Dégèle tous les objets DEEP_ARCHIVE des 2 préfixes :
-- `CGFL/liquid/20250917_1048_P2I-00117-A_PBG10934_962143e5 = OK/` → couvre pod5_rep1 + pod5_rep2
-- `CGFL/liquid/20250917_1218_P2S-01677-B_PBE78731_2347816e=OK/` → couvre pod5_rep1 + pod5_rep2
-- Tier Bulk, 7 jours.
+Le chemin correct est `s3://aima-pod-data/**data/**CGFL/liquid/...` et pas `s3://aima-pod-data/CGFL/liquid/...`. Le script initial utilisait le mauvais préfixe → `aws s3 sync` retournait silencieusement 0 fichier (au lieu d'une erreur).
 
-## TSV barcode sheets créés
+## Résultats S3
+
+**BAMs align_trimmed** : `s3://aima-bam-data/processed/Pod2Bam/RetD/{RUN_ID}/V0.9.6_V5.0.0/align_trimmed/{sample}/{sample}.bam`
+
+**Log global batch** : `s3://aima-bam-data/processed/Pod2Bam/RetD/Pod2Bam_20260409_120015.log`
+
+**Copies BAM → data/CGFL/liquid/** (20 copies, pattern `{sample}_OK/{sample}.bam` pour runs _OK et `{sample}/{sample}.bam` pour full) : destinations vérifiées inexistantes avant copie, aucun écrasement. Lignes `aws s3 cp` listées explicitement (préférence utilisateur : pas de boucle, lisibilité).
+
+## Config finale du script
+
+- `RUNS` : 5 clés
+- `S3_POD5_MAP` : 5 entrées avec préfixe `data/`
+- `MAX_LOCAL=4` (sliding window prefetch)
+- `prefetch()` : retry loop 5x
+- VERSION `V0.9.6_V5.0.0`
+- Pipeline V0.2.0 : `basecall --trim adapters` → `demux_trimmed` → `align_trimmed` → sort/index
+
+## TSV barcode sheets (5)
 
 Dans `tables/` :
-- `20250917_1048_P2I-00117-A_PBG10934_962143e5_pod5_rep1.tsv` (4 rep1 Colon_17-20)
-- `20250917_1048_P2I-00117-A_PBG10934_962143e5_pod5_rep2.tsv` (4 rep2 Colon_17-20)
-- `20250917_1218_P2S-01677-B_PBE78731_2347816e_pod5_rep1.tsv` (4 rep1 Colon_21-24)
+- `20250917_1048_P2I-00117-A_PBG10934_962143e5_pod5_rep1.tsv` (Colon_17-20_rep1)
+- `20250917_1048_P2I-00117-A_PBG10934_962143e5_pod5_rep1_OK.tsv` (même contenu, suffix `_OK`)
+- `20250917_1048_P2I-00117-A_PBG10934_962143e5_pod5_rep2.tsv` (Colon_17-20_rep2)
+- `20250917_1048_P2I-00117-A_PBG10934_962143e5_pod5_rep2_OK.tsv` (même contenu, suffix `_OK`)
+- `20250917_1218_P2S-01677-B_PBE78731_2347816e_pod5_rep1.tsv` (Colon_21-24_rep1)
 
-## Script de lancement GPU
+## Timings (batch 2026-04-09, début 12:00)
 
-`dev/Pod2Bam_retrim_colon_cgfl.sh` — copie surgicale de `Pod2Bam_colon.sh`.
-- VERSION `V0.9.6_V5.0.0` (Dorado 0.9.6 + modèle V5.0.0)
-- Pipeline V0.2.0 : basecall → demux_trimmed → align_trimmed → sort/index
-- Sliding window `MAX_LOCAL=3` : prefetch POD5 en background, GPU handoff via trace file, finalize/upload background
-- `S3_POD5_MAP` bash assoc array pour paths Scaleway non-standard (espaces, `=`)
-- `SCRIPT_DIR="$(dirname)/.."` car script dans `dev/`, racine projet au-dessus
-- Paramètres NF : `--kit_name SQK-NBD114-96 --min_qscore 9 -profile docker,tower,scw`
-- **Lancement** : `tmux new -s retrim_colon "bash ~/Pipeline/Pod2Bam/dev/Pod2Bam_retrim_colon_cgfl.sh"`
-- **Prêt à lancer** : dégel Glacier terminé, POD5 disponibles sur Scaleway
+| Run | Basecall |
+|---|---|
+| rep1_OK (62G) | ~18 min |
+| rep2_OK (62G) | ~20 min |
+| 2347816e (469G) | ~1h50 |
+| rep1 (308G) | ~2h15 |
+| rep2 (144G) | ~47 min |
 
-## Vérif avant lancement
-
-1. `aws s3 ls --profile aws "s3://aima-pod-data/CGFL/liquid/20250917_1048_P2I-00117-A_PBG10934_962143e5 = OK/pod5_rep1/" | head` — doit renvoyer des POD5 (pas Glacier)
-2. `bash -n dev/Pod2Bam_retrim_colon_cgfl.sh` — syntax OK
-3. `ls tables/20250917_*.tsv` — 3 TSV présents
-4. GPU libre (pas de basecall en cours)
-5. `/scratch` dispo (prévoir ~500 Go pour 3 POD5 + résultats)
-
-## Méthode de détection trim utilisée
-
-```bash
-samtools view /mnt/.../{sample}.merged.bam | head -50 | awk -F'\t' '{print substr($10,1,60)}' | grep -c TTGCTAAGGTTAA
-```
-- `>=10/50` = NO_TRIM (adaptateur LA ONT visible)
-- `0/50` = TRIMMED
-- entre = UNCERTAIN
-- Streaming depuis le mount, pas de copie locale, quelques secondes par BAM.
-
-Résultats complets : `/scratch/colon_17_rep_invest/trim_scan_all.tsv` (1148 samples)
+Durée totale batch : ~5h30 (12:00 → 17:21). Aucune erreur, tous pipelines exit=0.
