@@ -1,0 +1,4 @@
+- [Pipeline DuckDB](project_duckdb_migration.md) — Migration input GSheet vers DuckDB trace-prod, validations et fixes
+- [Trace-prod fixes](project_traceprod_fixes.md) — Bugs corrigés dans trace-prod pour aligner avec raima
+- [Data sourcing](reference_data_sourcing.md) — Chaine complete des donnees: Bam2Beta → trace-prod → GSheets → raima → pipeline
+- [User preferences](user_preferences.md) — Preferences de travail de l'utilisateur
