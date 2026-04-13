@@ -85,12 +85,33 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "frontend-design@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "example-skills@anthropic-agent-skills": true,
     "context7@claude-plugins-official": true
   },
-  "autoUpdatesChannel": "latest"
+  "autoUpdatesChannel": "latest",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); cmd=$(echo \"$input\" | jq -r '.tool_input.command // \"\"'); if echo \"$cmd\" | grep -qE '(aws s3 rm|aws s3 rb|aws s3 sync.*--delete)'; then echo 'BLOCKED: opération de suppression S3 détectée — golden rule violation' >&2; exit 2; fi; exit 0"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "notify-send 'Claude Code' \"$(cat | jq -r '.message // \"Action requise\"')\" --urgency=normal 2>/dev/null || true",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  }
 }

@@ -1,16 +1,46 @@
-# Global Guidelines
+# Global Guidelines — Boris Blipinski
 
-**Ces règles s'appliquent à TOUS les projets.**
+**Ces règles s'appliquent à TOUS les projets, TOUTES les sessions.**
+
+## Profil utilisateur
+
+Boris = Bioinformaticien chez AIMA Diagnostics (diagnostic cancer, méthylation ADN, ONT + Illumina).
+Auteur unique de 20 projets dans `~/Pipeline/`. Bus factor = 1 sur tout le stack bioinformatique.
+
+- **Compétences** : Nextflow (expert), R/Bash/Docker/Plotly (avancé), Python/Git/Infra (intermédiaire), ML/Stats/Dash (débutant)
+- **Env** : serveur calcul Scaleway, SSH depuis Cursor IDE, terminal uniquement
+- **Usage** : 4-10h/jour, 1-5 sessions parallèles
+
+## Communication
+
+- Toujours répondre en **français** (code en anglais)
+- Boris veut **comprendre AVANT d'implémenter** — pas d'implémentation sans explication préalable
+- Utiliser des **schémas avec des flèches** (diagrammes ASCII, flux visuels) pour expliquer
+- Être **concret et synthétique** — pas de théorie abstraite
+- Claude **optimise mais ne remplace pas** l'expertise de Boris — plus la criticité réglementaire est haute (ISO 15189), plus Boris garde la main
 
 ## Session Start
 
-Dès le premier message de l'utilisateur sur un projet avec du code source, lance automatiquement en **background** (`run_in_background: true`) le subagent approprié :
-- **Première session** (projet inconnu ou sans CLAUDE.md) → `agent-explore` (exploration profonde)
-- **Sessions suivantes** (projet déjà documenté) → `agent-explore-quick` (chargement rapide)
+À chaque premier message sur un projet avec du code source, lancer automatiquement en **background** (`run_in_background: true`) le subagent `agent-explore` (exploration profonde). Toujours une exploration **deep**, jamais quick.
 
-Réponds immédiatement à l'utilisateur sans attendre l'exploration. Quand le subagent termine, intègre ses résultats dans le contexte de la conversation.
+Répondre immédiatement à l'utilisateur sans attendre l'exploration. Intégrer les résultats quand le subagent termine.
 
-Les Karpathy Guidelines ci-dessous s'appliquent à toutes les interactions.
+## Golden Rules
+
+Les règles critiques de sécurité et de données sont dans `~/.claude/rules/` :
+- `s3-safety.md` — protection absolue des données S3 et POD5
+- `duckdb.md` — conventions DuckDB
+- `nextflow.md` — conventions Nextflow
+- `secrets.md` — sécurité des credentials
+
+Ces règles sont **non négociables**. Ne jamais les contourner.
+
+## Proactivité attendue
+
+- **Veille sécurité** : signaler les failles de sécurité identifiées (secrets en clair, permissions trop larges)
+- **Axes d'amélioration** : signaler les optimisations possibles (code, performance, architecture)
+- **Ponts inter-projets** : quand une information d'un projet est pertinente pour un autre, le mentionner
+- Ne PAS être proactif sur l'exécution de code en production — toujours demander confirmation
 
 ---
 
