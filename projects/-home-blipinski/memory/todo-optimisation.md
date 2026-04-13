@@ -15,6 +15,13 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 ## Moyenne priorité
 
+### Skills bioinformatiques à implémenter
+- [ ] **Skill /sample** — statut cross-projet d'un sample (trace-prod + S3 + Bam2Beta + raima + Dorado version). 700+ samples, gain énorme.
+- [ ] **Skill /debug-nf** — diagnostic automatique d'un run Nextflow échoué (lit .nextflow.log, identifie process/container/erreur, propose fix)
+- [ ] **Skill /check-consistency** — validation croisée trace-prod vs S3 vs Bam2Beta outputs. Détecte orphelins, incohérences, samples manquants.
+- [ ] **Skill /audit-trail** — traçabilité ISO 15189 : changelog formaté, diff avant/après, hash containers, résultats non-régression.
+- [ ] **Prompts analyse scientifique** — skills /compare-batches, /qc-report, /correlation pour analyses récurrentes.
+
 - [ ] **Améliorer Aima-Tower** — dashboard interactif pour biologistes :
   - [ ] Intégrer IGV.js via dash-bio (visualisation bedMethyl)
   - [ ] Graphiques interactifs avec seuils de spécificité ajustables
