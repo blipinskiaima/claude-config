@@ -10,6 +10,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 ## Haute priorité
 
+- [ ] **Investigation batch effect CGFL vs HCL** — utiliser `/batch-effect --report` pour identifier systématiquement toutes les sources de variabilité inter-centres. Collecter les variables confondantes, comparer les distributions QC, documenter les résultats. Prérequis avant correction (ComBat-met).
 - [ ] **Tester ComBat-met sur données CGFL vs HCL** — R package (NAR 2025), correction batch effect méthylation. Directement applicable au problème n°1 du modèle ctDNA. ~1-2 jours.
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config). Step by step.
 

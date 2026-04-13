@@ -25,6 +25,15 @@ Auteur unique de 20 projets dans `~/Pipeline/`. Bus factor = 1 sur tout le stack
 
 Répondre immédiatement à l'utilisateur sans attendre l'exploration. Intégrer les résultats quand le subagent termine.
 
+## Compaction
+
+Lors de la compaction du contexte, TOUJOURS conserver :
+- Les fichiers modifiés dans cette session et pourquoi
+- Les commandes testées et leurs résultats (succès/échec)
+- Les décisions prises et leur justification
+- L'état des runs Nextflow en cours
+- Les bugs identifiés ou résolus
+
 ## Golden Rules
 
 Les règles critiques de sécurité et de données sont dans `~/.claude/rules/` :
