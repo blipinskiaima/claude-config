@@ -10,6 +10,10 @@
 
 - [Analyse de valeur AIMA](aima-value-analysis.md) — 21 réalisations clés identifiées (mars 2026)
 
+## Todo
+
+- [Todo optimisation](todo-optimisation.md) — Tâches restantes après rétrospective (batch effect, Aima-Tower, sécurité, MethylBERT...)
+
 ## Points clés
 
 - Boris = bioinformaticien unique AIMA, bus factor = 1, 20 projets dans ~/Pipeline/
