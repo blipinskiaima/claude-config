@@ -91,9 +91,4 @@ TOUJOURS utiliser `--modified-bases-models` (chemin explicite) et PAS `--modifie
 
 ## Référentiels génomiques
 
-| Genome | Chemin | Notes |
-|--------|--------|-------|
-| hg38 | `/scratch/dependencies/genomes/hg38/hg38.fa` | UCSC, chr prefix, avec alt contigs |
-| GRCh38 no_alt | `/scratch/dependencies/genomes/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa` | NCBI, sans alt contigs |
-
-Les deux produisent des résultats identiques (vérifié sur Healthy_826).
+Voir `bioinfo-tools.md` pour les chemins des génomes hg38 et GRCh38.
