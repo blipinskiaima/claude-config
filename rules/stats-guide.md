@@ -1,3 +1,13 @@
+---
+paths:
+  - "**/exploratory-analysis*/**"
+  - "**/IA/**"
+  - "**/IA-for-IA/**"
+  - "**/batch_effect/**"
+  - "**/*.R"
+  - "**/figures*/**"
+---
+
 # Guide Statistique — Analyse Methylation / ctDNA
 
 Ce guide aide Claude a choisir le bon test statistique et a l'expliquer simplement a Boris (debutant en stats, expert en bioinformatique).

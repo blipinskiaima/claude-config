@@ -1,3 +1,11 @@
+---
+paths:
+  - "**/Pod2Bam/**"
+  - "**/basecall/**"
+  - "**/pod2bam*"
+  - "**/Dockerfile*"
+---
+
 # Référence Dorado & Pod2Bam — Oxford Nanopore
 
 ## Images Docker AIMA

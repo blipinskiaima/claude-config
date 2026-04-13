@@ -1,3 +1,16 @@
+---
+paths:
+  - "**/*.nf"
+  - "**/nextflow.config"
+  - "**/Bam2Beta/**"
+  - "**/Pod2Bam/**"
+  - "**/basecall/**"
+  - "**/Watchmaker/**"
+  - "**/Fastq2Bam/**"
+  - "**/short-read/**"
+  - "**/batch_effect/**"
+---
+
 # Outils bioinformatiques AIMA — Conventions d'usage
 
 ## modkit (ONT methylation)

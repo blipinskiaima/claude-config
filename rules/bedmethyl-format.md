@@ -1,3 +1,13 @@
+---
+paths:
+  - "**/Bam2Beta/**"
+  - "**/IA/**"
+  - "**/IA-for-IA/**"
+  - "**/exploratory-analysis*/**"
+  - "**/*.bedMethyl*"
+  - "**/modkit*"
+---
+
 # Format bedMethyl — modkit (ONT)
 
 Référence des colonnes bedMethyl produites par `modkit pileup`.

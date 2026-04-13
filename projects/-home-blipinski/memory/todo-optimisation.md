@@ -16,12 +16,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 ## Moyenne priorité
 
-### Skills bioinformatiques à implémenter
-- [ ] **Skill /sample** — statut cross-projet d'un sample (trace-prod + S3 + Bam2Beta + raima + Dorado version). 700+ samples, gain énorme.
-- [ ] **Skill /debug-nf** — diagnostic automatique d'un run Nextflow échoué (lit .nextflow.log, identifie process/container/erreur, propose fix)
-- [ ] **Skill /check-consistency** — validation croisée trace-prod vs S3 vs Bam2Beta outputs. Détecte orphelins, incohérences, samples manquants.
+### Skills bioinformatiques
 - [ ] **Skill /audit-trail** — traçabilité ISO 15189 : changelog formaté, diff avant/après, hash containers, résultats non-régression.
 - [ ] **Prompts analyse scientifique** — skills /compare-batches, /qc-report, /correlation pour analyses récurrentes.
+- [ ] **Améliorer skills v1 avec /meta-skills-creator** — sample, debug-nf, check-consistency sont fonctionnels mais créés sans le processus rigoureux. Raffiner après usage.
 
 - [ ] **Améliorer Aima-Tower** — dashboard interactif pour biologistes :
   - [ ] Intégrer IGV.js via dash-bio (visualisation bedMethyl)
@@ -35,6 +33,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 2** : installer `gitleaks` en pre-commit hook sur les projets gittés
 - [ ] **Sécurité secrets — étape 3** : évaluer un gestionnaire de secrets (sops, age, vault)
 - [ ] **Skill save-code pour trace-prod** — automatiser la sauvegarde de session
+- [ ] **Projet veille-scientifique : automatisation complète** — remplacer les MCP inexistants (DuckDB, S3, Ensembl, NCBI) par des skills ou scripts, enrichir l'analyse des abstracts par Claude, intégrer les résultats dans un dashboard. Projet dédié à part.
 - [ ] **Agent de veille enrichi** — ajouter l'analyse automatique des abstracts par Claude (pertinence AIMA)
 - [ ] **Skills Pod2Bam** — créer test/qualif/maj analogues à Bam2Beta. Pas urgent tant que Pod2Bam n'est pas soumis à audit qualité.
 
@@ -48,6 +47,14 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] Veille scientifique automatisée (cron + skill /veille) — 2026-04-13
 - [x] Skill export-gsheet trace-prod — 2026-04-13
 - [x] Profil utilisateur complet (technique + scientifique) — 2026-04-13
+- [x] Skills /sample, /debug-nf, /check-consistency (v1) — 2026-04-13
+- [x] Skill /batch-effect — 2026-04-13
+- [x] Références bedMethyl, troubleshooting, stats-guide — 2026-04-13
+- [x] Référence Dorado complète (dorado-reference.md) — 2026-04-13
+- [x] Contexte pipeline AIMA dans 7 CLAUDE.md projets — 2026-04-13
+- [x] Instructions compaction intelligente — 2026-04-13
+- [x] Aliases et template CLAUDE.md — 2026-04-13
+- [x] Agent explore bioinfo (détection auto Phase 6) — 2026-04-13
 
 **Why:** Issue de la rétrospective complète Claude Code du 13/04/2026 (Phases 1-4).
 **How to apply:** Consulter cette liste en début de session quand Boris demande "quoi faire" ou "prochaine tâche". Mettre à jour quand une tâche est complétée.

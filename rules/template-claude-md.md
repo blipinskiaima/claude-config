@@ -1,3 +1,9 @@
+---
+paths:
+  - "**/CLAUDE.md"
+  - "**/.claude/**"
+---
+
 # Template CLAUDE.md pour nouveaux projets AIMA
 
 Utiliser ce template lors de la création d'un nouveau projet dans ~/Pipeline/.
