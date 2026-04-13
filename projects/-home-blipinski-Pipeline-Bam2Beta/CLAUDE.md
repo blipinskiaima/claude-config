@@ -26,7 +26,7 @@
                     exploratory-analysis    Aima-Tower
 ```
 
-**En amont** : BAM alignés produits par Pod2Bam
+**En amont** : BAM alignés, soit directement depuis le séquenceur ONT (cas standard), soit produits par Pod2Bam (cas de re-basecalling)
 **En aval** : bedMethyl → raima (scoring) → trace-prod (traçabilité) → exploratory-analysis + Aima-Tower
 
 ## Dépendances inter-projets
