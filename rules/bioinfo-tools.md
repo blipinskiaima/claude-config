@@ -6,9 +6,12 @@
 - Les fichiers de sortie sont par chromosome (chr1-22)
 
 ## dorado (ONT basecalling)
-- Modèles utilisés : sup@v5.0.0 (HCL récent), sup@v4.3.0 (CGFL historique)
-- ATTENTION au batch effect entre versions de modèles Dorado
-- TOUJOURS vérifier la version du modèle dans les métadonnées BAM
+- Voir `~/.claude/rules/dorado-reference.md` pour la référence complète (images Docker, modèles, trimming)
+- TOUJOURS utiliser `--modified-bases-models` (chemin explicite), PAS `--modified-bases` (télécharge au runtime)
+- TOUJOURS utiliser `--kit-name SQK-NBD114-24 --trim all` pour HCL simplex (delta=0 avec MinKNOW)
+- Kit CGFL multiplex : `SQK-NBD114-96` avec `--barcode_sheet`
+- ATTENTION : V5.2.0 (Dorado 1.4.0) perd ~24% des reads vs versions précédentes (filtre qualité plus strict)
+- ATTENTION au batch effect entre versions de modèles Dorado — TOUJOURS tracer la version dans les métadonnées
 
 ## samtools
 - TOUJOURS vérifier le exit code après merge/sort/index
