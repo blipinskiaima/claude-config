@@ -44,6 +44,14 @@ Les règles critiques de sécurité et de données sont dans `~/.claude/rules/` 
 
 Ces règles sont **non négociables**. Ne jamais les contourner.
 
+## Ressources persistantes
+
+- **Todo list** : `~/.claude/projects/-home-blipinski/memory/todo-optimisation.md` — tâches en cours et à faire
+- **Inventaire outils** : `~/.claude/projects/-home-blipinski/memory/inventaire-claude-code.md` — skills, agents, MCP, rules, hooks
+- **Profil** : `~/.claude/projects/-home-blipinski/memory/profil-technique.md` et `profil-scientifique.md`
+
+Quand Boris dit "todo list", "quoi faire", "prochaine tâche", "inventaire" → lire le fichier correspondant.
+
 ## Proactivité attendue
 
 - **Veille sécurité** : signaler les failles de sécurité identifiées (secrets en clair, permissions trop larges)
