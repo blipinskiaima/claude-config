@@ -22,8 +22,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## Moyenne priorité
 
 ### Skills bioinformatiques
-- [ ] **Skill /audit-trail** — traçabilité ISO 15189 : changelog formaté, diff avant/après, hash containers, résultats non-régression.
-- [ ] **Prompts analyse scientifique** — skills /compare-batches, /qc-report, /correlation pour analyses récurrentes.
 - [ ] **Améliorer skills v1 avec /meta-skills-creator** — sample, debug-nf, check-consistency sont fonctionnels mais créés sans le processus rigoureux. Raffiner après usage.
 
 ### Projets bioinformatiques
@@ -35,7 +33,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
   - [ ] Module exploratory-analysis embarqué
 - [ ] **Explorer MethylBERT** — Transformer read-level (Nat Comm 2025) pour améliorer sensibilité basse VAF (<5%). Nécessite GPU. ~2-3 jours.
 - [ ] **Prendre en main automate veille scientifique** — comprendre le cron + skill `/veille` existants pour pouvoir les faire évoluer. Prérequis avant d'améliorer l'agent ou l'analyse d'abstracts.
-- [ ] **Centraliser la doc effet batch** — organiser en un seul endroit tous les travaux : mémoire Claude (`batch-effect-investigation.md`), README ComBat-Met, rapports internes, dossier qualité ISO 15189. Couvrir les 2 batch effects racines : EPIC→ONT (majeur, biais raima) et Apostle vs Maxwell (amplificateur, 2% FP CGFL vs 17% HCL). Prérequis traçabilité clinique ISO.
 
 ## Basse priorité
 
@@ -75,6 +72,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Conclusion ComBat-met** : **non retenu pour la production**. Documenté dans `~/Pipeline/ComBat-Met/README.md`. Dépendance batch-spécifique incompatible ISO 15189 + simplification technique suffit pour 80% du problème.
 - [x] **Mise à jour mémoire Claude** : `batch-effect-investigation.md` + pointeur dans MEMORY.md Bam2Beta.
 - [x] **Restructuration todo list** : séparation tâches à faire (par priorité) / tâches complétées (par jour).
+- [x] **Skill `/audit-trail`** — créé, traçabilité ISO 15189 (changelog + diff + hashes containers + non-régression) pour les versions Bam2Beta/Pod2Bam.
+- [x] **Skills analyse scientifique** — `/compare-batches` (Wilcoxon/Fisher + confounders), `/qc-report` (rapport standardisé avec seuils), `/correlation` (Spearman + paradoxe de Simpson) créés et pushés sur claude-config.
+- [x] **Centralisation doc effet batch** — tout regroupé dans `~/Pipeline/batch_effect/` : README central (12 pistes + 2 batch effects racines + ComBat-met), CLAUDE.md workflow de reprise, `ComBat-Met/` déplacé en sous-dossier, mémoire Claude `batch-effect-investigation.md` mise à jour.
 
 ## 2026-04-13 — Rétrospective et setup Claude Code
 
