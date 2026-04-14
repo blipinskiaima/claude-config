@@ -1,8 +1,7 @@
 ---
 name: add-todo-list
-description: "Ajoute une tâche à la todo list personnelle de Boris (Partie 1 — À faire). Use when the user says \"ajoute à la todo\", \"add todo\", \"nouvelle tâche\", \"add-todo-list\", or asks to add something to his to-do list."
-argument-hint: "<description tâche> [--prio haute|moyenne|basse] [--section <nom>]"
-allowed-tools: Read, Edit
+description: "Ajoute une tâche synthétique à la todo list personnelle de Boris (Partie 1 — À faire du fichier ~/.claude/projects/-home-blipinski/memory/todo-optimisation.md). Reformule si verbeux, évite les doublons, place selon la priorité (haute/moyenne/basse). Use when the user says ajoute à la todo, add todo, nouvelle tâche, add-todo-list, or asks to add something to his to-do list."
+allowed-tools: Read, Edit, Grep
 ---
 
 # Skill : Add Todo
@@ -28,7 +27,29 @@ Règles :
 - Mots-clés en gras : nom du projet, chiffres clés, dépendances humaines.
 - Ordre de priorité interne : P0 > P1 > P2.
 
-## Instructions
+## Invocation sans argument
+
+Si l'utilisateur invoque le skill **sans décrire de tâche** (juste `/add-todo-list`) :
+
+1. **Scanner la session courante** pour détecter les candidats à ajouter. Chercher les signaux :
+   - verbes d'intention : "il faudrait", "on devrait", "je veux faire", "à faire", "prochaine étape", "TODO", "reste à"
+   - problèmes non résolus : bugs identifiés mais non fixés, pistes d'amélioration mentionnées
+   - décisions reportées : "on verra plus tard", "à creuser", "pas urgent mais..."
+   - axes d'optimisation (sécurité, perf, architecture) évoqués sans action prise
+2. **Ignorer** ce qui a déjà été fait dans la session (ça va dans `/maj-todo-list`) et ce qui est déjà dans Partie 1 du fichier todo (grep avant).
+3. **Proposer une liste numérotée** (max 5 candidats) à l'utilisateur, au format final synthétique + priorité proposée. Exemple :
+   ```
+   Candidats détectés dans la session :
+   1. [haute] **Intégrer pyranges dans trace-prod** — opérations bed plus rapides.
+   2. [moyenne/Skills] **Skill /qc-report** — générer un rapport QC standardisé à partir de trace-prod.
+   3. [basse] **Nettoyer anciennes images Docker** — 12 GB récupérables sur /scratch.
+
+   Lesquels veux-tu ajouter ? (numéros séparés par virgule, ou "tous", ou "aucun")
+   ```
+4. **Attendre la confirmation** de l'utilisateur avant d'insérer.
+5. Si **aucun candidat détecté**, dire : "Rien d'évident à ajouter depuis la session. Donne-moi la tâche en 1 ligne."
+
+## Instructions (mode avec argument ou après confirmation)
 
 1. **Lire** le fichier todo pour voir la structure actuelle et éviter les doublons.
 2. **Déterminer la priorité** :
