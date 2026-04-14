@@ -15,7 +15,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## Haute priorité
 
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
-- [ ] **Harmoniser les protocoles wet-lab CGFL/HCL** — négociation labos sur kit extraction (Apostle vs Maxwell) et kit barcoding (NBD114-96 vs NBD114-24). Long terme, mais seule solution durable.
+- [ ] **Harmoniser les protocoles wet-lab CGFL/HCL** — négociation labos sur kit extraction (Apostle vs Maxwell) et kit barcoding (NBD114-96 vs NBD114-24). Seule solution durable pour éliminer le batch effect inter-kit (amplificateur du biais EPIC→ONT de raima). Long terme.
+- [ ] **Expérience wet-lab contrôlée Apostle vs Maxwell** — même plasma sain → 2 aliquotes → Apostle + Maxwell en parallèle → ONT → comparer scores raima. Tranche définitivement si le driver du batch effect (17% FP HCL Healthy vs 2% CGFL) est le kit extraction ou un autre facteur (barcoding, opérateur, protocole). Prérequis pour la négociation d'harmonisation.
 
 ## Moyenne priorité
 
@@ -32,7 +33,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
   - [ ] Enrichir les agents IA d'Aima-Tower avec features DB
   - [ ] Module exploratory-analysis embarqué
 - [ ] **Explorer MethylBERT** — Transformer read-level (Nat Comm 2025) pour améliorer sensibilité basse VAF (<5%). Nécessite GPU. ~2-3 jours.
-- [ ] **Documenter le biais technologique EPIC→ONT** dans le dossier qualité ISO — finding clé de l'investigation batch effect. Le modèle raima V1 est calibré sur EPIC, pas ONT.
+- [ ] **Documenter les 2 batch effects racines dans le dossier qualité ISO 15189** — findings clés de l'investigation batch effect (2026-04-14) :
+  1. **EPIC → ONT** (majeur) : raima V1 entraîné sur 19 EPIC bisulfite arrays, appliqué à ONT → biais technologique de la méthode
+  2. **Apostle vs Maxwell** (amplificateur) : kits d'extraction avec chimies différentes → profils CpG différents ; Apostle matche mieux les refs EPIC par hasard → 2% FP CGFL vs 17% HCL
+  Ces 2 effets sont liés et confounded avec le centre. Tracer pour traçabilité clinique.
 
 ## Basse priorité
 
@@ -65,7 +69,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
   - Voir `~/.claude/projects/-home-blipinski-Pipeline-Bam2Beta/memory/batch-effect-investigation.md`
 - [x] **Création projet `~/Pipeline/ComBat-Met/`** — CLAUDE.md, .claude/rules, Docker (R 4.4 + ComBatMet 0.99.3), 9 scripts R/bash pour extraction, correction, scoring parallèle.
 - [x] **Test ComBat-met** — 4 variantes testées (group=H/C, rebalancé, ref.batch=CGFL, Healthy only). **Aucune ne fonctionne**. Finding inattendu : la simplification du bedMethyl seule réduit 17% → 3% FP HCL sans ComBat-met.
-- [x] **Identification du vrai problème** : biais technologique EPIC → ONT. Raima V1 entraîné sur 19 références EPIC bisulfite microarray, pas sur ONT. CGFL matche par hasard ces références, HCL s'en éloigne.
+- [x] **Identification des 2 batch effects racines** :
+  1. **EPIC → ONT** (majeur) : raima V1 entraîné sur 19 EPIC bisulfite microarrays, appliqué à ONT → biais technologique jamais corrigé
+  2. **Apostle vs Maxwell** (amplificateur) : kits d'extraction ADN cfDNA avec chimies différentes (Apostle = nanoparticules propriétaires, Maxwell = billes magnétiques Promega) → biais de capture CpG différent ; Apostle produit des profils ONT plus proches des refs EPIC **par hasard** → explique les 2% FP CGFL vs 17% HCL
+  - Les 2 effets sont liés : le kit crée une composante de biais ONT qui interagit avec le biais EPIC. Confounded avec centre (pas de Maxwell CGFL, pas d'Apostle HCL).
 - [x] **Conclusion ComBat-met** : **non retenu pour la production**. Documenté dans `~/Pipeline/ComBat-Met/README.md`. Dépendance batch-spécifique incompatible ISO 15189 + simplification technique suffit pour 80% du problème.
 - [x] **Mise à jour mémoire Claude** : `batch-effect-investigation.md` + pointeur dans MEMORY.md Bam2Beta.
 - [x] **Restructuration todo list** : séparation tâches à faire (par priorité) / tâches complétées (par jour).
