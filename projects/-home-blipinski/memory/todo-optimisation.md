@@ -55,6 +55,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Lancer les 8 runs HCL sur Bam2Beta** — métadonnées ONT HCL reçues (2026-04-14). Planifier le lancement PROD avec Bam2Beta, vérifier les seuils et intégrer les nouveaux samples dans la cohorte exploratory.
 - [ ] **Sauvegarde des données HCL sur S3** — upload des BAM et POD5 des 8 runs HCL vers les buckets dédiés (BAM + POD5). Vérifier `local_count == s3_count` après sync, retry en boucle si besoin (bug skip Scaleway).
 - [ ] **Import metadata HCL depuis gsheet** — 282 samples importés le 15/04, 32 Healthy (111-142) absents de la table `samples` (pas encore intégrés). Cron one-shot auto-destructif planifié 16/04 12h Paris pour re-lancer `import-metadata liquid HCL` après intégration des nouveaux samples.
+- [ ] **Prise en charge nouveau client** — premier mail envoyé, en attente de retour.
 
 ---
 
@@ -67,6 +68,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Todo list restructurée** : ajout d'une Partie 2 "En cours" (entre À faire et Complété). Routing par section sauvé en mémoire Aima-Tower (`feedback_todo_sections.md`).
 - [x] **trace-workflow multi-workspace** — ajout workspace `aima-diagnostics` en plus du perso via filtre `ALLOWED_ORGS`. Migration DB idempotente (`workspace_id`), 15 957 workflows existants préservés.
 - [x] **Prise en main CLI Seqera** — `seqera ai --headless` (via skill `/seqera`) pour les questions NL, et API REST directe (`/user-info`, `/workflow?workspaceId=`) utilisée par `trace-workflow`.
+- [x] **Traduction user manual plateforme** — terminée.
 
 ## 2026-04-14 — Aima-Tower : Batches A-F + refonte navigation
 
