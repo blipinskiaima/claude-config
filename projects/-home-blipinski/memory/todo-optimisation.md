@@ -6,7 +6,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 # Todo — Optimisation Claude Code & Projets
 
-**Dernière mise à jour : 2026-04-14 (Aima-Tower Batches A-F + refonte navigation)**
+**Dernière mise à jour : 2026-04-15 (ajout tâches post-Batches A-F + planification HCL)**
 
 ---
 
