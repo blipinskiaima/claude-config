@@ -17,8 +17,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
 - [ ] **Harmoniser les protocoles wet-lab CGFL/HCL** — négociation labos sur kit extraction (Apostle vs Maxwell) et kit barcoding (NBD114-96 vs NBD114-24). Seule solution durable pour éliminer le batch effect inter-kit (amplificateur du biais EPIC→ONT de raima). Long terme.
 - [ ] **Expérience wet-lab contrôlée Apostle vs Maxwell** — même plasma sain → 2 aliquotes → Apostle + Maxwell en parallèle → ONT → comparer scores raima. Tranche définitivement si le driver du batch effect (17% FP HCL Healthy vs 2% CGFL) est le kit extraction ou un autre facteur (barcoding, opérateur, protocole). Prérequis pour la négociation d'harmonisation.
-- [ ] **Lancer les 8 runs HCL sur Bam2Beta** — métadonnées ONT HCL reçues (2026-04-14). Planifier le lancement PROD avec Bam2Beta, vérifier les seuils et intégrer les nouveaux samples dans la cohorte exploratory.
-
 ## Moyenne priorité
 
 ### Skills bioinformatiques
@@ -49,7 +47,13 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 ---
 
-# Partie 2 — Complété (par jour)
+# Partie 2 — En cours
+
+- [ ] **Lancer les 8 runs HCL sur Bam2Beta** — métadonnées ONT HCL reçues (2026-04-14). Planifier le lancement PROD avec Bam2Beta, vérifier les seuils et intégrer les nouveaux samples dans la cohorte exploratory.
+
+---
+
+# Partie 3 — Complété (par jour)
 
 ## 2026-04-14 — Aima-Tower : Batches A-F + refonte navigation
 
@@ -206,7 +210,7 @@ Session de livraisons successives post-phase-3, page `/exploration` refondue :
 
 ---
 
-# Partie 3 — En stand-by
+# Partie 4 — En stand-by
 
 Tâches identifiées mais bloquées (dépendance externe, info manquante, décision en attente). Ne pas mélanger avec "basse priorité" — ici c'est **bloqué**, pas juste **pas prioritaire**.
 
@@ -214,5 +218,12 @@ Format : `- [ ] **Titre** — raison du blocage. **Débloquer quand :** conditio
 
 ---
 
-**Why:** Issue de la rétrospective complète Claude Code du 13/04/2026 + investigation batch effect du 14/04/2026. Format 3-parties : à faire (Partie 1) / complété (Partie 2) / en stand-by (Partie 3).
-**How to apply:** Consulter la Partie 1 en début de session. Ajouter en tête de Partie 2 à chaque fin de session avec la date. Utiliser Partie 3 pour les tâches bloquées qu'on ne veut pas perdre mais qu'on ne peut pas avancer.
+**Why:** Issue de la rétrospective complète Claude Code du 13/04/2026 + investigation batch effect du 14/04/2026. Format 4-parties : à faire (Partie 1) / en cours (Partie 2) / complété (Partie 3) / en stand-by (Partie 4).
+**How to apply:** Consulter la Partie 1 en début de session. Déplacer une tâche en Partie 2 quand elle démarre activement. Ajouter en tête de Partie 3 à chaque fin de session avec la date. Utiliser Partie 4 pour les tâches bloquées qu'on ne veut pas perdre mais qu'on ne peut pas avancer.
+
+**Routing des requêtes utilisateur :**
+- "qu'est-ce qui est à faire" / "todo" / "à faire" → Partie 1
+- "qu'est-ce qui est en cours" / "en cours" → Partie 2
+- "qu'est-ce qui est fait" / "complété" / "historique" → Partie 3
+- "qu'est-ce qui est en stand-by" / "bloqué" → Partie 4
+- "montre la todo list" (sans précision) → Partie 1 + 2 (actif uniquement)
