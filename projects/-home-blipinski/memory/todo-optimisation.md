@@ -17,6 +17,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
 - [ ] **Harmoniser les protocoles wet-lab CGFL/HCL** — négociation labos sur kit extraction (Apostle vs Maxwell) et kit barcoding (NBD114-96 vs NBD114-24). Seule solution durable pour éliminer le batch effect inter-kit (amplificateur du biais EPIC→ONT de raima). Long terme.
 - [ ] **Expérience wet-lab contrôlée Apostle vs Maxwell** — même plasma sain → 2 aliquotes → Apostle + Maxwell en parallèle → ONT → comparer scores raima. Tranche définitivement si le driver du batch effect (17% FP HCL Healthy vs 2% CGFL) est le kit extraction ou un autre facteur (barcoding, opérateur, protocole). Prérequis pour la négociation d'harmonisation.
+
 ## Moyenne priorité
 
 - [ ] **Clean dossier `raw HCL` dans le bucket BAM** — nettoyage ciblé des fichiers obsolètes. ⚠️ Rappel golden rule S3 : aucune suppression sans confirmation explicite + lister les fichiers avant + vérifier qu'ils ne sont pas référencés dans trace-prod/trace-platform.
@@ -57,6 +58,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-04-15 — Housekeeping projets
+
+- [x] **Renommage projet `veille-scientifique` → `Aima-Survey`** : dossier renommé, 2 lignes crontab mises à jour, skill `/veille` migré (2 refs), CLAUDE.md du projet corrigé.
+- [x] **Git push Aima-Survey sur GitHub** : branche renommée `master` → `main`, remote `origin` configuré sur https://github.com/aima-dx/Aima-Survey.git, 2 commits poussés. Aucun secret dans les fichiers trackés (clé NCBI via `NCBI_API_KEY` env var).
+- [x] **Todo list restructurée** : ajout d'une Partie 2 "En cours" (entre À faire et Complété). Routing par section sauvé en mémoire Aima-Tower (`feedback_todo_sections.md`).
 
 ## 2026-04-14 — Aima-Tower : Batches A-F + refonte navigation
 
