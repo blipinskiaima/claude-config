@@ -12,6 +12,13 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 1 — À faire (par priorité)
 
+## Pour demain (2026-04-16)
+
+- [ ] **Aima-Survey** — avancer sur le projet (automatisation veille, enrichissement abstracts).
+- [ ] **Check prod Healthy** — vérifier l'état de production des samples Healthy.
+- [ ] **Nouveau client** — suivre la prise en charge (relance / réponse au premier mail).
+- [ ] **Seqera AI** — finir la prise en main du CLI et de l'API.
+
 ## Haute priorité
 
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
