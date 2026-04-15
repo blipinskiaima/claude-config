@@ -54,6 +54,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [ ] **Lancer les 8 runs HCL sur Bam2Beta** — métadonnées ONT HCL reçues (2026-04-14). Planifier le lancement PROD avec Bam2Beta, vérifier les seuils et intégrer les nouveaux samples dans la cohorte exploratory.
 - [ ] **Sauvegarde des données HCL sur S3** — upload des BAM et POD5 des 8 runs HCL vers les buckets dédiés (BAM + POD5). Vérifier `local_count == s3_count` après sync, retry en boucle si besoin (bug skip Scaleway).
+- [ ] **Import metadata HCL depuis gsheet** — 282 samples importés le 15/04, 32 Healthy (111-142) absents de la table `samples` (pas encore intégrés). Cron one-shot auto-destructif planifié 16/04 12h Paris pour re-lancer `import-metadata liquid HCL` après intégration des nouveaux samples.
 
 ---
 
