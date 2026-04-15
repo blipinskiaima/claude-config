@@ -50,6 +50,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 # Partie 2 — En cours
 
 - [ ] **Lancer les 8 runs HCL sur Bam2Beta** — métadonnées ONT HCL reçues (2026-04-14). Planifier le lancement PROD avec Bam2Beta, vérifier les seuils et intégrer les nouveaux samples dans la cohorte exploratory.
+- [ ] **Sauvegarde des données HCL sur S3** — upload des BAM et POD5 des 8 runs HCL vers les buckets dédiés (BAM + POD5). Vérifier `local_count == s3_count` après sync, retry en boucle si besoin (bug skip Scaleway).
 
 ---
 
