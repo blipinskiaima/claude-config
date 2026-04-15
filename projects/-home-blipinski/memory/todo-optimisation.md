@@ -65,6 +65,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Renommage projet `veille-scientifique` → `Aima-Survey`** : dossier renommé, 2 lignes crontab mises à jour, skill `/veille` migré (2 refs), CLAUDE.md du projet corrigé.
 - [x] **Git push Aima-Survey sur GitHub** : branche renommée `master` → `main`, remote `origin` configuré sur https://github.com/aima-dx/Aima-Survey.git, 2 commits poussés. Aucun secret dans les fichiers trackés (clé NCBI via `NCBI_API_KEY` env var).
 - [x] **Todo list restructurée** : ajout d'une Partie 2 "En cours" (entre À faire et Complété). Routing par section sauvé en mémoire Aima-Tower (`feedback_todo_sections.md`).
+- [x] **trace-workflow multi-workspace** — ajout workspace `aima-diagnostics` en plus du perso via filtre `ALLOWED_ORGS`. Migration DB idempotente (`workspace_id`), 15 957 workflows existants préservés.
+- [x] **Prise en main CLI Seqera** — `seqera ai --headless` (via skill `/seqera`) pour les questions NL, et API REST directe (`/user-info`, `/workflow?workspaceId=`) utilisée par `trace-workflow`.
 
 ## 2026-04-14 — Aima-Tower : Batches A-F + refonte navigation
 
