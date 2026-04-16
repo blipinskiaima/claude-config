@@ -72,6 +72,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Aima-Survey — requêtes PubMed enrichies** — 10 requêtes (vs 6) avec filtres `humans[mesh]` sur axes cliniques + `NOT review[Publication Type]` partout + 3 nouveaux axes (fragmentomics, modkit/dorado, 5hmC) + filet haut-impact (Nature/Genome Biology/NAR...).
 - [x] **Prendre en main automate veille scientifique** — projet exploré en profondeur (agent-explore), flux cron → PubMed E-utilities → markdown compris, évolutions majeures apportées dans la foulée (cf. entrées ci-dessus).
 - [x] **Aima-Tower — page Survey polish & perf** — filtres redesignés (InputGroup avec icônes, persistence session, compact `size="sm"`), lazy-render des onglets (payload Day 170→15 KB soit -91%, Week 278→104 KB soit -62%), `dbc.Collapse` par card remplacé par `html.Div` + toggle `style.display` (mount React plus rapide), UI note retirée (backend préservé). Commit `d1d8486`.
+- [x] **Agent de veille enrichi** — `scorer.py` Claude Haiku 4.5 : score 0-10 + why + tags par article dans Aima-Survey, cache SQLite `scoring_cache.db`, rendu via span `score-badge` + bullet `**IA**` dans le markdown. Commit Aima-Survey `85036d0`.
+- [x] **Aima-Tower — scoring IA intégré dans /survey** — parser étendu (`score`, `why`), badge `IA X/10` coloré (vert ≥7 / jaune 4-6 / gris <4), ligne justification en italique, slider "Score min" 0-10, tri multi-critères `(priorité, score desc, None en fin, date desc)`, rétrocompatible rapports pré-scoring.
 
 ## 2026-04-15 — Housekeeping projets
 
