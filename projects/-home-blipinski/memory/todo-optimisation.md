@@ -49,7 +49,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 2** : installer `gitleaks` en pre-commit hook sur les projets gittés.
 - [ ] **Sécurité secrets — étape 3** : évaluer un gestionnaire de secrets (sops, age, vault).
 - [ ] **Skill save-code pour trace-prod** — automatiser la sauvegarde de session.
-- [ ] **Projet Aima-Survey — automatisation complète** — remplacer les MCP inexistants (DuckDB, S3, Ensembl, NCBI) par des skills ou scripts. Scoring IA = fait (04-16). Dashboard = fait (04-16, cf. Aima-Tower page Survey).
+- [ ] **Aima-Survey — évaluer remplacement MCPs inexistants** — seul point restant du chantier "automatisation complète" : statuer si les MCPs DuckDB/S3/Ensembl/NCBI sont utiles ou si les scripts Python directs (PubMed E-utilities + SQLite) suffisent. Scoring IA + dashboard + email quotidien = faits le 04-16.
 - [ ] **Skills Pod2Bam** — créer test/qualif/maj analogues à Bam2Beta. Pas urgent tant que Pod2Bam n'est pas soumis à audit qualité.
 
 ---
@@ -74,6 +74,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Aima-Tower — page Survey polish & perf** — filtres redesignés (InputGroup avec icônes, persistence session, compact `size="sm"`), lazy-render des onglets (payload Day 170→15 KB soit -91%, Week 278→104 KB soit -62%), `dbc.Collapse` par card remplacé par `html.Div` + toggle `style.display` (mount React plus rapide), UI note retirée (backend préservé). Commit `d1d8486`.
 - [x] **Agent de veille enrichi** — `scorer.py` Claude Haiku 4.5 : score 0-10 + why + tags par article dans Aima-Survey, cache SQLite `scoring_cache.db`, rendu via span `score-badge` + bullet `**IA**` dans le markdown. Commit Aima-Survey `85036d0`.
 - [x] **Aima-Tower — scoring IA intégré dans /survey** — parser étendu (`score`, `why`), badge `IA X/10` coloré (vert ≥7 / jaune 4-6 / gris <4), ligne justification en italique, slider "Score min" 0-10, tri multi-critères `(priorité, score desc, None en fin, date desc)`, rétrocompatible rapports pré-scoring.
+- [x] **Aima-Survey — dédup cross-jours + fenêtre 7j + docs** — table SQLite `sent_articles` qui filtre les PMIDs déjà envoyés (évite le spam quand cron passe à `--days 7`). Cron daily 1j → 7j : rattrape les papiers avec `pdat` indexé en retard (ex: fRagmentomics PMID 41886314 loupé en `--days 1`). README.md créé, CLAUDE.md réécrit (stack + conventions + historique v1→v5), 2 mémoires Claude : `email_sending.md`, `scoring_and_dedup.md`. Commit Aima-Survey `08328ae`.
 
 ## 2026-04-15 — Housekeeping projets
 
