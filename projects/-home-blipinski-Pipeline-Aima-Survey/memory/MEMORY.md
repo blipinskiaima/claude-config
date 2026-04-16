@@ -1,1 +1,2 @@
 - [Email sending](email_sending.md) — Aima-Survey envoie via email-hub (Redis/BullMQ), pas SMTP direct (port 587 bloqué Scaleway)
+- [Scoring & dédup](scoring_and_dedup.md) — 2 caches SQLite dans data/scoring_cache.db (scores Haiku + sent_articles anti-spam)

@@ -37,3 +37,7 @@ Definir les fonctions helper AVANT leur premier appel dans la boucle. UnboundLoc
 Rebuild rapide : `docker compose down && docker compose build && docker compose up -d`
 Restart sans rebuild (si seul CSS change dans assets/) : `docker compose restart`
 Note : `COPY src/` dans Dockerfile invalide le cache a chaque modif src/.
+
+## Page Survey — patterns
+
+Parser extensible, lazy tabs, state atomique, scoring IA découplé, persistence session. Tous les patterns réutilisables consolidés dans [survey_patterns.md](survey_patterns.md).
