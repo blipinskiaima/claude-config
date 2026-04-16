@@ -1,0 +1,1 @@
+- [Email sending](email_sending.md) — Aima-Survey envoie via email-hub (Redis/BullMQ), pas SMTP direct (port 587 bloqué Scaleway)

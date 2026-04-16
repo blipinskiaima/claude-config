@@ -13,7 +13,7 @@ Lis et analyse les rapports de veille PubMed generes automatiquement par le cron
 
 1. **Lire les derniers rapports** :
    ```bash
-   ls -lt ~/Pipeline/veille-scientifique/reports/ | head -5
+   ls -lt ~/Pipeline/Aima-Survey/reports/ | head -5
    ```
    Lis le rapport le plus recent (ou celui des N derniers jours si --days specifie).
 
@@ -39,7 +39,7 @@ Lis et analyse les rapports de veille PubMed generes automatiquement par le cron
 
 4. **Si aucun rapport recent** : lancer manuellement la veille
    ```bash
-   cd ~/Pipeline/veille-scientifique && python3 veille.py --days 7 --report
+   cd ~/Pipeline/Aima-Survey && python3 veille.py --days 7 --report
    ```
 
 ## Options
