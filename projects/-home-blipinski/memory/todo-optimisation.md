@@ -49,7 +49,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 2** : installer `gitleaks` en pre-commit hook sur les projets gittés.
 - [ ] **Sécurité secrets — étape 3** : évaluer un gestionnaire de secrets (sops, age, vault).
 - [ ] **Skill save-code pour trace-prod** — automatiser la sauvegarde de session.
-- [ ] **Projet Aima-Survey (ex veille-scientifique) : automatisation complète** — remplacer les MCP inexistants (DuckDB, S3, Ensembl, NCBI) par des skills ou scripts, enrichir l'analyse des abstracts par Claude, intégrer les résultats dans un dashboard.
+- [ ] **Projet Aima-Survey — automatisation complète** — remplacer les MCP inexistants (DuckDB, S3, Ensembl, NCBI) par des skills ou scripts, enrichir l'analyse des abstracts par Claude (pertinence AIMA en bulk). Dashboard = fait (04-16, cf. Aima-Tower page Survey).
 - [ ] **Agent de veille enrichi** — ajouter l'analyse automatique des abstracts par Claude (pertinence AIMA).
 - [ ] **Skills Pod2Bam** — créer test/qualif/maj analogues à Bam2Beta. Pas urgent tant que Pod2Bam n'est pas soumis à audit qualité.
 
@@ -66,8 +66,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-04-16 — Aima-Survey : envoi email quotidien + requêtes enrichies
+## 2026-04-16 — Aima-Survey + Aima-Tower : email quotidien + page Survey intégrée
 
+- [x] **Aima-Tower — page Survey intégrée** — nouvelle route `/survey` consommant les rapports markdown Aima-Survey. Vue Jour/Semaine avec onglets rubriques, filtres combinables (recherche + priorité + rubrique + journal + date + état lu/non-lu), synthèse IA par article à la demande (claude-sonnet-4-6), marquage vu/non-vu avec badge navbar, favoris avec notes inline. Bug `TOP_N=10` fixé côté `veille.py` (tous les articles exportés). Commit `91c545d`.
 - [x] **Aima-Survey — envoi email quotidien** — `veille.py` refactoré : envoi via email-hub (Redis/BullMQ), contourne le port 587 bloqué Scaleway. Badges date/priorité HTML, dédup par PMID + tri priorité > date. `run_veille.sh` wrapper + `.env` chmod 600 gitignoré. Cron daily 8h00 opérationnel (email envoyé uniquement si ≥1 publication).
 - [x] **Aima-Survey — requêtes PubMed enrichies** — 10 requêtes (vs 6) avec filtres `humans[mesh]` sur axes cliniques + `NOT review[Publication Type]` partout + 3 nouveaux axes (fragmentomics, modkit/dorado, 5hmC) + filet haut-impact (Nature/Genome Biology/NAR...).
 - [x] **Prendre en main automate veille scientifique** — projet exploré en profondeur (agent-explore), flux cron → PubMed E-utilities → markdown compris, évolutions majeures apportées dans la foulée (cf. entrées ci-dessus).
