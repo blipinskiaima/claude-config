@@ -65,6 +65,13 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-04-20 — Aima-Tower /exploration : refresh + UX filtres + slider VAF
+
+- [x] **Aima-Tower /exploration — bouton Refresh** — bouton dans le header qui appelle `exploratory_service.reload()` + invalide le cache LRU + toast de confirmation. Évite le `docker compose restart` quand de nouveaux samples arrivent dans trace-prod.
+- [x] **Aima-Tower /exploration — défaut Dorado = ge5** — filtre version Dorado par défaut passé de `v5.0.0` strict à `Toutes (≥ 5.0)` (option en première position). Reset filters aligné. Couvre v5.0.0 + v5.2.0 d'office (~270 healthy au lieu de 148).
+- [x] **Aima-Tower /exploration — filtres avancés en collapse** — selects (indications, cancer actif, dorado, kit, rebasecalled) déplacés dans un `dbc.Collapse` togglé par bouton "Filtres avancés ▾". Bouton aligné avec Seuils/Cohorte/Reset/Export sur une seule barre du bas.
+- [x] **Aima-Tower /exploration — slider VAF_LIMIT** — `VAF_LIMIT` (seuil high/low VAF du tableau stratifié) exposé en slider 0.5–5.0 (défaut 2.0) à côté de Spec/Profondeur. Câblé dans `compute()`, `_compute_stratified()`, callbacks tab/thresholds/reset/permalink/restore_url/download.
+
 ## 2026-04-16 — Aima-Survey + Aima-Tower : email quotidien + page Survey intégrée
 
 - [x] **Aima-Tower — page Survey intégrée** — nouvelle route `/survey` consommant les rapports markdown Aima-Survey. Vue Jour/Semaine avec onglets rubriques, filtres combinables (recherche + priorité + rubrique + journal + date + état lu/non-lu), synthèse IA par article à la demande (claude-sonnet-4-6), marquage vu/non-vu avec badge navbar, favoris avec notes inline. Bug `TOP_N=10` fixé côté `veille.py` (tous les articles exportés). Commit `91c545d`.
