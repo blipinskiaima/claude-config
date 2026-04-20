@@ -1,23 +1,29 @@
 ---
-name: Scoring IA et dédup cross-jours
-description: Mécanisme de scoring Claude Haiku + cache SQLite + dédup qui empêche le spam email dans Aima-Survey
+name: Scoring IA et dédup cross-jours (v6)
+description: Mécanisme scoring Claude Haiku 4.5 sur DuckDB + anti-spam email via colonne email_sent_at
 type: project
-originSessionId: b90afe98-d10b-470a-abbd-8297ffeb430d
+originSessionId: 39895026-ccd6-4902-95d9-095b93ed61ed
 ---
-Aima-Survey embarque 2 caches SQLite dans `data/scoring_cache.db` :
+## Refonte v6 (2026-04-20)
 
-**Table `scores`** — cache des scores IA par PMID (pour ne pas re-scorer un article vu 2 fois).
-Colonnes : `pmid, score, why, tags, model, scored_at`.
+**OBSOLÈTE** : l'ancienne DB `data/scoring_cache.db` (SQLite avec 2 tables `scores` + `sent_articles`). Remplacée par la table `articles` de `data/aima_survey.duckdb`.
 
-**Table `sent_articles`** — liste des PMIDs déjà envoyés par email.
-Colonnes : `pmid, first_sent_at`.
+### Scoring
 
-**Why:** Le cron daily tourne en `--days 7` (fenêtre glissante) pour rattraper les papiers indexés en retard par PubMed (`pdat` parfois mois-seul ou futur). Sans dédup, chaque article apparaitrait 7 jours d'affilée dans les emails. La dédup `sent_articles` garantit qu'un PMID n'est envoyé qu'une fois.
+- Module : `lib/scorer.py` (plus `scorer.py` à la racine, supprimé)
+- Modèle : `claude-haiku-4-5` (prompt système inchangé depuis v4)
+- Cache : `WHERE score IS NULL` — un article scoré reste scoré (sauf `cli.py score --force`)
+- Les scores migrés depuis l'ancien SQLite ont été réinjectés via `cli.py migrate`
 
-**How to apply:**
-- Le filtre dédup ne s'applique QUE si `--email` est passé. Un run manuel `--report` sans `--email` montre tout.
-- Les PMIDs sont marqués comme envoyés SEULEMENT si `send_email_via_hub` retourne True (pas de marquage si l'envoi échoue).
-- Pour "reset" la dédup (ex: reforce un renvoi) : `DELETE FROM sent_articles WHERE pmid IN (...)`.
-- Le scoring cache est orthogonal : il reste peuplé même si on reset le dédup (évite le coût API).
-- Claude Haiku enveloppe parfois sa réponse en ```json ... ```. `scorer.py` strip le fence avant `json.loads`.
-- Tri final des articles : priorité asc > score desc (None en dernier) > date desc.
+### Anti-spam email
+
+- Colonne `email_sent_at` (TIMESTAMP, NULL par défaut) sur la table `articles`
+- `db.mark_email_sent(src, eid)` utilise `COALESCE(email_sent_at, now())` pour ne JAMAIS écraser un timestamp existant → idempotent par construction
+- Le nouveau `veille.py` filtre `email_sent_at IS NULL` uniquement si `--email` est passé
+
+**Why :** L'UPSERT d'un article via `upsert_article` préserve `email_sent_at` (cf. `database_schema.md`). Donc re-fetcher un article déjà envoyé ne le renverra pas.
+
+**How to apply :**
+- Reset dédup d'un article : `python3 cli.py query "UPDATE articles SET email_sent_at = NULL WHERE external_id = 'XXX'"` (nécessite mode write — utiliser l'API Python directement).
+- Claude Haiku wrappe parfois sa réponse en `\`\`\`json ... \`\`\`` : `lib/scorer.py::score_one` strip les fences avant `json.loads`.
+- Tri final des articles pour le render : priorité asc > score desc (NULLs en fin) > pub_date desc.

@@ -41,3 +41,7 @@ Note : `COPY src/` dans Dockerfile invalide le cache a chaque modif src/.
 ## Page Survey — patterns
 
 Parser extensible, lazy tabs, state atomique, scoring IA découplé, persistence session. Tous les patterns réutilisables consolidés dans [survey_patterns.md](survey_patterns.md).
+
+## Intégration DuckDB Aima-Survey (v6 — 2026-04-20)
+
+Vues `month` et `all` lisent `~/Pipeline/Aima-Survey/data/aima_survey.duckdb` en READ_ONLY (retry backoff), fallback markdown si DB KO. Day/week inchangés. Traduction `queries_matched` (names) → `categories` (descriptions humaines) via `queries.json`. Détails : [survey_duckdb_integration.md](survey_duckdb_integration.md)

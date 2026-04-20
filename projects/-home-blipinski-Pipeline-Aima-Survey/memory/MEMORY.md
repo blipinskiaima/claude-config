@@ -1,2 +1,5 @@
 - [Email sending](email_sending.md) — Aima-Survey envoie via email-hub (Redis/BullMQ), pas SMTP direct (port 587 bloqué Scaleway)
-- [Scoring & dédup](scoring_and_dedup.md) — 2 caches SQLite dans data/scoring_cache.db (scores Haiku + sent_articles anti-spam)
+- [Scoring & dédup](scoring_and_dedup.md) — scoring Claude Haiku 4.5 sur DuckDB v6 (WHERE score IS NULL) + anti-spam email via email_sent_at COALESCE
+- [Database schema v6](database_schema.md) — DuckDB single-table multi-source (PK composite), stratégie UPSERT+COALESCE, piège DuckDB CURRENT_TIMESTAMP
+- [Migration v5→v6](migration_history.md) — consolidation 4 sources (SQLite scoring + 2 JSON Tower) vers aima_survey.duckdb, ordre bookmarks→scores→sent→seen, stub title pour PMIDs orphelins
+- [Multi-sources architecture](multi_source_architecture.md) — convention lib/sources/, registre dict, ajout d'une nouvelle source en 3 étapes sans refactor
