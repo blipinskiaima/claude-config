@@ -71,6 +71,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Aima-Tower /exploration — défaut Dorado = ge5** — filtre version Dorado par défaut passé de `v5.0.0` strict à `Toutes (≥ 5.0)` (option en première position). Reset filters aligné. Couvre v5.0.0 + v5.2.0 d'office (~270 healthy au lieu de 148).
 - [x] **Aima-Tower /exploration — filtres avancés en collapse** — selects (indications, cancer actif, dorado, kit, rebasecalled) déplacés dans un `dbc.Collapse` togglé par bouton "Filtres avancés ▾". Bouton aligné avec Seuils/Cohorte/Reset/Export sur une seule barre du bas.
 - [x] **Aima-Tower /exploration — slider VAF_LIMIT** — `VAF_LIMIT` (seuil high/low VAF du tableau stratifié) exposé en slider 0.5–5.0 (défaut 2.0) à côté de Spec/Profondeur. Câblé dans `compute()`, `_compute_stratified()`, callbacks tab/thresholds/reset/permalink/restore_url/download.
+- [x] **Aima-Tower /exploration — headers dynamiques tableau stratifié** — colonnes `VAF > X%` / `0 < VAF <= X%` du tableau Sensibilité Stratifiée suivent le slider VAF en temps réel (format `:g`, ex. 2.0 → "2"). `vaf_limit` threadé via `_build_one_side` → `_build_tables_content`.
 
 ## 2026-04-16 — Aima-Survey + Aima-Tower : email quotidien + page Survey intégrée
 
