@@ -18,6 +18,11 @@
 
 - [Todo optimisation](todo-optimisation.md) — Tâches restantes après rétrospective (batch effect, Aima-Tower, sécurité, MethylBERT...)
 
+## Side business & carrière
+
+- [Side business](side-business.md) — Projet bioinfo non-clinique, 4 pistes retenues (consulting acad, BaaS PME, library premium, formation B2B), périmètre en 7 dimensions, étape en cours : validation synthèse 1 phrase
+- [Rémunération & package](remuneration-package.md) — Salaire 47,1k€ + 200 BSPCE + 100% TT, cible négo 50-56k€, leviers et arguments marché 2026
+
 ## Points clés
 
 - Boris = bioinformaticien unique AIMA, bus factor = 1, 20 projets dans ~/Pipeline/
