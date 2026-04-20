@@ -1,6 +1,6 @@
 # Synthèse valeur ajoutée — Boris Blipinski (AIMA Diagnostics)
 
-Dernière mise à jour : 20/03/2026. Couvre la période sept 2025 – mars 2026.
+Dernière mise à jour : 20/04/2026. Couvre la période sept 2025 – avril 2026.
 
 ## Bullet points de valeur
 
@@ -58,10 +58,27 @@ Dernière mise à jour : 20/03/2026. Couvre la période sept 2025 – mars 2026.
 
 - **Bus factor = 1** sur l'ensemble du stack bioinformatique : risque pour AIMA, mais preuve d'une charge technique justifiant 2-3 personnes.
 
+### Livraisons mars-avril 2026 (ajout 2026-04-20)
+
+- **Pivot Aima-Tower vers outil ISO 15189 opérationnel** (14/04/2026) : page `/qualite` dédiée à la qualité pipeline avec drift plot, snapshots JSONL versionnés, rapport HTML imprimable signé SHA-256, onglet ML Details, onglet Confrontation CGFL vs HCL — transformation stratégique d'un dashboard exploration en support de certification.
+
+- **Réimplémentation Python de run_pipeline.R (ExploratoryAnalysisService)** : phases 1-3 terminées, 28/28 tests cross-validés R ↔ pandas, sortie de la dépendance R pour la consommation Dash → fiabilité et performance du dashboard.
+
+- **Aima-Survey v2** (ex-veille-scientifique) : renommage, push GitHub, scoring Claude Haiku 4.5, dédup SQLite, cron daily + hebdo, intégration Aima-Tower — veille scientifique industrialisée.
+
+- **Outillage IA interne étendu** : création des skills `/audit-trail`, `/compare-batches`, `/correlation`, `/qc-report`, `/batch-effect` (5 nouveaux skills bioinformatiques), industrialisation du workflow d'investigation.
+
+- **Investigation ComBat-Met menée à son terme** : projet complet créé, 4 variantes testées, conclusion argumentée de non-rétention pour production (documenté dans `batch-effect-investigation.md`) — protection ISO 15189 contre une correction statistique qui aurait été non auditable.
+
+- **trace-workflow multi-workspace** (15/04) : ajout du workspace `aima-diagnostics` en plus de `community`, monitoring consolidé.
+
+- **Prise en main du CLI Seqera** : intégration au sous-agent `/seqera`, automatisation des requêtes Tower.
+
 ## Données sources
 
 - `~/boris_notes_extract.txt` — 75 entrées daily standup (sept 2025 – mars 2026)
 - `~/Notes_Team_Meetings.txt` + `~/Notes_Team_Meetings (1).txt` — Réunions équipe 2025-2026
 - `~/Notes_Team_Meetings (2).txt` — Réunions équipe janv-mars 2026 (source ajoutée 20/03/2026)
-- `~/Pipeline/` — 16 projets analysés (code, README, configs, git logs)
+- `~/Pipeline/` — 24 projets analysés (code, README, configs, git logs) — état 2026-04-20
 - `~/.claude/projects/*/memory/` — Mémoires projets Pipeline (IA, Pod2Bam, trace-prod, Bam2Beta, short-read, SampleSheetChecker)
+- `~/.claude/projects/-home-blipinski/memory/todo-optimisation.md` — chantiers mars-avril 2026
