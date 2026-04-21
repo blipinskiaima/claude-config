@@ -47,7 +47,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 2** : installer `gitleaks` en pre-commit hook sur les projets gittés.
 - [ ] **Sécurité secrets — étape 3** : évaluer un gestionnaire de secrets (sops, age, vault).
 - [ ] **Skill save-code pour trace-prod** — automatiser la sauvegarde de session.
-- [ ] **Aima-Survey — évaluer remplacement MCPs inexistants** — seul point restant du chantier "automatisation complète" : statuer si les MCPs DuckDB/S3/Ensembl/NCBI sont utiles ou si les scripts Python directs (PubMed E-utilities + SQLite) suffisent. Scoring IA + dashboard + email quotidien = faits le 04-16.
 - [ ] **Skills Pod2Bam** — créer test/qualif/maj analogues à Bam2Beta. Pas urgent tant que Pod2Bam n'est pas soumis à audit qualité.
 
 ---
