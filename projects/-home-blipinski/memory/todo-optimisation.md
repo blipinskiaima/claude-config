@@ -14,7 +14,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 ## Pour demain (2026-04-16)
 
-- [ ] **Check prod Healthy** — vérifier l'état de production des samples Healthy.
 - [ ] **Nouveau client** — suivre la prise en charge (relance / réponse au premier mail).
 - [ ] **Seqera AI** — finir la prise en main du CLI et de l'API.
 
@@ -57,8 +56,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 2 — En cours
 
-- [ ] **Lancer les 8 runs HCL sur Bam2Beta** — métadonnées ONT HCL reçues (2026-04-14). Planifier le lancement PROD avec Bam2Beta, vérifier les seuils et intégrer les nouveaux samples dans la cohorte exploratory.
-- [ ] **Sauvegarde des données HCL sur S3** — upload des BAM et POD5 des 8 runs HCL vers les buckets dédiés (BAM + POD5). Vérifier `local_count == s3_count` après sync, retry en boucle si besoin (bug skip Scaleway).
 - [ ] **Import metadata HCL depuis gsheet** — 282 samples importés le 15/04, 32 Healthy (111-142) absents de la table `samples` (pas encore intégrés). Cron one-shot auto-destructif planifié 16/04 12h Paris pour re-lancer `import-metadata liquid HCL` après intégration des nouveaux samples.
 - [ ] **Prise en charge nouveau client** — premier mail envoyé, en attente de retour.
 
@@ -66,9 +63,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-04-21 — Aima-Tower : sécurisation HTTPS + basic auth
+## 2026-04-21 — Aima-Tower sécurisation + HCL runs + backup S3 + check Healthy
 
 - [x] **Sécurisation Aima-Tower HTTPS + basic auth** — Caddy reverse proxy + cert Let's Encrypt auto (TLS-ALPN-01) + `basic_auth` bcrypt cost=14 (user `aima`), port 8050 fermé à Internet (`expose:` au lieu de `ports:`), `SECRET_KEY` Flask depuis `.env` + `SESSION_COOKIE_SECURE=True`. `.env` retiré du tracking git (était pushé sur `aima-dx/Aima-Tower` — incident détecté et documenté). Rotation secrets Anthropic/Seqera reportée (repo privé, Boris seul dev). Commits `a2321e1` (Aima-Tower) + `bee7b2e` (claude-config). URL prod : `https://tower.aima-diagnostics.com`. Détails mémoire : `security_setup.md`, `project_env_leak.md`.
+- [x] **32 samples HCL Bam2Beta** — lancés en PROD, nouveaux samples intégrés dans la cohorte exploratory.
+- [x] **Sauvegarde HCL sur S3** — BAM + POD5 des 32 samples uploadés, counts vérifiés.
+- [x] **Check prod Healthy** — état de production des samples Healthy vérifié.
 
 ## 2026-04-20 — Aima-Tower /exploration : refresh + UX filtres + slider VAF
 
