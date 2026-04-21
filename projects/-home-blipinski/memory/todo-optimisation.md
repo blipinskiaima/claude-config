@@ -26,6 +26,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 ## Moyenne priorité
 
+- [ ] **Rotation secrets Aima-Tower compromis** — `.env` était tracked dans git jusqu'au 2026-04-21 (historique pushé sur `aima-dx/Aima-Tower`, repo privé). Révoquer `ANTHROPIC_API_KEY` (console.anthropic.com > API Keys) + `accessToken` Seqera (cloud.seqera.io > Tokens), regénérer les 2 et mettre à jour `.env` local + `docker compose restart`. Voir `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/project_env_leak.md`.
 - [ ] **Clean dossier `raw HCL` dans le bucket BAM** — nettoyage ciblé des fichiers obsolètes. ⚠️ Rappel golden rule S3 : aucune suppression sans confirmation explicite + lister les fichiers avant + vérifier qu'ils ne sont pas référencés dans trace-prod/trace-platform.
 
 ### Skills bioinformatiques
