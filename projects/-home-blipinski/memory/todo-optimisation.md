@@ -20,8 +20,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## Haute priorité
 
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
-- [ ] **Harmoniser les protocoles wet-lab CGFL/HCL** — négociation labos sur kit extraction (Apostle vs Maxwell) et kit barcoding (NBD114-96 vs NBD114-24). Seule solution durable pour éliminer le batch effect inter-kit (amplificateur du biais EPIC→ONT de raima). Long terme.
-- [ ] **Expérience wet-lab contrôlée Apostle vs Maxwell** — même plasma sain → 2 aliquotes → Apostle + Maxwell en parallèle → ONT → comparer scores raima. Tranche définitivement si le driver du batch effect (17% FP HCL Healthy vs 2% CGFL) est le kit extraction ou un autre facteur (barcoding, opérateur, protocole). Prérequis pour la négociation d'harmonisation.
 
 ## Moyenne priorité
 
