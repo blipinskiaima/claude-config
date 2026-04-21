@@ -68,7 +68,22 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Sauvegarde HCL sur S3** — BAM + POD5 des 32 samples uploadés, counts vérifiés.
 - [x] **Check prod Healthy** — état de production des samples Healthy vérifié.
 
-## 2026-04-20 — Aima-Tower /exploration : refresh + UX filtres + slider VAF
+## 2026-04-20 — Aima-Survey refonte v6 + Aima-Tower /survey + /exploration
+
+### Aima-Survey — refonte v6 (8 commits)
+
+- [x] **Aima-Survey v6 — DuckDB single-table multi-source** — `lib/db.py` + table `articles` avec colonnes `external_id`, `source`, `score`, `score_why`, `first_seen_at` (commits `636f83b`, `a65a4e7`, `af1341b`, `fa13c65`, `30b6587`, `939a0bd`).
+- [x] **Aima-Survey v6 — CLI Click complet** — `cli.py` : `add`/`remove`/`list`/`query`/`stats`/`export`/`backfill`. `veille.py` refactoré pour lire la DB + nouveau `lib/render.py` dédié markdown.
+- [x] **Aima-Survey — fusion rubriques + +5 rubriques** — fusion ctDNA+cancer, fusion outils, suppression high_impact_journals (`4fec01a`) ; ajout MRD, MCED, tissue-origin, ML classifiers, EPIC/Illumina (`73ff597`). Total 12 rubriques.
+
+### Aima-Tower /survey — intégration DuckDB v6 (13 commits)
+
+- [x] **Tower /survey — lit `aima_survey.duckdb`** — `SurveyService._articles_from_duckdb` pour vues mois/all (READ_ONLY + retry backoff), fallback markdown si DB KO. Config paths + mount Docker Aima-Survey (commits `93958bd`, `2183bc3`).
+- [x] **Tower /survey — 5 vues temporelles** — jour / semaine (défaut) / mois / all / **Favoris** (5e mode, `4d5cd27`). Semaine par défaut à chaque ouverture (`7a10c12`), suppression DatePickerRange + slider Score IA min (`702f520`), suppression onglet "Top articles" vue Semaine (`19f1197`).
+- [x] **Tower /survey — fixes parser + onglets** — un article ne peut être que dans un seul onglet rubrique (`de66540`), vue Mois filtre strictement `pub_date` (retire OR first_seen_at, `cb75f4f`), `get_article_by_pmid` lit aussi la DuckDB (`acfce9e`), catégories obsolètes → "Autres", traduction vieilles descriptions markdown, filtre catégories obsolètes parser + maj labels.
+- [x] **Tower /survey — UX polish** — spinner `dots` pendant génération synthèse IA, header "Vue Jour" harmonisé, script one-shot maj descriptions favoris post-fusion. Pagination 50 par onglet testée puis revert.
+
+### Aima-Tower /exploration — refresh + UX filtres + slider VAF
 
 - [x] **Aima-Tower /exploration — bouton Refresh** — bouton dans le header qui appelle `exploratory_service.reload()` + invalide le cache LRU + toast de confirmation. Évite le `docker compose restart` quand de nouveaux samples arrivent dans trace-prod.
 - [x] **Aima-Tower /exploration — défaut Dorado = ge5** — filtre version Dorado par défaut passé de `v5.0.0` strict à `Toutes (≥ 5.0)` (option en première position). Reset filters aligné. Couvre v5.0.0 + v5.2.0 d'office (~270 healthy au lieu de 148).
