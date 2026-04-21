@@ -65,6 +65,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-04-21 — Aima-Tower : sécurisation HTTPS + basic auth
+
+- [x] **Sécurisation Aima-Tower HTTPS + basic auth** — Caddy reverse proxy + cert Let's Encrypt auto (TLS-ALPN-01) + `basic_auth` bcrypt cost=14 (user `aima`), port 8050 fermé à Internet (`expose:` au lieu de `ports:`), `SECRET_KEY` Flask depuis `.env` + `SESSION_COOKIE_SECURE=True`. `.env` retiré du tracking git (était pushé sur `aima-dx/Aima-Tower` — incident détecté et documenté). Rotation secrets Anthropic/Seqera reportée (repo privé, Boris seul dev). Commits `a2321e1` (Aima-Tower) + `bee7b2e` (claude-config). URL prod : `https://tower.aima-diagnostics.com`. Détails mémoire : `security_setup.md`, `project_env_leak.md`.
+
 ## 2026-04-20 — Aima-Tower /exploration : refresh + UX filtres + slider VAF
 
 - [x] **Aima-Tower /exploration — bouton Refresh** — bouton dans le header qui appelle `exploratory_service.reload()` + invalide le cache LRU + toast de confirmation. Évite le `docker compose restart` quand de nouveaux samples arrivent dans trace-prod.
