@@ -45,3 +45,15 @@ Parser extensible, lazy tabs, state atomique, scoring IA découplé, persistence
 ## Intégration DuckDB Aima-Survey (v6 — 2026-04-20)
 
 Vues `month` et `all` lisent `~/Pipeline/Aima-Survey/data/aima_survey.duckdb` en READ_ONLY (retry backoff), fallback markdown si DB KO. Day/week inchangés. Traduction `queries_matched` (names) → `categories` (descriptions humaines) via `queries.json`. Détails : [survey_duckdb_integration.md](survey_duckdb_integration.md)
+
+## Sécurité Tower (2026-04-21)
+
+Tower accessible via `https://tower.aima-diagnostics.com` (Caddy reverse proxy + basic auth bcrypt + Let's Encrypt). Port 8050 non exposé à Internet. Password dans gestionnaire de mdp AIMA. Détails : [security_setup.md](security_setup.md)
+
+## Sécurité — approche pragmatique
+
+Boris valide le scope discipline en sécu : couches par iteration (Caddy d'abord, Security Group plus tard). Détails : [feedback_security_pragmatism.md](feedback_security_pragmatism.md)
+
+## Incident `.env` tracked dans git
+
+`.env` était tracked dans git jusqu'au 2026-04-21 (repo privé). Retiré via `git rm --cached`. Rotation secrets Anthropic/Seqera **reportée** (repo privé, Boris seul dev). Détails : [project_env_leak.md](project_env_leak.md)
