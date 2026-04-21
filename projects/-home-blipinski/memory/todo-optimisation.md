@@ -90,6 +90,19 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Aima-Tower /exploration — slider VAF_LIMIT** — `VAF_LIMIT` (seuil high/low VAF du tableau stratifié) exposé en slider 0.5–5.0 (défaut 2.0) à côté de Spec/Profondeur. Câblé dans `compute()`, `_compute_stratified()`, callbacks tab/thresholds/reset/permalink/restore_url/download.
 - [x] **Aima-Tower /exploration — headers dynamiques tableau stratifié** — colonnes `VAF > X%` / `0 < VAF <= X%` du tableau Sensibilité Stratifiée suivent le slider VAF en temps réel (format `:g`, ex. 2.0 → "2"). `vaf_limit` threadé via `_build_one_side` → `_build_tables_content`.
 
+## 2026-04-16 — trace-prod schema v2 + colonnes avril
+
+- [x] **trace-prod schema v2** — bump `SCHEMA_VERSION` 1→2, migration idempotente `ALTER TABLE bam_metadata ADD COLUMN bam_horaire`. Nouvelles colonnes : `qc_metrics.mvaf_v1_10m/20m`, `retd_suivis.frag_mode1/2`, `bam_metadata.bam_horaire`, `metadata` (+gene1_detailed_variant, active_cancer_clinical, stage, commentaire_global).
+- [x] **mVAF raréfiée 10M/20M** — extraction depuis `BETA/{sample}.{depth}.epic.raima_score.V2.tsv` via `BaseChecker.get_mvaf_rarefied()`. Colonnes export "mVAF v1 10M" / "mVAF v1 20M" dans liquid + solid.
+- [x] **Frag modes 1/2** — extraction depuis `Fragmentomics/filtered/{sample}.fragmentomics_modes.tsv` (ligne 2, col 1/2). Colonnes export entre IchorCNA et BAM. NA si fichier absent.
+- [x] **update-column bam_horaire** — sous-commande dédiée qui met à jour UNIQUEMENT `bam_horaire` (OK/clean/KO) sans toucher nb_bam/taille_bam/bam_completude. Via `aws s3 ls --recursive --profile scw` sur `s3://aima-bam-data/data/{labo}/{type}/{sample}/`.
+- [x] **gene1_vaf logic raima (BREAKING)** — `gene1_vaf = max(gene1_freq)` uniquement si `mutation_status == "Tumoral"`, sinon NULL. Avant : toujours rempli depuis freq. Impact : réimport metadata vide certains gene1_vaf.
+- [x] **Propagation metadata rebasecalled** — `import-metadata` copie auto depuis sample original vers `{sample}_rebasecalled*` sans metadata. Compteur `{propagated}` en sortie.
+- [x] **TSVExtractor NFS-first** — `_read_lines()` priorité NFS (plus rapide), fallback S3. Avant : S3-first.
+- [x] **CLI jobs default 12→4** — le 12 saturait S3 pour `check`/`update-column`/`probs`.
+- [x] **Cleanup `.claude/` dans trace-prod** — suppression des skills/agents dupliqués du repo trace-prod (gérés dans claude-config).
+- [x] **Commit `6ebd388`** — `feat: schema v2 (bam_horaire), mVAF rarefied, frag modes, metadata propagation`.
+
 ## 2026-04-16 — Aima-Survey + Aima-Tower : email quotidien + page Survey intégrée
 
 - [x] **Aima-Tower — page Survey intégrée** — nouvelle route `/survey` consommant les rapports markdown Aima-Survey. Vue Jour/Semaine avec onglets rubriques, filtres combinables (recherche + priorité + rubrique + journal + date + état lu/non-lu), synthèse IA par article à la demande (claude-sonnet-4-6), marquage vu/non-vu avec badge navbar, favoris avec notes inline. Bug `TOP_N=10` fixé côté `veille.py` (tous les articles exportés). Commit `91c545d`.

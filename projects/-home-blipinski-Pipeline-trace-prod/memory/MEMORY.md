@@ -110,9 +110,9 @@
 - `_has_single_ghost()` méthode statique sur BaseChecker pour détecter le ghost côté S3
 - Audit mars 2026 : 0 sample avec 45 fichiers (tolérance préventive), 35 HCL sans combine flags (anciens rebasecalled)
 
-## CLI Defaults (mars 2026)
-- Jobs par défaut passé de 4 à 12 pour `check`, `update-column`, `probs`
-- `update-column --sample` accepte maintenant multiple samples (`-s sample1 -s sample2`)
+## CLI Defaults (avril 2026)
+- Jobs par défaut : **4** pour `check`, `update-column`, `probs` (revert du 12→4 car 12 saturait S3)
+- `update-column --sample` accepte multiple samples (`-s sample1 -s sample2`)
 - `_update_pod5_storage()` et `_update_bam_sizes()` supportent le filtrage par samples via `sample_filter`
 
 ## HCL Verification (mars 2026)
@@ -151,3 +151,44 @@
 - European format: comma decimals, DD-MM-YYYY dates
 - Missing: "NA" in exports, NULL in DB
 - samples table: colonne `sample_type` (pas `type`)
+
+## Schema v2 Migration (avril 2026)
+- SCHEMA_VERSION bumped 1→2 dans `lib/duckdb.py`
+- Migration idempotente dans `DuckDBService._migrate()` : `ALTER TABLE bam_metadata ADD COLUMN bam_horaire` si absent
+- Nouvelles colonnes DDL pour nouvelles DB : `qc_metrics.mvaf_v1_10m/20m`, `retd_suivis.frag_mode1/2`, `bam_metadata.bam_horaire`, `metadata.{gene1_detailed_variant,active_cancer_clinical,stage,commentaire_global}`
+
+## bam_horaire Column (avril 2026)
+- Col `bam_metadata.bam_horaire` VARCHAR DEFAULT 'KO'. Tracks présence BAM raw horaires S3.
+- Update dédié : `update-column bam_horaire {type} {labo}` — UPDATE chirurgical de la seule colonne via `_update_bam_horaire()`, ne touche JAMAIS nb_bam/taille_bam/bam_completude
+- Logique : liste `s3://aima-bam-data/data/{labo}/{type}/{sample}/` via `aws s3 ls --recursive --profile scw`. `OK` si ≥1 `.bam`, `clean` si listing OK et 0 `.bam`, inchangé si erreur S3
+- `update-column taille_bam` side-effect : tag aussi `bam_horaire='OK'` quand il observe des BAM raw
+
+## mVAF Rarefied 10M/20M (avril 2026)
+- Cols `qc_metrics.mvaf_v1_10m`, `mvaf_v1_20m` DECIMAL(10,4)
+- Sources : `BETA/{sample}.10M.epic.raima_score.V2.tsv` et `.20M.epic.raima_score.V2.tsv`
+- Extraction via `BaseChecker.get_mvaf_rarefied(depth)` — réutilise `TSVExtractor.extract_mvaf()`
+- Export headers : "mVAF v1 10M" / "mVAF v1 20M" dans `_LIQUID_QC` et `_SOLID_QC`
+- `update-column mvaf_v1_10m|mvaf_v1_20m` supportés
+
+## Frag Modes (avril 2026)
+- Cols `retd_suivis.frag_mode1`, `frag_mode2` VARCHAR DEFAULT 'NA' (**PAS dans STATUS_COLUMNS**)
+- Source : `Fragmentomics/filtered/{sample}.fragmentomics_modes.tsv`, ligne 2, col 1 (mode1) et col 2 (mode2)
+- Format : virgule décimale, "NA" si fichier absent/colonne vide
+- Méthodes `BaseChecker.check_frag_mode1/2` + `_check_frag_mode(col_idx)` (S3-first via `_s3_read_text`, fallback NFS)
+- Export : "Frag Mode1" / "Frag Mode2" entre "IchorCNA" et "BAM" dans `_LIQUID_QC` et `_SOLID_QC`
+
+## gene1_vaf Raima Logic (avril 2026, BREAKING)
+- Avant : `gene1_vaf = gene1_freq` si gene1_vaf absent (toujours rempli)
+- Après : `gene1_vaf = max(gene1_freq.split(" / "))` **uniquement si `gene1_mutation_status == "Tumoral"`**, sinon NULL
+- Raison : les freq Non-tumoral/Unknown ne doivent pas alimenter la VAF raima
+- Impact : réimporter les metadata peut vider des gene1_vaf qui étaient précédemment remplis
+
+## Metadata Rebasecalled Propagation (avril 2026)
+- `import-metadata` : après l'import principal, copie les metadata depuis le sample original vers les variantes `{sample}_rebasecalled*` sans metadata
+- Regex `_rebasecalled.*$` → `base_name`, lookup `get_sample(base_name, type, labo)`, copie de toute la ligne metadata avec `sample_id` remplacé
+- Compteur `{propagated}` ajouté dans le message de sortie
+
+## NFS-First Priority (avril 2026, BREAKING)
+- `TSVExtractor._read_lines()` lit NFS d'abord, S3 en fallback (avant : S3 d'abord)
+- Raison : sur ce serveur, NFS est plus rapide que S3 pour les petits TSV quand le mount est dispo
+- `_s3_read_text()` reste utilisé ailleurs (checkers comme `check_ichorcna`, `check_mvaf_v12`) avec priorité S3
