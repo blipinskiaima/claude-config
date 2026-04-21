@@ -183,10 +183,17 @@
 - Raison : les freq Non-tumoral/Unknown ne doivent pas alimenter la VAF raima
 - Impact : réimporter les metadata peut vider des gene1_vaf qui étaient précédemment remplis
 
-## Metadata Rebasecalled Propagation (avril 2026)
-- `import-metadata` : après l'import principal, copie les metadata depuis le sample original vers les variantes `{sample}_rebasecalled*` sans metadata
-- Regex `_rebasecalled.*$` → `base_name`, lookup `get_sample(base_name, type, labo)`, copie de toute la ligne metadata avec `sample_id` remplacé
-- Compteur `{propagated}` ajouté dans le message de sortie
+## Metadata Rebasecalled Propagation (avril 2026, updated)
+- `import-metadata` : après l'import principal, re-propage les metadata depuis le sample original vers **TOUTES** les variantes `{sample}_rebasecalled*` (pas seulement celles sans metadata)
+- Raison : les rebasecalled ne sont jamais dans la gsheet → seule la propagation les touche. Sans re-propagation systématique, leur metadata se fige au moment de la 1re propagation et diverge de l'original dès qu'une valeur ou colonne change
+- Exemple constaté : `Lung_10` original avec `stage="IV"`, rebasecalled figé à `"stade IV"` (ancien format) ; `Colon_32` original avec `stage="III"`, rebasecalled à NULL (colonne ajoutée après propagation)
+- Résultat à chaque import : 113 CGFL + 71 HCL = 184 rebasecalled re-propagés
+- Regex `_rebasecalled.*$` → `base_name`, lookup `get_sample(base_name, type, labo)`, copie complète avec `sample_id` remplacé via `_upsert_table("metadata", ...)`
+
+## Metadata Import Lookup Fallback (avril 2026)
+- Si lookup via "Old sample name" échoue → retente avec "Sample name" (était : seulement si Old était vide)
+- Nécessaire pour les `*bis` : gsheet a `Old sample name = "Breast_1_bis"` (legacy avec underscore), DB stocke `"Breast_1bis"` (format court)
+- Fix : +4 samples `*bis` récupérés (Breast_1bis, Lung_9bis, Lung_10bis, Lung_11bis), +4 rebasecalled propagés
 
 ## NFS-First Priority (avril 2026, BREAKING)
 - `TSVExtractor._read_lines()` lit NFS d'abord, S3 en fallback (avant : S3 d'abord)
