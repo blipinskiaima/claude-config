@@ -59,7 +59,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-04-21 — Aima-Tower sécurisation + HCL runs + backup S3 + check Healthy + import metadata
+## 2026-04-21 — Aima-Tower sécurisation + HCL runs + backup S3 + check Healthy + import metadata + migration IA Max
 
 - [x] **Import metadata HCL + CGFL depuis gsheets** — 314 HCL + 341 CGFL importés (tous les samples de la table `samples` matchés), logique VAF Tumoral-only appliquée, 184 rebasecalled re-synchronisés.
 - [x] **Fix import-metadata fallback Sample name** — les `*bis` cherchés via `Old sample name="Breast_1_bis"` (legacy underscore) alors que DB stocke `"Breast_1bis"`. Fallback ajouté. +4 samples récupérés. Commit `5ab85ac`.
@@ -68,6 +68,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **32 samples HCL Bam2Beta** — lancés en PROD, nouveaux samples intégrés dans la cohorte exploratory.
 - [x] **Sauvegarde HCL sur S3** — BAM + POD5 des 32 samples uploadés, counts vérifiés.
 - [x] **Check prod Healthy** — état de production des samples Healthy vérifié.
+- [x] **Migration IA Tower vers Claude Max (abonnement Pro)** — 5 appels API Anthropic (Survey + Analytics ×2 + DB Q&A ×2) basculés vers CLI `claude -p` + token OAuth long-lived, modèle unifié `claude-sonnet-4-6`, contexte injecté = 14 CLAUDE.md `~/Pipeline/*/` (16-20K tokens). Nouveau `src/claude_cli.py`, Dockerfile + Node.js + @anthropic-ai/claude-code global, `ANTHROPIC_API_KEY` retiré du container (priorité sur OAuth quand coexistent), HOME override au subprocess pour isoler totalement `~/.claude` du host. Plan : `~/.claude/plans/c-avec-sonnet-4-6-indexed-bubble.md`.
 
 ## 2026-04-20 — Aima-Survey refonte v6 + Aima-Tower /survey + /exploration
 
