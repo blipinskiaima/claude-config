@@ -59,7 +59,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-04-21 — Aima-Tower sécurisation + HCL runs + backup S3 + check Healthy + import metadata + migration IA Max
+## 2026-04-21 — Aima-Tower sécurisation + HCL runs + backup S3 + check Healthy + import metadata + migration IA Max + Aima-Survey classif concurrents
 
 - [x] **Import metadata HCL + CGFL depuis gsheets** — 314 HCL + 341 CGFL importés (tous les samples de la table `samples` matchés), logique VAF Tumoral-only appliquée, 184 rebasecalled re-synchronisés.
 - [x] **Fix import-metadata fallback Sample name** — les `*bis` cherchés via `Old sample name="Breast_1_bis"` (legacy underscore) alors que DB stocke `"Breast_1bis"`. Fallback ajouté. +4 samples récupérés. Commit `5ab85ac`.
@@ -69,6 +69,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Sauvegarde HCL sur S3** — BAM + POD5 des 32 samples uploadés, counts vérifiés.
 - [x] **Check prod Healthy** — état de production des samples Healthy vérifié.
 - [x] **Migration IA Tower vers Claude Max (abonnement Pro)** — 5 appels API Anthropic (Survey + Analytics ×2 + DB Q&A ×2) basculés vers CLI `claude -p` + token OAuth long-lived, modèle unifié `claude-sonnet-4-6`, contexte injecté = 14 CLAUDE.md `~/Pipeline/*/` (16-20K tokens). Nouveau `src/claude_cli.py`, Dockerfile + Node.js + @anthropic-ai/claude-code global, `ANTHROPIC_API_KEY` retiré du container (priorité sur OAuth quand coexistent), HOME override au subprocess pour isoler totalement `~/.claude` du host. Plan : `~/.claude/plans/c-avec-sonnet-4-6-indexed-bubble.md`.
+- [x] **Aima-Survey v6.1 — classification sector/org_type via Haiku** — +8 colonnes DB (affiliations, last_author_affiliation, sector, org_type, org_name, classification_why/model/at), `lib/classifier.py` avec batch N=5 + IDs explicites, short-circuit gratuit si pas d'affiliation. Migration complète vers abonnement Claude Pro/Max via `lib/claude_cli.py` (fin crédits API, pattern copié de Aima-Tower). 353 articles classifiés. Mémoire : `aima_survey_v61.md`, `claude_pro_auth_pattern.md`.
+- [x] **Aima-Survey — veille active concurrents** — 22 entreprises identifiées (recherche web approfondie via agent-websearch + `/prompt-creator`), `data/competitors.json` + `docs/COMPETITORS.md` versionnés (3 tiers + aliases PubMed-ready + synthèse stratégique). Query PubMed `competitive_affiliations` dans queries.json (19 acteurs ciblés). Mémoire : `competitive_landscape.md`.
+- [x] **Aima-Tower — onglet Concurrence + page /competitors + vue Année** — onglet "Concurrence" dans `/survey` basé sur `org_name` matching competitors.json (fix bug : Volition/GRAIL apparaissent, Stanford/Mayo/Karolinska filtrés automatiquement). Nouvelle page `/competitors` (3 tiers + synthèse stratégique + stats publis DB). Dropdown "Secteur / Organisation" multi-select (93 options). Vue Semaine passée sur DuckDB 7j glissants (stable vs 7 rapports), nouvelle vue "Année" 365j.
+- [x] **Batch processing classifier (N=5)** — `classify_batch()` avec IDs explicites, re-indexing défensif contre inversion Haiku, fallback individuel par article si batch fail. Gain ~2× vs séquentiel (smoke test 2 articles = 16s).
+- [x] **Slider depth min=0 aligné 3 pages** — `/exploration`, `/qualite`, `/analytics` Avancé : slider depth accepte la valeur 0 (`min=0.10`→`0.0`), marks ajustés. Commit `6b792ff`.
+- [x] **Figure sensibilité par stade cancer** — nouvelle section en bas de `/exploration` > Graphiques : forest plot (CI Wilson 95%) + bar plot (gradient couleur) par stade I/II/III/IV/NR, visibles dans 3 onglets (ALL/CGFL/HCL). Stage lu depuis `metadata.stage`, CGFL tous en NR (colonne vide côté CGFL). Commit `3a60af3`.
 
 ## 2026-04-20 — Aima-Survey refonte v6 + Aima-Tower /survey + /exploration
 
