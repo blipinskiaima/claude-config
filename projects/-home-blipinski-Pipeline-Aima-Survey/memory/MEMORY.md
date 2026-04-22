@@ -7,3 +7,4 @@
 - [Aima-Survey v6.1](aima_survey_v61.md) — classification sector/org_type/org_name via Haiku + migration Pro/Max, short-circuit gratuit sans affiliations, taxonomie enums fixes
 - [Explorer projets jumeaux d'abord](explore_pipeline_siblings_first.md) — pour toute tâche AIMA, chercher le pattern dans les autres ~/Pipeline/* avant de designer from-scratch
 - [Paysage concurrentiel AIMA](competitive_landscape.md) — 22 concurrents listés dans Aima-Survey/data/competitors.json + docs/COMPETITORS.md, query PubMed competitive_affiliations active, doublons UI Tower assumés
+- [Preprints biorxiv/medrxiv dormants](preprints_dormant.md) — support ajouté puis désactivé 2026-04-22 (moteur medrxiv.org bruyant sur OR-groupé), réactivable en décommentant 2 lignes dans `build_sources()` après refactor 1-search-per-keyword
