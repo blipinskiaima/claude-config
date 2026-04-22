@@ -57,3 +57,15 @@ Boris valide le scope discipline en sécu : couches par iteration (Caddy d'abord
 ## Incident `.env` tracked dans git
 
 `.env` était tracked dans git jusqu'au 2026-04-21 (repo privé). Retiré via `git rm --cached`. Rotation secrets Anthropic/Seqera **reportée** (repo privé, Boris seul dev). Détails : [project_env_leak.md](project_env_leak.md)
+
+## Backend IA via CLI `claude -p` (2026-04-22)
+
+Tous les appels IA Tower (Survey synthese, Analytics chat, DB Q&A) passent par `src/claude_cli.py` subprocess `claude -p` + `CLAUDE_CODE_OAUTH_TOKEN` (abonnement Max au lieu credits API). `ANTHROPIC_API_KEY` **retire** du container (priorite CLI bypasse OAuth). HOME isole `/app/data/claude-home`. Contexte injecte = 14 CLAUDE.md Pipeline (~20K tokens). Détails : [ia_cli_migration.md](ia_cli_migration.md)
+
+## Vues temporelles Survey pilotees par `first_seen_at` (2026-04-22)
+
+Depuis backfill EDAT Aima-Survey, toutes les vues (Day/Week/Month/Year/All) filtrent sur `first_seen_at` = EDAT PubMed (stable, immuable, non-future). Plus de pub_date. Card UI affiche les 2 dates distinctes ("Indexé : ... • Publié : ..."). Vue Jour migree DuckDB avec `DATE(first_seen_at) = ?` + selecteur conditionnel. Détails : [survey_first_seen_at.md](survey_first_seen_at.md)
+
+## Onglet Concurrence Survey étendu
+
+`is_competitor_article(a)` matche desormais `a.org_name` OR `a.last_author_affiliation` contre `competitors.json` (23 entreprises tier_1/2/3 avec aliases). +IMBdx ajoute comme tier_2 MOYENNE. Passe de 11 a 29 articles concurrents. Reclassification Haiku ciblee en cours (script `reclassify_competitors.py` cote Aima-Survey).
