@@ -60,6 +60,17 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-04-22 — Aima-Survey entrez_date + Tower vues temporelles first_seen_at + panel filtres Survey
+
+- [x] **Fix cron Aima-Survey (PATH)** — `run_veille.sh` exporte `PATH=~/.local/bin:$PATH` pour que `subprocess["claude"]` soit trouve (scoring + classification Haiku). Cron du 22/04 avait crash sur `FileNotFoundError: claude`.
+- [x] **Colonne `entrez_date` Aima-Survey** — PubMed EDAT stockee comme source de verite d'indexation. Schema + parser XML (`PubmedPubDate[@PubStatus="entrez"]`) + `first_seen_at = entrez_date` a l'insert. Backfill one-shot 439/439 articles (`scripts/backfill_entrez_date.py`), range 2025-03-19 → 2026-04-21.
+- [x] **Vues temporelles Tower pilotees par first_seen_at** — filtres Week/Month/Year basculent de `pub_date` (sujet aux dates futures genre 2026-12) a `first_seen_at` (EDAT immuable). Vue Jour migree DuckDB (`DATE(first_seen_at) = ?`), avec selecteur conditionnel alimente par `list_first_seen_dates()`. Fenetres post-backfill : Week=15 / Month=92 / Year=436 (vs 411/411/411 avant).
+- [x] **Affichage card Survey** — 2 dates distinctes : "Indexé : YYYY-MM-DD • Publié : YYYY-MM-DD". Plus d'ambiguite entre date cron et date journal.
+- [x] **Redesign panel filtres /survey** — aligne patterns Tower (Card+CardHeader, g-3, Row Vue+Jour conditionnel+Reset ms-auto / Row Recherche+Priorite+Rubrique+Journal+Secteur+Etat). Suppression bouton "Tout marquer lu" + callback `bulk_mark_seen`.
+- [x] **IMBdx ajoute aux concurrents** — entree tier_2 dans `competitors.json` (threat MOYENNE). Article PMID 42014847 remonte dans onglet Concurrence via `org_name` substring.
+- [x] **`is_competitor_article` etendu** (variant B') — matche desormais `org_name` OR `last_author_affiliation`. Nouveau champ `Article.last_author_affiliation` propage via SELECT DuckDB. Passe de 11 a 29 articles concurrents.
+- [x] **Support biorxiv + queries.json** — nouvelle source `lib/sources/biorxiv.py` + tests, badge UI Tower (PubMed/bioRxiv/medRxiv). +5 rubriques dans `queries.json` (MRD, MCED, tissue-origin, ML classifiers, EPIC/Illumina).
+
 ## 2026-04-21 — Aima-Tower sécurisation + HCL runs + backup S3 + check Healthy + import metadata + migration IA Max + Aima-Survey classif concurrents
 
 - [x] **Import metadata HCL + CGFL depuis gsheets** — 314 HCL + 341 CGFL importés (tous les samples de la table `samples` matchés), logique VAF Tumoral-only appliquée, 184 rebasecalled re-synchronisés.
