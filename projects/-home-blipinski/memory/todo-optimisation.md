@@ -49,6 +49,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 3** : évaluer un gestionnaire de secrets (sops, age, vault).
 - [ ] **Skill save-code pour trace-prod** — automatiser la sauvegarde de session.
 - [ ] **Skills Pod2Bam** — créer test/qualif/maj analogues à Bam2Beta. Pas urgent tant que Pod2Bam n'est pas soumis à audit qualité.
+- [ ] **Refresh README Aima-Survey + Aima-Tower** — README.md Aima-Survey très obsolète (v5 : "10 requêtes", SQLite scoring_cache, ANTHROPIC_API_KEY). À refaire pour refléter v6.1 (DuckDB, 13 queries PubMed + 17 preprints dormantes, classification Haiku, CLAUDE_CODE_OAUTH_TOKEN, migration IA Pro/Max). README Aima-Tower à vérifier côté /survey multi-source. Session dédiée.
 
 ---
 
