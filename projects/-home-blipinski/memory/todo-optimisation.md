@@ -60,7 +60,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-04-22 — Aima-Survey entrez_date + Tower vues temporelles first_seen_at + panel filtres Survey
+## 2026-04-22 — Aima-Survey entrez_date + Tower vues temporelles first_seen_at + panel filtres Survey + preprints dormants + Tower multi-source
 
 - [x] **Fix cron Aima-Survey (PATH)** — `run_veille.sh` exporte `PATH=~/.local/bin:$PATH` pour que `subprocess["claude"]` soit trouve (scoring + classification Haiku). Cron du 22/04 avait crash sur `FileNotFoundError: claude`.
 - [x] **Colonne `entrez_date` Aima-Survey** — PubMed EDAT stockee comme source de verite d'indexation. Schema + parser XML (`PubmedPubDate[@PubStatus="entrez"]`) + `first_seen_at = entrez_date` a l'insert. Backfill one-shot 439/439 articles (`scripts/backfill_entrez_date.py`), range 2025-03-19 → 2026-04-21.
@@ -69,7 +69,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Redesign panel filtres /survey** — aligne patterns Tower (Card+CardHeader, g-3, Row Vue+Jour conditionnel+Reset ms-auto / Row Recherche+Priorite+Rubrique+Journal+Secteur+Etat). Suppression bouton "Tout marquer lu" + callback `bulk_mark_seen`.
 - [x] **IMBdx ajoute aux concurrents** — entree tier_2 dans `competitors.json` (threat MOYENNE). Article PMID 42014847 remonte dans onglet Concurrence via `org_name` substring.
 - [x] **`is_competitor_article` etendu** (variant B') — matche desormais `org_name` OR `last_author_affiliation`. Nouveau champ `Article.last_author_affiliation` propage via SELECT DuckDB. Passe de 11 a 29 articles concurrents.
-- [x] **Support biorxiv + queries.json** — nouvelle source `lib/sources/biorxiv.py` + tests, badge UI Tower (PubMed/bioRxiv/medRxiv). +5 rubriques dans `queries.json` (MRD, MCED, tissue-origin, ML classifiers, EPIC/Illumina).
+- [x] **Aima-Survey — preprints biorxiv/medrxiv (dormant)** — `lib/sources/biorxiv.py` (web scraping medrxiv.org/search + meta `citation_*`), 17 queries calquées sur PubMed, 16 tests verts. Désactivé en final (`build_sources()` commenté) : moteur medrxiv.org retourne trop de faux positifs sur les queries OR-groupées (seul `fragmentomics` matchait vraiment le papier Sauer ciblé). Code conservé, réactivable en décommentant 2 lignes quand les queries seront affinées.
+- [x] **Aima-Tower /survey multi-source** — filtre `WHERE source='pubmed'` retiré de `survey_service.py:392`, badge source (PubMed bleu / preprints cyan) + labels génériques "Indexé/Publié" dans `survey_render.py`. 7 tests duckdb verts. Changements conservés (inoffensifs même sources dormantes).
 
 ## 2026-04-21 — Aima-Tower sécurisation + HCL runs + backup S3 + check Healthy + import metadata + migration IA Max + Aima-Survey classif concurrents
 
