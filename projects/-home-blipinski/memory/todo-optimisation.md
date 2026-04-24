@@ -61,8 +61,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-04-24 — Clean-skill (création + audits Tower) + Aima-Survey v6.2
+## 2026-04-24 — Clean-skill (création + audits Tower) + Aima-Survey v6.2 + Refonte /analytics Avancé
 
+- [x] **Refonte onglet `/analytics` Avancé** — suppression des 4 figures du Batch A (distribution kit / calibration / stats CGFL-HCL / clustering FN-FP). Remplacé par panneau de **148 filtres dynamiques** auto-détectés depuis trace-prod (nouveau `src/filters_service.py`, 207 L) + 1 figure boxplot paramétrable (17 métriques Y en radio, split/group/color, pseudo-valeur "ALL" dans labo, échelle log Y, QC thresholds 5M / 0.25). Les 2 tâches Partie 1 "Remplacer Distribution scores Healthy" et "Améliorer Calibration plot" deviennent caduques (cartes sources supprimées).
 - [x] **Clean-skill Aima-Survey v6.2** — nettoyage exhaustif −1446 lignes net (19 fichiers). Suppressions : support biorxiv/medrxiv dormant (`lib/sources/biorxiv.py` + 17 queries + tests), migration v5→v6 one-shot (`lib/migrate.py` + CLI `migrate` + `scoring_cache.db`), `upsert_synthesis` + colonnes `synthesis_*` (Tower cache RAM, aucun SELECT sur la colonne), 2 scripts one-shot (`backfill_entrez_date`, `reclassify_2026_04_20`). 8 tests cassés par fusion v6.1 réparés (`ctDNA_methylation_ONT` → `cancer_detection_cfDNA`). 69 tests verts, pyflakes 0 warning, smoke fetch réel OK. Commit `1609ce1`.
 - [x] **Refresh README Aima-Survey** — réécrit pour refléter v6.2 : 13 queries PubMed (suppression des 17 preprints dormantes), DuckDB single-table, `CLAUDE_CODE_OAUTH_TOKEN`, classification sector/org_type, retrait refs `scoring_cache`/`ANTHROPIC_API_KEY`/`migrate`. Partie Aima-Tower du bullet initial reste à faire.
 - [x] **Skill `/clean-skill` créé** — nettoyage code multi-langage (Python/Nextflow/R/Bash) générique pour projets `~/Pipeline/`. Checkpoint git obligatoire (commit + tag) avant modif, rapport classifié 🟢/🟡/🔴 par niveau de confiance, `Edit` chirurgical, respect Karpathy + Golden Rules. Installé dans `~/.claude/skills/clean-skill/SKILL.md` (228 lignes).
