@@ -49,7 +49,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 3** : évaluer un gestionnaire de secrets (sops, age, vault).
 - [ ] **Skill save-code pour trace-prod** — automatiser la sauvegarde de session.
 - [ ] **Skills Pod2Bam** — créer test/qualif/maj analogues à Bam2Beta. Pas urgent tant que Pod2Bam n'est pas soumis à audit qualité.
-- [ ] **Refresh README Aima-Survey + Aima-Tower** — README.md Aima-Survey très obsolète (v5 : "10 requêtes", SQLite scoring_cache, ANTHROPIC_API_KEY). À refaire pour refléter v6.1 (DuckDB, 13 queries PubMed + 17 preprints dormantes, classification Haiku, CLAUDE_CODE_OAUTH_TOKEN, migration IA Pro/Max). README Aima-Tower à vérifier côté /survey multi-source. Session dédiée.
+- [ ] **Refresh README Aima-Tower** — vérifier côté `/survey` multi-source post-v6.2 Survey (colonnes synthesis orphelines en DB Survey côté Tower, `upsert_synthesis` supprimée côté Survey). README Aima-Survey déjà refait le 2026-04-24.
 
 ---
 
@@ -60,6 +60,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-04-24 — Clean-skill Aima-Survey v6.2 (−1446 lignes, 8 tests réparés)
+
+- [x] **Clean-skill Aima-Survey v6.2** — nettoyage exhaustif −1446 lignes net (19 fichiers). Suppressions : support biorxiv/medrxiv dormant (`lib/sources/biorxiv.py` + 17 queries + tests), migration v5→v6 one-shot (`lib/migrate.py` + CLI `migrate` + `scoring_cache.db`), `upsert_synthesis` + colonnes `synthesis_*` (Tower cache RAM, aucun SELECT sur la colonne), 2 scripts one-shot (`backfill_entrez_date`, `reclassify_2026_04_20`). 8 tests cassés par fusion v6.1 réparés (`ctDNA_methylation_ONT` → `cancer_detection_cfDNA`). 69 tests verts, pyflakes 0 warning, smoke fetch réel OK. Commit `1609ce1`.
+- [x] **Refresh README Aima-Survey** — réécrit pour refléter v6.2 : 13 queries PubMed (suppression des 17 preprints dormantes), DuckDB single-table, `CLAUDE_CODE_OAUTH_TOKEN`, classification sector/org_type, retrait refs `scoring_cache`/`ANTHROPIC_API_KEY`/`migrate`. Partie Aima-Tower du bullet initial reste à faire.
 
 ## 2026-04-22 — Aima-Survey entrez_date + Tower vues temporelles first_seen_at + panel filtres Survey + preprints dormants + Tower multi-source
 
