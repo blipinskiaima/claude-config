@@ -61,10 +61,13 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-04-24 — Clean-skill Aima-Survey v6.2 (−1446 lignes, 8 tests réparés)
+## 2026-04-24 — Clean-skill (création + audits Tower) + Aima-Survey v6.2
 
 - [x] **Clean-skill Aima-Survey v6.2** — nettoyage exhaustif −1446 lignes net (19 fichiers). Suppressions : support biorxiv/medrxiv dormant (`lib/sources/biorxiv.py` + 17 queries + tests), migration v5→v6 one-shot (`lib/migrate.py` + CLI `migrate` + `scoring_cache.db`), `upsert_synthesis` + colonnes `synthesis_*` (Tower cache RAM, aucun SELECT sur la colonne), 2 scripts one-shot (`backfill_entrez_date`, `reclassify_2026_04_20`). 8 tests cassés par fusion v6.1 réparés (`ctDNA_methylation_ONT` → `cancer_detection_cfDNA`). 69 tests verts, pyflakes 0 warning, smoke fetch réel OK. Commit `1609ce1`.
 - [x] **Refresh README Aima-Survey** — réécrit pour refléter v6.2 : 13 queries PubMed (suppression des 17 preprints dormantes), DuckDB single-table, `CLAUDE_CODE_OAUTH_TOKEN`, classification sector/org_type, retrait refs `scoring_cache`/`ANTHROPIC_API_KEY`/`migrate`. Partie Aima-Tower du bullet initial reste à faire.
+- [x] **Skill `/clean-skill` créé** — nettoyage code multi-langage (Python/Nextflow/R/Bash) générique pour projets `~/Pipeline/`. Checkpoint git obligatoire (commit + tag) avant modif, rapport classifié 🟢/🟡/🔴 par niveau de confiance, `Edit` chirurgical, respect Karpathy + Golden Rules. Installé dans `~/.claude/skills/clean-skill/SKILL.md` (228 lignes).
+- [x] **Audit clean Aima-Tower (test `/clean-skill`)** — codebase confirmée propre : 29 lignes mortes détectées sur 9712 (0.3 %), aucune duplication pathologique, aucun over-engineering. Refactor senior Python chiffré à 40-50 % code touché pour +25-40 % lignes (tests) et 50-80 h — non rentable au profil bus-factor=1. Aucune modif appliquée, checkpoint rollback OK.
+- [x] **Audit arborescence Aima-Tower** — identifié à nettoyer : `launch.sh` (92 L, jamais utilisé ni dans CLAUDE.md), `VERSION` (6 B, jamais lu), `.pytest_cache/` à ajouter au `.gitignore`, `scripts/update_bookmark_categories.py` (migration one-shot idempotente déjà appliquée). Sécurité à re-vérifier : `.env` encore tracked selon `git ls-files` (contradiction avec memory du 2026-04-21).
 
 ## 2026-04-22 — Aima-Survey entrez_date + Tower vues temporelles first_seen_at + panel filtres Survey + preprints dormants + Tower multi-source
 
