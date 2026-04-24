@@ -1,10 +1,9 @@
 - [Email sending](email_sending.md) — Aima-Survey envoie via email-hub (Redis/BullMQ), pas SMTP direct (port 587 bloqué Scaleway)
 - [Scoring & dédup](scoring_and_dedup.md) — scoring Claude Haiku 4.5 sur DuckDB v6 (WHERE score IS NULL) + anti-spam email via email_sent_at COALESCE
 - [Database schema v6](database_schema.md) — DuckDB single-table multi-source (PK composite), stratégie UPSERT+COALESCE, piège DuckDB CURRENT_TIMESTAMP
-- [Migration v5→v6](migration_history.md) — consolidation 4 sources (SQLite scoring + 2 JSON Tower) vers aima_survey.duckdb, ordre bookmarks→scores→sent→seen, stub title pour PMIDs orphelins
+- [Migration v5→v6 (archivée)](migration_history.md) — consolidation 4 sources (SQLite scoring + 2 JSON Tower) vers aima_survey.duckdb. Code `lib/migrate.py` supprimé v6.2 2026-04-24 (migration one-shot déjà effectuée, aucun scénario de re-run).
 - [Multi-sources architecture](multi_source_architecture.md) — convention lib/sources/, registre dict, ajout d'une nouvelle source en 3 étapes sans refactor
 - [Claude Pro auth pattern](claude_pro_auth_pattern.md) — subprocess `claude -p` + CLAUDE_CODE_OAUTH_TOKEN (pas le SDK anthropic), HOME isolé, piège ANTHROPIC_API_KEY qui bypass le token
 - [Aima-Survey v6.1](aima_survey_v61.md) — classification sector/org_type/org_name via Haiku + migration Pro/Max, short-circuit gratuit sans affiliations, taxonomie enums fixes
 - [Explorer projets jumeaux d'abord](explore_pipeline_siblings_first.md) — pour toute tâche AIMA, chercher le pattern dans les autres ~/Pipeline/* avant de designer from-scratch
 - [Paysage concurrentiel AIMA](competitive_landscape.md) — 22 concurrents listés dans Aima-Survey/data/competitors.json + docs/COMPETITORS.md, query PubMed competitive_affiliations active, doublons UI Tower assumés
-- [Preprints biorxiv/medrxiv dormants](preprints_dormant.md) — support ajouté puis désactivé 2026-04-22 (moteur medrxiv.org bruyant sur OR-groupé), réactivable en décommentant 2 lignes dans `build_sources()` après refactor 1-search-per-keyword

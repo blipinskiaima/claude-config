@@ -69,3 +69,7 @@ Depuis backfill EDAT Aima-Survey, toutes les vues (Day/Week/Month/Year/All) filt
 ## Onglet Concurrence Survey étendu
 
 `is_competitor_article(a)` matche desormais `a.org_name` OR `a.last_author_affiliation` contre `competitors.json` (23 entreprises tier_1/2/3 avec aliases). +IMBdx ajoute comme tier_2 MOYENNE. Passe de 11 a 29 articles concurrents. Reclassification Haiku ciblee en cours (script `reclassify_competitors.py` cote Aima-Survey).
+
+## Guardant Health — stratégie Europe (2026-04-23)
+
+Snapshot : Guardant360 CDx seul IVDR-certifié (mai 2024). Reveal MRD = LDT via labs hospitaliers (VHIO, Royal Marsden, Gemelli) — **aucun partenariat France**. Shield MCED **absent Europe**, priorité Asie 2026 (Manulife). Signatera devance Guardant sur CRC France (CIRCULATE-PRODIGE-70). Fenêtres AIMA : MCED CRC sanguin méthylation + MRD CRC France via UNICANCER/CLCC. IVDR classe C se ferme 2028. Détails : [competitors_guardant_europe.md](competitors_guardant_europe.md)
