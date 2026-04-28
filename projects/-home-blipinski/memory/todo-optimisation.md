@@ -61,9 +61,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-04-28 — Aima-Tower : page Overview en 2 onglets
+## 2026-04-28 — Aima-Tower : Overview 2 onglets + figures /exploration vers Graphiques
 
 - [x] **Page Overview Aima-Tower — 2 onglets** — Infrastructure (S3.md existant) + nouveau Database (synthèse des 94 filtres visibles de `/analytics > Avancé` avec valeurs distinctes et nb samples par choix). Refactor : extraction `_get_visible_filter_columns()` réutilisable + `get_value_counts()` + cache `_counts_cache`. Commit `309c983`.
+- [x] **Aima-Tower /exploration — figures R04-R07 vers Graphiques** — déplacement de QC reads, QC depth, mVAF, TF/VAF, Bladder de l'onglet Tableaux vers 5 nouveaux sous-onglets de Graphiques (en amont des 4 existants Scores/ROC/Sens/Sens-profondeur). Conditions d'affichage et réactivité aux sliders préservées. Commit `4bfcdda`.
 
 ## 2026-04-24 — Clean-skill (création + audits Tower) + Aima-Survey v6.2 + Refonte /analytics Avancé
 
