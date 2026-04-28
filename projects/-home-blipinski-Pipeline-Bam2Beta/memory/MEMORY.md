@@ -67,6 +67,11 @@
 - `remotes::install_github` n'installe pas `inst/scripts/` → scripts clonés séparément dans Dockerfile
 - `runIchorCNA.R` ne crée pas le outDir → `mkdir -p` nécessaire dans le process NF
 
+## SV Modules — Sniffles2 + Severus + Decoil (V1.2.0, 2026-04-28)
+
+- [SV Modules](sv_modules.md) — Architecture Sniffles2/Severus/Decoil + caveats cliniques (Decoil non validé plasma 5-30x)
+
 ## Feedback
 
 - [S3 Never Delete](feedback_s3_no_delete.md) - NEVER delete anything from S3 buckets
+- [Bash inline dans process Nextflow](feedback_bash_inline.md) - Boris préfère bash inline dans `script:""""""` plutôt que scripts externes dans `bin/Module/`
