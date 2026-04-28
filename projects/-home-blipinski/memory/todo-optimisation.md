@@ -61,13 +61,14 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-04-28 — Aima-Tower : Overview 2 onglets + figures /exploration + trace-prod : fix BETA_28M + audit 6mA
+## 2026-04-28 — Aima-Tower Overview + figures /exploration + trace-prod fix BETA_28M/audit 6mA + Bam2Beta V1.2.0 SVs
 
 - [x] **Page Overview Aima-Tower — 2 onglets** — Infrastructure (S3.md existant) + nouveau Database (synthèse des 94 filtres visibles de `/analytics > Avancé` avec valeurs distinctes et nb samples par choix). Refactor : extraction `_get_visible_filter_columns()` réutilisable + `get_value_counts()` + cache `_counts_cache`. Commit `309c983`.
 - [x] **Aima-Tower /exploration — figures R04-R07 vers Graphiques** — déplacement de QC reads, QC depth, mVAF, TF/VAF, Bladder de l'onglet Tableaux vers 5 nouveaux sous-onglets de Graphiques (en amont des 4 existants Scores/ROC/Sens/Sens-profondeur). Conditions d'affichage et réactivité aux sliders préservées. Commit `4bfcdda`.
 - [x] **Fix check_beta_28m faux-positif ghost** — exigence 44 fichiers réels (size>0) + ≤1 ghost (size=0), évite le cas "43 réels + 1 ghost = 44 total". 1 faux-positif débusqué : `Healthy_26_rebasecalled_V4.3.0` (HCL) — `chr18.bedMethyl.gz` absent. Commit `0b49cb5`.
 - [x] **Audit modification 6mA ('a' col4) sur bedMethyl liquid** — scan exhaustif 7247 fichiers + recheck 1114 `.merged.epic.bedMethyl.gz` → 0 match. Aucun sample liquid (CGFL+HCL) ne contient de 6mA dans BETA. Cohérent avec pipeline ciblant 5mC only.
 - [x] **Audit 6mA sur 4 premiers Colon_ solid** — les 4 ont des matches dans `.merged.epic.bedMethyl.gz` (45k–86k lignes 'a' sur ~2.6M lignes total). Comportement asymétrique liquid vs solid à investiguer.
+- [x] **Bam2Beta V1.2.0 — modules Sniffles2 + Decoil + Severus** — détection SVs ONT (mode mosaic Sniffles2) + reconstruction ecDNA (Decoil) + SVs somatiques tumor-only avec phasing Clair3+LongPhase (Severus). 3 nouveaux containers + 2 workflows (`workflow/Sniffles2.nf` 2 process, `workflow/Severus.nf` 3 process). Validation Healthy_826 OK, Colon_3 en cours (Severus_clair3). Caveat : Decoil non validé plasma 5-30x. Commit `23bcf54`. Détails : `~/.claude/projects/-home-blipinski-Pipeline-Bam2Beta/memory/sv_modules.md`.
 
 ## 2026-04-27 — exploratory-analysis-CGFL-HCL : pipeline 04-07 + DuckDB enrichi + doc sync
 
