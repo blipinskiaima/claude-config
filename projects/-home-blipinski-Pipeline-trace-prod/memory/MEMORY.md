@@ -152,10 +152,11 @@
 - Missing: "NA" in exports, NULL in DB
 - samples table: colonne `sample_type` (pas `type`)
 
-## Schema v2 Migration (avril 2026)
-- SCHEMA_VERSION bumped 1→2 dans `lib/duckdb.py`
-- Migration idempotente dans `DuckDBService._migrate()` : `ALTER TABLE bam_metadata ADD COLUMN bam_horaire` si absent
-- Nouvelles colonnes DDL pour nouvelles DB : `qc_metrics.mvaf_v1_10m/20m`, `retd_suivis.frag_mode1/2`, `bam_metadata.bam_horaire`, `metadata.{gene1_detailed_variant,active_cancer_clinical,stage,commentaire_global}`
+## Schema v2/v3 Migration (avril 2026)
+- SCHEMA_VERSION bumped 1→2→3 dans `lib/duckdb.py`
+- Migration idempotente dans `DuckDBService._init_schema()` : `ALTER TABLE ... ADD COLUMN` si absent
+- v2 : `qc_metrics.mvaf_v1_10m/20m`, `retd_suivis.frag_mode1/2`, `bam_metadata.bam_horaire`, `metadata.{gene1_detailed_variant,active_cancer_clinical,stage,commentaire_global}`
+- v3 : `metadata.grade` (VARCHAR) — source "Grade" gsheet metadata_CGFL VAF, mapping `"Grade" → grade` dans `TSV_TO_DB_METADATA`. HCL reste NULL (pas de col Grade côté HCL)
 
 ## bam_horaire Column (avril 2026)
 - Col `bam_metadata.bam_horaire` VARCHAR DEFAULT 'KO'. Tracks présence BAM raw horaires S3.
