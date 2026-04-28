@@ -61,6 +61,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-04-28 — Aima-Tower : page Overview en 2 onglets
+
+- [x] **Page Overview Aima-Tower — 2 onglets** — Infrastructure (S3.md existant) + nouveau Database (synthèse des 94 filtres visibles de `/analytics > Avancé` avec valeurs distinctes et nb samples par choix). Refactor : extraction `_get_visible_filter_columns()` réutilisable + `get_value_counts()` + cache `_counts_cache`. Commit `309c983`.
+
 ## 2026-04-24 — Clean-skill (création + audits Tower) + Aima-Survey v6.2 + Refonte /analytics Avancé
 
 - [x] **Refonte onglet `/analytics` Avancé** — suppression des 4 figures du Batch A (distribution kit / calibration / stats CGFL-HCL / clustering FN-FP). Remplacé par panneau de **148 filtres dynamiques** auto-détectés depuis trace-prod (nouveau `src/filters_service.py`, 207 L) + 1 figure boxplot paramétrable (17 métriques Y en radio, split/group/color, pseudo-valeur "ALL" dans labo, échelle log Y, QC thresholds 5M / 0.25). Les 2 tâches Partie 1 "Remplacer Distribution scores Healthy" et "Améliorer Calibration plot" deviennent caduques (cartes sources supprimées).
