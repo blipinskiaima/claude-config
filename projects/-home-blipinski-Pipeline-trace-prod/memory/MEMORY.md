@@ -102,13 +102,11 @@
 - `dev/hcl_correspondance_rapports.tsv` — correspondance 66 runs NANO Dir / Run Number / Adresse Rapport
 - `rapport/` — 36 rapports HTML Dorado copiés depuis SCW
 
-## BETA_28M Check Tolerance (mars 2026)
-- `check_beta_28m()` accepte 44 ou 45 fichiers dans BETA_28M
-- 45 fichiers OK seulement si exactement 1 fichier ghost de 0 bytes (marqueur dossier S3 matérialisé sur NFS)
+## BETA_28M Check (avril 2026, BREAKING)
+- `check_beta_28m()` exige **44 fichiers réels** (size > 0) + **≤ 1 ghost** (size = 0). Avant : tolérait 44 ou 45 sans distinguer ghost vs réel → faux-positif "44 total = 43 réels + 1 ghost"
 - Les 2 flags `--combine-mods` + `--combine-strands` dans le log chr22 restent obligatoires
-- `_s3_ls_lines()` extraite de `_s3_ls_count()` pour inspecter les tailles individuelles
-- `_has_single_ghost()` méthode statique sur BaseChecker pour détecter le ghost côté S3
-- Audit mars 2026 : 0 sample avec 45 fichiers (tolérance préventive), 35 HCL sans combine flags (anciens rebasecalled)
+- Méthode `_has_single_ghost()` supprimée, remplacée par comptage direct via `_s3_ls_lines()`
+- Audit avril 2026 : 1 faux-positif détecté = `Healthy_26_rebasecalled_V4.3.0` (HCL) — `chr18.bedMethyl.gz` manquant (43 réels + 1 ghost)
 
 ## CLI Defaults (avril 2026)
 - Jobs par défaut : **4** pour `check`, `update-column`, `probs` (revert du 12→4 car 12 saturait S3)

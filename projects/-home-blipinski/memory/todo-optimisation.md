@@ -66,6 +66,13 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Page Overview Aima-Tower — 2 onglets** — Infrastructure (S3.md existant) + nouveau Database (synthèse des 94 filtres visibles de `/analytics > Avancé` avec valeurs distinctes et nb samples par choix). Refactor : extraction `_get_visible_filter_columns()` réutilisable + `get_value_counts()` + cache `_counts_cache`. Commit `309c983`.
 - [x] **Aima-Tower /exploration — figures R04-R07 vers Graphiques** — déplacement de QC reads, QC depth, mVAF, TF/VAF, Bladder de l'onglet Tableaux vers 5 nouveaux sous-onglets de Graphiques (en amont des 4 existants Scores/ROC/Sens/Sens-profondeur). Conditions d'affichage et réactivité aux sliders préservées. Commit `4bfcdda`.
 
+## 2026-04-27 — exploratory-analysis-CGFL-HCL : pipeline 04-07 + DuckDB enrichi + doc sync
+
+- [x] **Pipeline R étendu 04-07** — `run_pipeline.R` orchestre maintenant 01→07 : `04_qc_plot.R` (QC reads/depth), `05_mvaf_dotplot_by_center.R` (log1p), `06_plot_methylation_tf_vs_genomic_vaf.R` (concordance TF méth ↔ VAF génomique), `07_bladder_sensitivity_and_mvaf.R` (stage/grade, grille spec 0.85→0.99). Ajout `nb_reads_total`.
+- [x] **Export DuckDB enrichi** — `00_export_from_duckdb.py` exporte désormais Comments / Stage / Grade en plus des colonnes existantes.
+- [x] **`multicentric_results/` ajouté** — scripts `01_barplot_counts.R` + `02_speci_sensi.R` (analyses multicentriques standalone).
+- [x] **Doc sync README + CLAUDE.md** — sections 04-07 documentées, wrapper `run_all.sh` + `run_pipeline.R` clarifié. `.gitignore` étendu (`rds_duckdb_run/`, `Rplots.pdf`). Branche `tower` push complète (11 commits dont `0f9925a`).
+
 ## 2026-04-24 — Clean-skill (création + audits Tower) + Aima-Survey v6.2 + Refonte /analytics Avancé
 
 - [x] **Refonte onglet `/analytics` Avancé** — suppression des 4 figures du Batch A (distribution kit / calibration / stats CGFL-HCL / clustering FN-FP). Remplacé par panneau de **148 filtres dynamiques** auto-détectés depuis trace-prod (nouveau `src/filters_service.py`, 207 L) + 1 figure boxplot paramétrable (17 métriques Y en radio, split/group/color, pseudo-valeur "ALL" dans labo, échelle log Y, QC thresholds 5M / 0.25). Les 2 tâches Partie 1 "Remplacer Distribution scores Healthy" et "Améliorer Calibration plot" deviennent caduques (cartes sources supprimées).
