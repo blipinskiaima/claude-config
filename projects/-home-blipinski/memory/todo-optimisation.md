@@ -61,6 +61,13 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-04-29 — trace-prod schema v4 + ONT Sample export
+
+- [x] **trace-prod schema v4 — colonne speedvac** — ajout `metadata.speedvac` (VARCHAR), mappings `SpeedVac`/`SpeedVAc` → speedvac (gère casse différente CGFL/HCL), harmonisation Yes/No via `HARMONIZATION_RULES["speedvac"]`. Coverage : 471/708 CGFL liquid + 401/401 HCL liquid. Commit `aafc159`.
+- [x] **Fix stage CGFL silencieux** — ajout mapping `"Stage" → stage` (la col HCL longue `"Stage (I, II, III...)"` n'existait pas côté CGFL, stage CGFL était 100% NULL). 0 → 281/708 CGFL liquid. Commit `aafc159`.
+- [x] **Fix collision mappings TSV_TO_DB_METADATA** — `upsert_metadata` ne doit pas écraser une valeur déjà non-None par None quand 2 `tsv_col` pointent vers le même `db_col`. Sans ce fix, ajouter `Stage`/`SpeedVAc` cassait silencieusement les imports précédents. Commit `aafc159`.
+- [x] **Export ONT Sample — metadata fusionnée → gsheet trace-prod** — nouvelle commande CLI `export-ont-samples` qui exporte la table `metadata` fusionnée (CGFL+HCL liquid) vers l'onglet `'ONT Sample'`. 51 cols (3 tech + ~46 metadata + 2 calculées), rebasecalled exclus par défaut, headers dédupliqués par db_col. 687 lignes (357 CGFL + 330 HCL), SpeedVac 100%, Stage 53%. Commit `8d0cb12`.
+
 ## 2026-04-28 — Aima-Tower Overview + figures /exploration + trace-prod fix BETA_28M/audit 6mA + Bam2Beta V1.2.0 SVs
 
 - [x] **Page Overview Aima-Tower — 2 onglets** — Infrastructure (S3.md existant) + nouveau Database (synthèse des 94 filtres visibles de `/analytics > Avancé` avec valeurs distinctes et nb samples par choix). Refactor : extraction `_get_visible_filter_columns()` réutilisable + `get_value_counts()` + cache `_counts_cache`. Commit `309c983`.
