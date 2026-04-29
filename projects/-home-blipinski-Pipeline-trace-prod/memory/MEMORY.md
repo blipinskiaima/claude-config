@@ -150,11 +150,28 @@
 - Missing: "NA" in exports, NULL in DB
 - samples table: colonne `sample_type` (pas `type`)
 
-## Schema v2/v3 Migration (avril 2026)
-- SCHEMA_VERSION bumped 1→2→3 dans `lib/duckdb.py`
+## Schema v2/v3/v4 Migration (avril 2026)
+- SCHEMA_VERSION bumped 1→2→3→4 dans `lib/duckdb.py`
 - Migration idempotente dans `DuckDBService._init_schema()` : `ALTER TABLE ... ADD COLUMN` si absent
 - v2 : `qc_metrics.mvaf_v1_10m/20m`, `retd_suivis.frag_mode1/2`, `bam_metadata.bam_horaire`, `metadata.{gene1_detailed_variant,active_cancer_clinical,stage,commentaire_global}`
 - v3 : `metadata.grade` (VARCHAR) — source "Grade" gsheet metadata_CGFL VAF, mapping `"Grade" → grade` dans `TSV_TO_DB_METADATA`. HCL reste NULL (pas de col Grade côté HCL)
+- v4 : `metadata.speedvac` (VARCHAR) — sources `SpeedVac` (CGFL) et `SpeedVAc` (HCL, casse différente). Coverage : 471/708 CGFL liquid + 401/401 HCL liquid. Harmonisation `Yes/No` via `HARMONIZATION_RULES["speedvac"]`
+- v4 (en plus) : fix mapping `stage` CGFL — ajout `"Stage" → stage` (la col HCL `"Stage (I, II, III and IV or code ADICAP if available)"` n'existait pas côté CGFL, stage CGFL était 100% NULL avant fix)
+
+## Mapping Collision Fix (`upsert_metadata`, avril 2026)
+- Plusieurs `tsv_col` peuvent pointer vers le même `db_col` (ex: `"Stage"` et `"Stage (I, II...)"` → `stage` ; `"SpeedVac"` et `"SpeedVAc"` → `speedvac`)
+- Avant : 2e itération écrasait la valeur précédente même avec `None` (col absente côté un labo)
+- Après : `if new is not None or db_col not in data: data[db_col] = new` — préserve la 1re valeur non-None
+- Sans ce fix, ajouter un mapping casse silencieusement les imports précédents
+
+## Export ONT Sample (avril 2026)
+- Commande `export-ont-samples` : DuckDB.metadata fusionnée (CGFL+HCL liquid) → onglet `'ONT Sample'` de la gsheet trace-prod (`1gm_vB7vTzAq38dgkJFNpgA3Cy_XRlUqunMgoBvKnh6M`)
+- Filtre : `sample_type='liquid'`, rebasecalled exclus par défaut (flag `--include-rebasecalled` pour les inclure)
+- Méthode DB : `DuckDBService.get_metadata_unified(exclude_rebasecalled=True)` — JOIN metadata + samples, ORDER BY labo, sample_name
+- Méthode export : `GSheetsService.export_ont_samples(rows)` — 51 cols (3 tech + 44 metadata dédupliquées + 2 calculées)
+- Headers metadata : déduplication par `db_col` en gardant la 1re entrée de `TSV_TO_DB_METADATA` (gère les collisions `"SpeedVac"/"SpeedVAc"` et `"Stage"/"Stage (I, II, III...)"`)
+- Config : entrée `ont_samples` dans `gsheets_config.json`
+- Coverage : 687 lignes (357 CGFL + 330 HCL), SpeedVac 687/687, Stage 365/687
 
 ## bam_horaire Column (avril 2026)
 - Col `bam_metadata.bam_horaire` VARCHAR DEFAULT 'KO'. Tracks présence BAM raw horaires S3.
