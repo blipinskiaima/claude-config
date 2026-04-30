@@ -49,7 +49,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 3** : évaluer un gestionnaire de secrets (sops, age, vault).
 - [ ] **Skill save-code pour trace-prod** — automatiser la sauvegarde de session.
 - [ ] **Skills Pod2Bam** — créer test/qualif/maj analogues à Bam2Beta. Pas urgent tant que Pod2Bam n'est pas soumis à audit qualité.
-- [ ] **Refresh README Aima-Tower** — vérifier côté `/survey` multi-source post-v6.2 Survey (colonnes synthesis orphelines en DB Survey côté Tower, `upsert_synthesis` supprimée côté Survey). README Aima-Survey déjà refait le 2026-04-24.
 
 ---
 
@@ -60,6 +59,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-04-30 — Refonte Aima-Tower /exploration v2.3 + onglet Avancé graphique + validation R
+
+- [x] **Refonte page /exploration v2.3** — layout 25/75 sticky (radio Centre + sliders inline ultra-réactifs), ~50 filtres dynamiques pattern Analytics (multi/range/date/text) avec helpers no-op (`_legacy_set_or_none`, `_active_cancer_param`), nouvel onglet **Avancé** graphique (boxplot ad-hoc reuse `build_boxplot`), 2 cohortes distinctes Sens/Spé (R02) vs Graphique (R04). Tests SpeedVac (snapshot + partition invariant). Mémoire : [exploration_v2_3_design.md](../-home-blipinski-Pipeline-Aima-Tower/memory/exploration_v2_3_design.md) + [dash_4_gotchas.md](../-home-blipinski-Pipeline-Aima-Tower/memory/dash_4_gotchas.md).
+- [x] **Validation Tower ≡ R main cell-by-cell** — confirmé sur DB actuelle aux targets 0.85 et 0.90, mode=ge5 : detection_global, stratified_global, by_indication_global tous identiques au pipeline R `~/Pipeline/exploratory-analysis-CGFL-HCL` branch main.
+- [x] **Refresh README Aima-Tower** — sections `/exploration` + `/qualite` ajoutées au README + changelog v2.3.0 (refonte filtres + onglet Avancé graphique). Section `/survey` post-v6.2 reste à faire si nécessaire.
 
 ## 2026-04-29 — trace-prod schema v4 + ONT Sample export
 
