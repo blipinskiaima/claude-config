@@ -73,3 +73,11 @@ Depuis backfill EDAT Aima-Survey, toutes les vues (Day/Week/Month/Year/All) filt
 ## Guardant Health — stratégie Europe (2026-04-23)
 
 Snapshot : Guardant360 CDx seul IVDR-certifié (mai 2024). Reveal MRD = LDT via labs hospitaliers (VHIO, Royal Marsden, Gemelli) — **aucun partenariat France**. Shield MCED **absent Europe**, priorité Asie 2026 (Manulife). Signatera devance Guardant sur CRC France (CIRCULATE-PRODIGE-70). Fenêtres AIMA : MCED CRC sanguin méthylation + MRD CRC France via UNICANCER/CLCC. IVDR classe C se ferme 2028. Détails : [competitors_guardant_europe.md](competitors_guardant_europe.md)
+
+## Refonte Exploration v2.3 (2026-04-30)
+
+Tower ≡ R main cell-by-cell validé (target=0.85+0.90, mode=ge5). 2 cohortes distinctes par sub-tab : Sens/Spé (cancer+healthy strict, R02) vs Graphique (tous samples filtrés, R04). Pattern "tout sélectionné = no-op" via `_legacy_set_or_none` / `_active_cancer_param`. Onglet Avancé reuse `build_boxplot()`. TNE/Nuclear et Healthy carve-out asymétriques (tableaux only). Détails : [exploration_v2_3_design.md](exploration_v2_3_design.md)
+
+## Dash 4.1+ gotchas Tower
+
+`allow_direct_input=False` requis sur sliders (sinon input numérique éditable). Persistence ID bumping (`persistence="v2-key"`) pour invalider le cache navigateur. Composants conditionnels → utiliser `dcc.Store` relais. Imports tardifs pour éviter cycles. Détails : [dash_4_gotchas.md](dash_4_gotchas.md)
