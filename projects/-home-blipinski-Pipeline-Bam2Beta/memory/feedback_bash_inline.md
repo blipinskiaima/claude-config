@@ -6,7 +6,7 @@ originSessionId: 613eeff2-6b1f-420e-aaf2-3c2272f88dd3
 ---
 Pour les nouveaux modules Nextflow dans Bam2Beta, **toutes les commandes bash doivent être écrites directement dans le bloc `script: """ ... """`** du process, pas dans des scripts bash externes dans `bin/Module/`.
 
-**Why:** Boris a explicitement corrigé ce point lors de l'implémentation Sniffles2/Severus/Decoil (2026-04-28). Le plan initial proposait `bin/Sniffles2/run_sniffles2.sh` etc. à l'image d'`ichorCNA.nf` qui appelle `bin/ichorCNA/run_readCounter.sh`. Boris a préféré le pattern de `frag.nf` où les commandes (samtools, awk, etc.) sont inline. Raison : tout exécutable dans le `.nf`, plus facile à lire d'un coup, pas besoin de naviguer entre fichiers, et un seul endroit pour modifier la logique.
+**Why:** Boris a explicitement corrigé ce point lors de l'implémentation d'un nouveau module (2026-04-28). Le plan initial proposait des `bin/{Module}/run_*.sh` à l'image d'`ichorCNA.nf` qui appelle `bin/ichorCNA/run_readCounter.sh`. Boris a préféré le pattern de `frag.nf` où les commandes (samtools, awk, etc.) sont inline. Raison : tout exécutable dans le `.nf`, plus facile à lire d'un coup, pas besoin de naviguer entre fichiers, et un seul endroit pour modifier la logique.
 
 **How to apply:**
 - Pour TOUT nouveau process Nextflow dans ce projet : commandes bash inline dans `script: """ """`

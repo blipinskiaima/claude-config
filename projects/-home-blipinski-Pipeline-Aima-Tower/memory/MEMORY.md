@@ -1,5 +1,8 @@
 # Aima Tower — Auto Memory
 
+## Spec ciblée vs Spec réalisée
+Slider `target_specificity` = ce qu'on demande. `Spec_AI` du tableau = ce qu'on obtient (= `nb_healthy_below_threshold / nb_healthy_total`). Diverge à cause de la quantification (seuil discret sur N healthy fini). Détails : [spec_ciblee_vs_realisee.md](spec_ciblee_vs_realisee.md)
+
 ## Tower v3.0.0 en prod (2026-05-07) — refonte UI complète
 Stack : FastAPI + Vite + React + Tailwind v4 (remplace Dash). Tower main archivée v2.3.0 (rollback OK). Worktree prod = `~/Pipeline/Aima-Tower-main`. Plan C en stand-by sur `feat/ui-refresh-c`. Détails : [project_v3_cutover.md](project_v3_cutover.md)
 
@@ -84,3 +87,11 @@ Tower ≡ R main cell-by-cell validé (target=0.85+0.90, mode=ge5). 2 cohortes d
 ## Dash 4.1+ gotchas Tower
 
 `allow_direct_input=False` requis sur sliders (sinon input numérique éditable). Persistence ID bumping (`persistence="v2-key"`) pour invalider le cache navigateur. Composants conditionnels → utiliser `dcc.Store` relais. Imports tardifs pour éviter cycles. Détails : [dash_4_gotchas.md](dash_4_gotchas.md)
+
+## Cascade cohorte /exploration — intégrée v3.0.0 (2026-05-07)
+
+Backend `compute_cohort_cascade()` `@lru_cache(64)` + endpoint `/api/exploration/cohort-cascade`. Frontend `useCohortCascade` TanStack Query (lazy `enabled` au premier open) + `useDebouncedValue(250ms)` pour les sliders. Détails : [feature_cohort_cascade_integration.md](feature_cohort_cascade_integration.md)
+
+## UI Tower v3 — multi-utilisateurs (2026-05-07)
+
+Tower n'est plus un dashboard perso : retrait des références "Boris" / "Plan G" / branche `feat/ui-refresh-g` / "Internal · v3 preview" dans Sidebar + Home + Exploration. Thème **light par défaut** (fallback `getStoredTheme` → `"light"` au lieu de `"system"`, `theme-preference` localStorage préservé pour les users qui ont déjà choisi). Toggle dark/system reste dispo dans la sidebar.
