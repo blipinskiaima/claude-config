@@ -19,6 +19,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 ## Haute priorité
 
+- [ ] **Intégrer rapport Typst V2 dans Bam2Beta** — créer `Dockerfile.rapportv4` (Typst + cetz + IBM Plex) + remplacer `rmarkdown::render` dans `workflow/beta.nf:309` par `typst compile` + switcher `conf/{base,prod}.config` vers `rapportv4:latest`. **Lundi 2026-05-11**. Source : `test/V2final/report-grail-v2.typ`.
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
 
 ## Moyenne priorité
