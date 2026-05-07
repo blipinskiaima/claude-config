@@ -60,9 +60,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-05-07 — trace-prod schema v5 cohort
+## 2026-05-07 — trace-prod schema v5 cohort + projet Feature/ grid search
 
 - [x] **trace-prod schema v5 — colonne metadata.cohort** — ajout `metadata.cohort` (VARCHAR) + mapping `Cohorte → cohort` (col 48 gsheets CGFL+HCL) + `HARMONIZATION_RULES["cohort"]` défensif (casse/accent). 924 samples remplis via `import-metadata` (479 CGFL + 445 HCL). README + CLAUDE.md à jour. Commit `f433341`.
+- [x] **Projet Feature/ — base de connaissance + grid search XGBoost** — création projet séparé `~/Pipeline/Feature/` avec contexte des 4 projets sources (CLAUDE.md + 7 rules + memory) + pipeline validation Michael ↔ Feature (poc bit-exact + current à jour) + grid search exhaustif 957 combos (taille 3-8) qui identifie une combo +12 pp Sens@95% Active_NoMut vs config initiale Michael (`mvaf+mvaf_v2+ichor+score_cnv+frag1+frag2+loyfer_non_wbc`). Tableau final KPI en mémoire pour comparer futures features. Repo git local seul.
+- [x] **Réimport metadata HCL trace-prod** — récup de 44 nouveaux Lung HCL sans metadata + transition `oui → probable` pour Lung_19/23/83/84 (modif GSheet post-27/04). 378 importés, 12 manquants (Lung_133-144 pas encore checkés via `tp check`).
 
 ## 2026-04-30 — Refonte Aima-Tower /exploration v2.3 + onglet Avancé graphique + validation R
 
