@@ -89,6 +89,17 @@
 - `ss4.tsv`: sample sheet supplementaire
 - `samplesheet_0903.tsv`: 153 samples — consolidation complète (Colon, Healthy, TNE, Nuclear)
 
+## Renommage NANO sur S3 (effectué 2026-05-04)
+- ex-`NANO24_26_N4b` → renommé **NANO24_26_N4** (vrai N4)
+- ex-`NANO24_26_N4` → renommé **NANO25_26_N1** (BAM+FASTQ ajoutés le 04/05)
+- Cause initiale : erreur nommage MinKNOW. Désormais les noms S3 sont corrects.
+
+## Upload planifié vendredi 2026-05-08 22h (9 runs)
+- NANO22 : N1, N2B, N3, N4 (N2 déjà reçu le 24/04)
+- NANO23 : N1, N2, N3, N4
+- NANO14_26_N3 (run historique, Healthy_83-86, supprimé 12 mars)
+- Réception attendue **lundi 2026-05-11** (upload pendant le week-end).
+
 ## Upload Speed Monitoring
 - R/ggplot2 graph: `upload_speed.png`, data in `/tmp/upload_speed_week.csv`
 - Performance categories: CRITIQUE(<50)/DEGRADE/MOYEN/BON/OPTIMAL/EXCELLENT(>300 Go/h)

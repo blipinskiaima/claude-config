@@ -1,5 +1,8 @@
 # Aima Tower — Auto Memory
 
+## Refonte UI en cours — branche feat/ui-refresh (2026-05-05)
+Branche de dev `feat/ui-refresh`, tag de retour `pre-ui-refresh` sur `ed13d27`. Main intacte. Carte blanche utilisateur, réécriture totale autorisée. Cohérence avec charte platform.aima-diagnostics.com (Vite+React+Tailwind, Indigo+Emerald). Détails : [project_ui_refresh_constraints.md](project_ui_refresh_constraints.md)
+
 ## Todo list — routing par section
 Todo list `~/.claude/projects/-home-blipinski/memory/todo-optimisation.md` a 4 parties : À faire / En cours / Complété / Stand-by. Afficher UNIQUEMENT la partie demandée, pas le fichier complet. Détails : [feedback_todo_sections.md](feedback_todo_sections.md)
 

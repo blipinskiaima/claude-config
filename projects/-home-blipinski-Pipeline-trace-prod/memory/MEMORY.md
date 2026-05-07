@@ -150,13 +150,14 @@
 - Missing: "NA" in exports, NULL in DB
 - samples table: colonne `sample_type` (pas `type`)
 
-## Schema v2/v3/v4 Migration (avril 2026)
-- SCHEMA_VERSION bumped 1→2→3→4 dans `lib/duckdb.py`
+## Schema v2/v3/v4/v5 Migration (avril-mai 2026)
+- SCHEMA_VERSION bumped 1→2→3→4→5 dans `lib/duckdb.py`
 - Migration idempotente dans `DuckDBService._init_schema()` : `ALTER TABLE ... ADD COLUMN` si absent
 - v2 : `qc_metrics.mvaf_v1_10m/20m`, `retd_suivis.frag_mode1/2`, `bam_metadata.bam_horaire`, `metadata.{gene1_detailed_variant,active_cancer_clinical,stage,commentaire_global}`
-- v3 : `metadata.grade` (VARCHAR) — source "Grade" gsheet metadata_CGFL VAF, mapping `"Grade" → grade` dans `TSV_TO_DB_METADATA`. HCL reste NULL (pas de col Grade côté HCL)
-- v4 : `metadata.speedvac` (VARCHAR) — sources `SpeedVac` (CGFL) et `SpeedVAc` (HCL, casse différente). Coverage : 471/708 CGFL liquid + 401/401 HCL liquid. Harmonisation `Yes/No` via `HARMONIZATION_RULES["speedvac"]`
-- v4 (en plus) : fix mapping `stage` CGFL — ajout `"Stage" → stage` (la col HCL `"Stage (I, II, III and IV or code ADICAP if available)"` n'existait pas côté CGFL, stage CGFL était 100% NULL avant fix)
+- v3 : `metadata.grade` — source "Grade" gsheet metadata_CGFL VAF, HCL reste NULL
+- v4 : `metadata.speedvac` — `SpeedVac` (CGFL) + `SpeedVAc` (HCL, casse), harmonisé `Yes/No`
+- v4 (fix bonus) : `"Stage" → stage` ajouté (CGFL stage était 100% NULL avant)
+- v5 (mai 2026) : `metadata.cohort` — source col `Cohorte` (col 48 dans les 2 gsheets), mapping unique `"Cohorte" → cohort`. Valeurs : Validation tech, AlCapone, Bladder, Brenus, MSD, Lung-DI précoce. `HARMONIZATION_RULES["cohort"]` défensif (casse/accent). Coverage liquid : CGFL 479/644 (165 manquants = Lung_Alc absents DB), HCL 445/449 (4 vides en gsheet). Rempli uniquement via `import-metadata` (workflow `check` → `import-metadata`).
 
 ## Mapping Collision Fix (`upsert_metadata`, avril 2026)
 - Plusieurs `tsv_col` peuvent pointer vers le même `db_col` (ex: `"Stage"` et `"Stage (I, II...)"` → `stage` ; `"SpeedVac"` et `"SpeedVAc"` → `speedvac`)
