@@ -63,7 +63,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-05-07 — trace-prod schema v5 cohort + Feature/ grid search + Tower v3.0.0 cutover
+## 2026-05-07 — trace-prod schema v5 cohort + Feature/ grid search + Tower v3.0.0 cutover + Bam2Beta module IV / raima 0.4.17
 
 - [x] **trace-prod schema v5 — colonne metadata.cohort** — ajout `metadata.cohort` (VARCHAR) + mapping `Cohorte → cohort` (col 48 gsheets CGFL+HCL) + `HARMONIZATION_RULES["cohort"]` défensif (casse/accent). 924 samples remplis via `import-metadata` (479 CGFL + 445 HCL). README + CLAUDE.md à jour. Commit `f433341`.
 - [x] **Projet Feature/ — base de connaissance + grid search XGBoost** — création projet séparé `~/Pipeline/Feature/` avec contexte des 4 projets sources (CLAUDE.md + 7 rules + memory) + pipeline validation Michael ↔ Feature (poc bit-exact + current à jour) + grid search exhaustif 957 combos (taille 3-8) qui identifie une combo +12 pp Sens@95% Active_NoMut vs config initiale Michael (`mvaf+mvaf_v2+ichor+score_cnv+frag1+frag2+loyfer_non_wbc`). Tableau final KPI en mémoire pour comparer futures features. Repo git local seul.
@@ -71,6 +71,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Aima-Tower v3.0.0 — cutover Plan G en prod** — refonte UI complète (FastAPI + Vite + React + Tailwind v4) mergée sur main + tag `v3.0.0` (`d91f80b`). Tower main Dash archivée en `v2.3.0` (point de retour). Container `aima-tower-dashboard` actif sur tower.aima-diagnostics.com avec basic auth Caddy. Validation cell-by-cell vs v2.3.0 : 266 cancer / 192 healthy / Sens 84.6% / Spec 89.1%. Plan C (`feat/ui-refresh-c`, DMC sur Dash) conservé. Détails : [project_v3_cutover.md](../-home-blipinski-Pipeline-Aima-Tower/memory/project_v3_cutover.md).
 - [x] **Aima-Tower /exploration — cascade cohorte + UI cleanup multi-utilisateurs** — intégration feature cohort cascade (backend `compute_cohort_cascade()` `@lru_cache(64)` + endpoint `/api/exploration/cohort-cascade` + frontend `useCohortCascade` TanStack Query lazy + `useDebouncedValue(250ms)`). Cleanup multi-utilisateurs : thème light par défaut, retrait mentions "Boris" / "Plan G" / "feat/ui-refresh-g" / "Internal · v3 preview" sur Sidebar + Home + Exploration. Rebuild Docker + redéploiement prod. Commit `9327e1b`. Détails : [feature_cohort_cascade_integration.md](../-home-blipinski-Pipeline-Aima-Tower/memory/feature_cohort_cascade_integration.md).
 - [x] **Tower v3 — cascade cohorte étendue + liste samples + fluidité** — extension `/exploration` v3 : cascade 14 paliers descriptifs, filtre `cohort` opérationnel (m.cohort ajoutée à la query DuckDB), liste samples cohorte (TP/TN/FP/FN avec recherche), fix dedup misclassified (82 FN → 41), debounce sliders 250ms + keepPreviousData TanStack.
+- [x] **Bam2Beta — préparation V1.2.0 (commit `dbb174c`)** — bump raima 0.4.13→0.4.17 (test Healthy_826 identique bit-à-bit V1.1.2) + modules Sniffles2/Severus/Decoil archivés vers `dev/archive/` + doc/memory à jour. Tag V1.2.0 + release reportés à lundi 2026-05-11.
+- [x] **Bam2Beta — nouveau module IV (Identité de Vigilance)** — `workflow/IV.nf` + `bin/iv_score.R` (raima `infer_sex` + `infer_ancestry`). Outputs `${ID}.{sex,ancestry}.tsv` (1+2 lignes tab-séparées, 18 colonnes nommées). Activé prod/liquid/solid + mode rétrospectif. Validé Healthy_826 (CGFL solid) + Healthy_4 (HCL liquid retro).
 
 ## 2026-04-30 — Refonte Aima-Tower /exploration v2.3 + onglet Avancé graphique + validation R
 
