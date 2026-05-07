@@ -1,7 +1,7 @@
 # Aima Tower — Auto Memory
 
-## Refonte UI en cours — branche feat/ui-refresh (2026-05-05)
-Branche de dev `feat/ui-refresh`, tag de retour `pre-ui-refresh` sur `ed13d27`. Main intacte. Carte blanche utilisateur, réécriture totale autorisée. Cohérence avec charte platform.aima-diagnostics.com (Vite+React+Tailwind, Indigo+Emerald). Détails : [project_ui_refresh_constraints.md](project_ui_refresh_constraints.md)
+## Tower v3.0.0 en prod (2026-05-07) — refonte UI complète
+Stack : FastAPI + Vite + React + Tailwind v4 (remplace Dash). Tower main archivée v2.3.0 (rollback OK). Worktree prod = `~/Pipeline/Aima-Tower-main`. Plan C en stand-by sur `feat/ui-refresh-c`. Détails : [project_v3_cutover.md](project_v3_cutover.md)
 
 ## Todo list — routing par section
 Todo list `~/.claude/projects/-home-blipinski/memory/todo-optimisation.md` a 4 parties : À faire / En cours / Complété / Stand-by. Afficher UNIQUEMENT la partie demandée, pas le fichier complet. Détails : [feedback_todo_sections.md](feedback_todo_sections.md)

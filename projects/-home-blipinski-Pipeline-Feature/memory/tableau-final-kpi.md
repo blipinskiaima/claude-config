@@ -12,6 +12,19 @@ Convention validée le 2026-05-07. Format : **ligne = KPI, colonne = feature tes
 
 **How to apply:** À chaque test d'une nouvelle feature dans `Feature/features/{nom}/`, **ajouter 2 colonnes** au tableau (Michael, Feature current) avec les mêmes KPI (AUC ALL/CGFL/HCL, Sens à target_spec 0.95 et 0.90 stratifié All/LowVAF/HighVAF/Active no mut). Quand Boris demande un comparatif, présenter sous cette forme.
 
+## Convention KPI
+
+```
+   target_specificity = 0.95  → "Sens@95%" (standard ISO 15189)
+   target_specificity = 0.90  → "Sens@90%" (complément)
+   threshold = quantile(scores_healthy, target_spec, type=1)
+   AUC          = score-rank based, indépendant du seuil
+   N samples    = après cascade de filtres (cf. cohort-filters-cascade.md)
+                  diffère selon les features sélectionnées (NA cascade)
+```
+
+Voir [cohort-filters-cascade.md](cohort-filters-cascade.md) et [target-specificity.md](target-specificity.md).
+
 ## État actuel (6 features testées au 2026-05-07)
 
 | KPI | mVAF v1 (M) | mVAF v1 (F) | frag2 (M) | frag2 (F) | frag1 (M) | frag1 (F) | frag1+2 (M) | frag1+2 (F) | frag-diff (M) | frag-diff (F) | frag1+2+cnv (M) | frag1+2+cnv (F) | props_epic (M) | props_epic (F) |

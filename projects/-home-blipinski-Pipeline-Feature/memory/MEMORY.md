@@ -1,1 +1,4 @@
 - [Tableau final KPI Feature](tableau-final-kpi.md) — référence pour tout nouveau test de feature, ligne = KPI / colonne = feature
+- [Cascade des filtres cohorte](cohort-filters-cascade.md) — 7 étapes 1309 → 454 samples, à exposer dans Aima-Tower
+- [Target specificity convention](target-specificity.md) — `Sens@95%` standard ISO, `Sens@90%` complément
+- [trace-prod schema](trace-prod-schema.md) — référence colonnes des 7 tables
