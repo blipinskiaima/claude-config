@@ -60,6 +60,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-05-07 — trace-prod schema v5 cohort
+
+- [x] **trace-prod schema v5 — colonne metadata.cohort** — ajout `metadata.cohort` (VARCHAR) + mapping `Cohorte → cohort` (col 48 gsheets CGFL+HCL) + `HARMONIZATION_RULES["cohort"]` défensif (casse/accent). 924 samples remplis via `import-metadata` (479 CGFL + 445 HCL). README + CLAUDE.md à jour. Commit `f433341`.
+
 ## 2026-04-30 — Refonte Aima-Tower /exploration v2.3 + onglet Avancé graphique + validation R
 
 - [x] **Refonte page /exploration v2.3** — layout 25/75 sticky (radio Centre + sliders inline ultra-réactifs), ~50 filtres dynamiques pattern Analytics (multi/range/date/text) avec helpers no-op (`_legacy_set_or_none`, `_active_cancer_param`), nouvel onglet **Avancé** graphique (boxplot ad-hoc reuse `build_boxplot`), 2 cohortes distinctes Sens/Spé (R02) vs Graphique (R04). Tests SpeedVac (snapshot + partition invariant). Mémoire : [exploration_v2_3_design.md](../-home-blipinski-Pipeline-Aima-Tower/memory/exploration_v2_3_design.md) + [dash_4_gotchas.md](../-home-blipinski-Pipeline-Aima-Tower/memory/dash_4_gotchas.md).
