@@ -21,6 +21,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [ ] **Intégrer rapport Typst V2 dans Bam2Beta** — créer `Dockerfile.rapportv4` (Typst + cetz + IBM Plex) + remplacer `rmarkdown::render` dans `workflow/beta.nf:309` par `typst compile` + switcher `conf/{base,prod}.config` vers `rapportv4:latest`. **Lundi 2026-05-11**. Source : `test/V2final/report-grail-v2.typ`.
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
+- [ ] **Bam2Beta V1.2.0 — release lundi 2026-05-11** — commit + tag (raima 0.4.17 + suppression Sniffles/Severus/Decoil + nouveau module IV). Pipeline déjà testé OK sur Healthy_826.
+- [ ] **Vérifier qualité IV via trace-prod** — intégrer `sex.tsv` + `ancestry.tsv` dans trace-prod pour valider sur cohorte. Prérequis : release V1.2.0.
 
 ## Moyenne priorité
 
