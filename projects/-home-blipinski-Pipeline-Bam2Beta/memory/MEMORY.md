@@ -2,10 +2,10 @@
 
 ## Key Facts
 
-- Current version: V1.1.2 (tag V1.1.2, qualifie sur Healthy_826 le 2026-04-08)
+- Current version: V1.1.2 — V1.2.0 ready to tag 2026-05-11 (raima 0.4.17 + module IV + archived SVs)
 - Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest`
-- Raima package version: 0.4.13 (0.4.5 contenait `depth_per_region` non exportee, 0.4.13 retrocompatible verifie)
-- Pipeline modules: MERGE, BETA (EPIC), BETA_28M (Loyfer), FRAG, CNV, ICHORCNA, SCORE, QC
+- Raima package version: 0.4.17 (verifie retrocompatible sur Healthy_826 2026-05-07, identique bit-a-bit a V1.1.2)
+- Pipeline modules: MERGE, BETA (EPIC), BETA_28M (Loyfer), FRAG, CNV, ICHORCNA, IV, SCORE, QC
 - Prod profile enables: MERGE + BETA + FRAG + CNV
 - Retry strategy: doublement CPU/RAM par tentative, max 10, plafond cpus_max/memory_max
 
@@ -66,6 +66,29 @@
 - `getwilds/ichorcna` testé et rejeté (pas de readCounter, pas de libs graphiques png)
 - `remotes::install_github` n'installe pas `inst/scripts/` → scripts clonés séparément dans Dockerfile
 - `runIchorCNA.R` ne crée pas le outDir → `mkdir -p` nécessaire dans le process NF
+
+## IV Module (2026-05-07)
+
+- Container: `blipinskiaima/raima:latest` (raima 0.4.17)
+- Workflow: `workflow/IV.nf` — 1 process `IV_call`
+- Script: `bin/iv_score.R` — appelle `raima::infer_sex` + `raima::infer_ancestry`
+- Dependency: `/scratch/dependencies/raima-model/model_ancestry_data.tsv.gz` (1.5 GB)
+- Outputs publies dans `${output}/${ID}/IV/`:
+  - `${ID}.sex.tsv` — 1 ligne, 1 valeur scalaire
+  - `${ID}.ancestry.tsv` — 2 lignes (header + valeurs), 18 colonnes nommees (Africa W/S/E/N, Middle East, Ashkenazi, Italy, Europe E/NW/SW, Finland, South America, Sri Lanka, Pakistan, Bangladesh, Asia E, Japan, Philippines)
+- Active par defaut en prod/liquid/solid. Mode retrospectif supporte (BAM_FILE chain quand `--MERGE false`).
+- Hors strategie de qualification (pas de check-conformity).
+- Test Healthy_826 (CGFL solid): sex=0.9974, ancestry max Europe (NW)=0.4641 + Italy=0.3437 — PASS
+- Test Healthy_4 (HCL liquid, retrospectif): sex=0.0005, ancestry Europe (SW)=0.579 + (NW)=0.4055 — PASS
+
+## Refonte rapport PDF ctDNA — Typst V2 (2026-05-07)
+
+- Pivot LaTeX/XeLaTeX → **Typst 0.14.2** (binaire Rust 40MB, compile <1s, pas de math mode buggé, Unicode natif)
+- Direction retenue : **GRAIL Galleri** (Result en grande card colorée centrale, accessible patient + clinicien)
+- Template final : `test/V2final/report-grail-v2.typ` + 4 PDFs de test (NEG/POS × clean/warning)
+- Container futur : `blipinskiaima/rapportv4:latest` (à créer 2026-05-11)
+- Charte AIMA + Éxís hybride dans `~/.claude/rules/aima-brand.md`
+- See [report_pdf_typst_v2.md](report_pdf_typst_v2.md) for full details
 
 ## Feedback
 
