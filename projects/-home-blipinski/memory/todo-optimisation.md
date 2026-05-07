@@ -60,11 +60,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-05-07 — trace-prod schema v5 cohort + projet Feature/ grid search
+## 2026-05-07 — trace-prod schema v5 cohort + Feature/ grid search + Tower v3.0.0 cutover
 
 - [x] **trace-prod schema v5 — colonne metadata.cohort** — ajout `metadata.cohort` (VARCHAR) + mapping `Cohorte → cohort` (col 48 gsheets CGFL+HCL) + `HARMONIZATION_RULES["cohort"]` défensif (casse/accent). 924 samples remplis via `import-metadata` (479 CGFL + 445 HCL). README + CLAUDE.md à jour. Commit `f433341`.
 - [x] **Projet Feature/ — base de connaissance + grid search XGBoost** — création projet séparé `~/Pipeline/Feature/` avec contexte des 4 projets sources (CLAUDE.md + 7 rules + memory) + pipeline validation Michael ↔ Feature (poc bit-exact + current à jour) + grid search exhaustif 957 combos (taille 3-8) qui identifie une combo +12 pp Sens@95% Active_NoMut vs config initiale Michael (`mvaf+mvaf_v2+ichor+score_cnv+frag1+frag2+loyfer_non_wbc`). Tableau final KPI en mémoire pour comparer futures features. Repo git local seul.
 - [x] **Réimport metadata HCL trace-prod** — récup de 44 nouveaux Lung HCL sans metadata + transition `oui → probable` pour Lung_19/23/83/84 (modif GSheet post-27/04). 378 importés, 12 manquants (Lung_133-144 pas encore checkés via `tp check`).
+- [x] **Aima-Tower v3.0.0 — cutover Plan G en prod** — refonte UI complète (FastAPI + Vite + React + Tailwind v4) mergée sur main + tag `v3.0.0` (`d91f80b`). Tower main Dash archivée en `v2.3.0` (point de retour). Container `aima-tower-dashboard` actif sur tower.aima-diagnostics.com avec basic auth Caddy. Validation cell-by-cell vs v2.3.0 : 266 cancer / 192 healthy / Sens 84.6% / Spec 89.1%. Plan C (`feat/ui-refresh-c`, DMC sur Dash) conservé. Détails : [project_v3_cutover.md](../-home-blipinski-Pipeline-Aima-Tower/memory/project_v3_cutover.md).
 
 ## 2026-04-30 — Refonte Aima-Tower /exploration v2.3 + onglet Avancé graphique + validation R
 
