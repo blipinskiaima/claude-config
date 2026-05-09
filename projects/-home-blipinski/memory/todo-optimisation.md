@@ -63,9 +63,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-05-09 — Aima-Tower fix Home stockage + URLs Scaleway
+## 2026-05-09 — Aima-Tower fix Home stockage + URLs Scaleway + SampleSheetChecker consolidation NANO22-23
 
 - [x] **Aima-Tower v3 — fix jauge stockage Home + URLs Scaleway Monitoring** — bind-mount /scratch et /scratch2 dans le container + whitelist `MONITORED_DISKS` (root + scratch) avec label disque mis en valeur (dot coloré, font 15px semibold). `s3ToScaleway` concatène désormais le path après `/files/` au lieu de `?path=...` (l'ancien format ouvrait la racine du bucket). Fige `name: aima-tower` dans docker-compose pour éviter la divergence images/containers depuis Aima-Tower-main. Commit `f136e7a`. Détails : [feedback_compose_project_name.md](../-home-blipinski-Pipeline-Aima-Tower/memory/feedback_compose_project_name.md).
+- [x] **SampleSheetChecker — sample sheets ss5-ss9** — création de 8 TSV (Healthy_59-66/111-150 + Lung_81-144 + Nuclear_13-16) pour les batchs reçus du 21/03 au 09/05 (NANO13-25). Sync ss5 bam+pod5 validé. Commit `1675155`.
+- [x] **NANO14_N3 retrouvé (Healthy_83-86)** — run historique perdu depuis le 12/03 re-uploadé le 8-9 mai (1.4 TB). Total 9/9 runs reçus comme planifié (NANO22 N1/N2b/N3/N4 + NANO23 N1-N4 + NANO14_N3) via cron `at` jeudi 21h.
+- [x] **Consolidation variants b/c → originaux NANO22/23 (bam_pass)** — fusion de 9 paires de runs via `aws s3 cp --recursive` (61.8 GB / 33 156 fichiers, **0 collision**) grâce à l'unicité `{run_id}_{acquisition_id}` dans les noms MinKNOW. Pod5_pass restant à faire. Détails : [MEMORY.md](../-home-blipinski-Pipeline-SampleSheetChecker/memory/MEMORY.md).
 
 ## 2026-05-07 — trace-prod schema v5 cohort + Feature/ grid search + Tower v3.0.0 cutover + Bam2Beta module IV / raima 0.4.17 + rapport PDF Typst V2
 
