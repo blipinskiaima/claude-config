@@ -48,18 +48,8 @@
 - NANO13_26_N3-N4, NANO14_26_N3: complets
 - **9 runs gsheet absents de S3** (~40 samples)
 
-### Cas 1 — Healthy_59-66 : NANO13 manquants
-| Sample | Name | Barcode | Run | Run ID | NANO |
-|--------|------|---------|-----|--------|------|
-| Healthy_59 | H60-S | barcode25 | 20260216_1053_1C_PBI54259_aa33c7e7 | aa33c7e7 | NANO13_26_N1 |
-| Healthy_60 | H61-S | barcode26 | (même run) | aa33c7e7 | NANO13_26_N1 |
-| Healthy_61 | H62-S | barcode27 | (même run) | aa33c7e7 | NANO13_26_N1 |
-| Healthy_62 | H63-S | barcode28 | (même run) | aa33c7e7 | NANO13_26_N1 |
-| Healthy_63 | H64-S | barcode29 | 20260216_1054_1E_PBI51449_99962cf0 | 99962cf0 | NANO13_26_N2 |
-| Healthy_64 | H65-S | barcode30 | (même run) | 99962cf0 | NANO13_26_N2 |
-| Healthy_65 | H66-S | barcode31 | (même run) | 99962cf0 | NANO13_26_N2 |
-| Healthy_66 | H67-S | barcode32 | (même run) | 99962cf0 | NANO13_26_N2 |
-→ Données jamais uploadées, à localiser sur machine source
+### Cas 1 — Healthy_59-66 (NANO13_N1+N2)
+Reçus le 20-21/03/2026 (uploads retardataires) puis synchronisés via `ss5.tsv` le 07/04. Runs `aa33c7e7` (N1, bc25-28) et `99962cf0` (N2, bc29-32).
 
 ### Cas 2 — Samples sur S3 raw mais pas en DB (à sync liquid)
 - NANO13_26_N4 (`bc4b0d55`): Healthy_71-74
@@ -87,18 +77,36 @@
 - `samplesheet3.tsv`: 32 samples (Healthy_27-58)
 - `samplesheet_test_basecall.tsv`: 7 samples (Healthy_11/12/14/23/25/26/34) — test pod5
 - `ss4.tsv`: sample sheet supplementaire
-- `samplesheet_0903.tsv`: 153 samples — consolidation complète (Colon, Healthy, TNE, Nuclear)
+- `samplesheet_0903.tsv`: 161 samples — consolidation Colon/Healthy/TNE/Nuclear (mise à jour avec Healthy_59-66)
+- `ss5.tsv`: 8 samples (Healthy_59-66, NANO13_N1+N2)
+- `ss6.tsv`: 32 samples (Healthy_111-142, NANO19)
+- `ss7.tsv`: 16 samples (Healthy_143-150 + Lung_81-88, NANO20+21)
+- `ss8.tsv` / `ss8bis.tsv` / `ss8done.tsv`: drafts pour Lung_89+ avec différents découpages variants/originaux
+- `ss9_final.tsv` / `ss9_final_final.tsv`: 60 samples (Lung_89-144 + Nuclear_13-16) — version finale après consolidation variants→originaux
 
 ## Renommage NANO sur S3 (effectué 2026-05-04)
 - ex-`NANO24_26_N4b` → renommé **NANO24_26_N4** (vrai N4)
 - ex-`NANO24_26_N4` → renommé **NANO25_26_N1** (BAM+FASTQ ajoutés le 04/05)
 - Cause initiale : erreur nommage MinKNOW. Désormais les noms S3 sont corrects.
 
-## Upload planifié vendredi 2026-05-08 22h (9 runs)
-- NANO22 : N1, N2B, N3, N4 (N2 déjà reçu le 24/04)
-- NANO23 : N1, N2, N3, N4
-- NANO14_26_N3 (run historique, Healthy_83-86, supprimé 12 mars)
-- Réception attendue **lundi 2026-05-11** (upload pendant le week-end).
+## Upload du 8-9 mai 2026 — 9 runs reçus ✅
+Upload programmé jeudi 7/05 21h (cron `at`), réception le 8-9 mai :
+- **NANO14_26_N3** : Healthy_83-86 retrouvés (run historique perdu depuis le 12 mars).
+- **NANO22** : N1, N2b, N3, N4 reçus (N2 était déjà sur S3 depuis le 24/04).
+- **NANO23** : N1-N4 reçus.
+
+## Consolidation variants b/c → originaux (2026-05-09)
+Pour les runs avec re-séquences (variants `Nxb`, `Nxc`), les données ont été **fusionnées** dans le run original via `aws s3 cp --recursive` (pas de `mv`, sources préservées).
+
+**Garantie de non-écrasement** : noms de fichiers MinKNOW = `{flowcell}_pass_{barcode}_{run_id}_{acquisition_id}_{n}.bam` — `run_id` + `acquisition_id` uniques par acquisition, donc cohabitation côte à côte sans collision (vérifié à 0 collision sur les 9 paires).
+
+**Statut** : 9/9 copies `bam_pass` faites (61.8 GB / 33 156 fichiers). **Pod5_pass restant à faire** avec la même méthode.
+
+**Mapping appliqué** :
+- N22 : N1b/N2b/N2c/N3b/N4b → N1/N2/N3/N4 (run dirs : `21502dde`/`b97fcc55`/`61179999`/`d87b865f`/`867c86da` → `b3d88a80`/`a9e8f963`/`80e6ffd1`/`b7dc9666`)
+- N23 : N1b-N4b → N1-N4 (run dirs : `dc2aaea3`/`583553ad`/`e29ab570`/`4c7ea746` → `f1e2d309`/`2bde5754`/`bf422774`/`0d1e87ca`)
+
+**Vérification cohérence variant/original** : pour les 9 paires, mêmes barcodes remplis (4 barcodes consécutifs identiques), juste yields différents (variants = re-runs faible yield).
 
 ## Upload Speed Monitoring
 - R/ggplot2 graph: `upload_speed.png`, data in `/tmp/upload_speed_week.csv`

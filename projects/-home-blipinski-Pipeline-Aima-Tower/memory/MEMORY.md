@@ -9,6 +9,9 @@ Stack : FastAPI + Vite + React + Tailwind v4 (remplace Dash). Tower main archiv�
 ## Todo list — routing par section
 Todo list `~/.claude/projects/-home-blipinski/memory/todo-optimisation.md` a 4 parties : À faire / En cours / Complété / Stand-by. Afficher UNIQUEMENT la partie demandée, pas le fichier complet. Détails : [feedback_todo_sections.md](feedback_todo_sections.md)
 
+## Docker compose Tower main — project name figé à `aima-tower`
+Le compose de `Aima-Tower-main` contient `name: aima-tower` (override). Sans ça compose dérive du dossier (`aima-tower-main`) et taggue une image fantôme distincte des containers historiques. Détails : [feedback_compose_project_name.md](feedback_compose_project_name.md)
+
 ## DuckDB Cross-DB Join Pattern
 
 Quand on doit joindre deux bases DuckDB read-only (ex: platform + trace-workflow), `_query()` ne peut pas ATTACH (connexion read-only). Solution : connexion in-memory avec ATTACH des deux bases :
