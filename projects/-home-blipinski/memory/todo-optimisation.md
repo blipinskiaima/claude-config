@@ -63,6 +63,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-05-09 — Aima-Tower fix Home stockage + URLs Scaleway
+
+- [x] **Aima-Tower v3 — fix jauge stockage Home + URLs Scaleway Monitoring** — bind-mount /scratch et /scratch2 dans le container + whitelist `MONITORED_DISKS` (root + scratch) avec label disque mis en valeur (dot coloré, font 15px semibold). `s3ToScaleway` concatène désormais le path après `/files/` au lieu de `?path=...` (l'ancien format ouvrait la racine du bucket). Fige `name: aima-tower` dans docker-compose pour éviter la divergence images/containers depuis Aima-Tower-main. Commit `f136e7a`. Détails : [feedback_compose_project_name.md](../-home-blipinski-Pipeline-Aima-Tower/memory/feedback_compose_project_name.md).
+
 ## 2026-05-07 — trace-prod schema v5 cohort + Feature/ grid search + Tower v3.0.0 cutover + Bam2Beta module IV / raima 0.4.17 + rapport PDF Typst V2
 
 - [x] **Refonte rapport PDF ctDNA en Typst V2 (R&D)** — pivot LaTeX/XeLaTeX → Typst 0.14.2 + direction GRAIL Galleri retenue (donut TF + ✓/✗ vectoriel cetz + KPI cards + palette hybride AIMA/Éxís). Source `test/V2final/report-grail-v2.typ` + 4 PDFs de test (NEG/POS × clean/warning). Intégration pipeline prévue lundi 2026-05-11. Commit Bam2Beta `574e779`. Détails : [report_pdf_typst_v2.md](../-home-blipinski-Pipeline-Bam2Beta/memory/report_pdf_typst_v2.md).
