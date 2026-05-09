@@ -16,7 +16,7 @@
 
 ## Audit
 
-- [Audit Claude Code 2026-05-09](audit-claude-code-2026-05-09.md) — 30j de transcripts, 100 sessions, 19 skills à 0 invoc, 17 actions priorisées (top : MCP DuckDB read-only, hook PreToolUse étendu, skill docker-restart)
+- [Audit Claude Code 2026-05-09](audit-claude-code-2026-05-09.md) — 30j transcripts + 7 changelogs hebdo Claude Code (w13-w19) + Code w/ Claude 06/05. 100 sessions, 19 skills à 0 invoc, 25 actions priorisées (top : `/fewer-permission-prompts`, Remote Control + push mobile, MCP DuckDB read-only, hook PreToolUse `if:` étendu, skill docker-restart)
 
 ## Todo
 
