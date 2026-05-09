@@ -14,6 +14,10 @@
 
 - [Inventaire Claude Code](inventaire-claude-code.md) — 24 skills, 4 agents, 3 MCP, 11 rules, 2 hooks, 3 plugins (2026-04-13)
 
+## Audit
+
+- [Audit Claude Code 2026-05-09](audit-claude-code-2026-05-09.md) — 30j de transcripts, 100 sessions, 19 skills à 0 invoc, 17 actions priorisées (top : MCP DuckDB read-only, hook PreToolUse étendu, skill docker-restart)
+
 ## Todo
 
 - [Todo optimisation](todo-optimisation.md) — Tâches restantes après rétrospective (batch effect, Aima-Tower, sécurité, MethylBERT...)
