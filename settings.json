@@ -77,6 +77,28 @@
       "Bash(cd * && *)",
       "Bash(git * && git *)",
       "Bash(git * && *)"
+    ],
+    "deny": [
+      "Bash(aws s3 rm:*)",
+      "Bash(aws s3 rb:*)",
+      "Bash(rm * *.pod5)",
+      "Bash(rm * *.pod5 *)",
+      "Bash(rm * /scratch/basecall/dorado/*)",
+      "Bash(rm -rf /:*)",
+      "Bash(rm -rf ~:*)",
+      "Bash(rm -rf ~/Pipeline:*)",
+      "Bash(rm -rf ~/Run:*)",
+      "Bash(rm -rf ~/Run2:*)",
+      "Bash(rm -rf .git:*)",
+      "Bash(find * -delete)",
+      "Bash(find * -delete *)",
+      "Bash(find * -exec rm *)",
+      "Bash(dd of=/dev/*)",
+      "Bash(dd if=* of=/dev/*)",
+      "Bash(shred:*)",
+      "Bash(mkfs:*)",
+      "Bash(mkfs.ext4:*)",
+      "Bash(mkfs.xfs:*)"
     ]
   },
   "hooks": {
@@ -86,7 +108,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); cmd=$(echo \"$input\" | jq -r '.tool_input.command // \"\"'); if echo \"$cmd\" | grep -qE '(aws s3 rm|aws s3 rb|aws s3 sync.*--delete)'; then echo 'BLOCKED: opération de suppression S3 détectée — golden rule violation' >&2; exit 2; fi; exit 0"
+            "command": "bash ~/.claude/scripts/pretool-bash-guard.sh"
           }
         ]
       }
@@ -123,7 +145,8 @@
     "feature-dev@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
   },
   "autoUpdatesChannel": "latest",
   "agentPushNotifEnabled": true
