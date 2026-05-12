@@ -1,10 +1,10 @@
 ---
 name: Docker compose Tower main — project name figé à `aima-tower`
-description: Le docker-compose.yml de Aima-Tower-main fixe le project name à `aima-tower` (sans suffixe `-main`). Sans cela, compose dérive du nom du dossier et taggue une image fantôme.
+description: Le docker-compose.yml de Aima-Tower fixe le project name à `aima-tower` (sans suffixe `-main`). Sans cela, compose dérive du nom du dossier et taggue une image fantôme.
 type: feedback
 originSessionId: c43652e0-b0c5-4c6d-8cd9-e05ec94930e4
 ---
-Le `docker-compose.yml` de `~/Pipeline/Aima-Tower-main/` contient `name: aima-tower` en tête. Sans ce override, Docker Compose dérive le project name du nom du dossier (`Aima-Tower-main` → `aima-tower-main`) et taggue les images comme `aima-tower-main-mini-tower:latest`, alors que les containers historiques utilisent `aima-tower-mini-tower:latest`. Résultat : `compose build` produit une image fantôme et `compose up` recrée des containers basés sur la vieille image.
+Le `docker-compose.yml` de `~/Pipeline/Aima-Tower/` contient `name: aima-tower` en tête. Sans ce override, Docker Compose dérive le project name du nom du dossier (`Aima-Tower` → `aima-tower-main`) et taggue les images comme `aima-tower-main-mini-tower:latest`, alors que les containers historiques utilisent `aima-tower-mini-tower:latest`. Résultat : `compose build` produit une image fantôme et `compose up` recrée des containers basés sur la vieille image.
 
 Symptôme typique : on modifie `src/compute.py`, on rebuild, mais le container tourne toujours avec l'ancien code (les hashes md5 entre `/app/src/compute.py` et le fichier host divergent).
 

@@ -1,5 +1,7 @@
 # trace-prod Memory
 
+- [Rebasecalled POD5 — ne pas propager](feedback_rebasecalled_pod5.md) — laisser NULL après update-column stockage_pod5, ne pas copier depuis l'original
+
 ## Architecture
 - CLI entry: `database/check_samples.py` (Click)
 - Core: `lib/checkers.py`, `lib/duckdb.py`, `lib/utils.py`, `lib/extractors.py`

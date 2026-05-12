@@ -1,5 +1,8 @@
 # SampleSheetChecker - Project Memory
 
+## Memories
+- [BAM merged path](bam_merged_path.md) — Les BAM finaux sont dans `processed/MRD/RetD/liquid/HCL/{sample}/BAM/`, PAS dans `data/HCL/liquid/`
+
 ## Project Overview
 - Single Bash script (`SampleSheetChecker.sh`, ~317 lines) — no dependencies, no build system
 - Validates TSV sample sheets then syncs BAM/POD5 data from `raw/` to `liquid/` on S3 (Scaleway, `AWS_PROFILE=scw`)

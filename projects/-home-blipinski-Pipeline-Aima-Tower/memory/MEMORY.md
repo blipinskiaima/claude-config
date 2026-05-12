@@ -4,13 +4,13 @@
 Slider `target_specificity` = ce qu'on demande. `Spec_AI` du tableau = ce qu'on obtient (= `nb_healthy_below_threshold / nb_healthy_total`). Diverge à cause de la quantification (seuil discret sur N healthy fini). Détails : [spec_ciblee_vs_realisee.md](spec_ciblee_vs_realisee.md)
 
 ## Tower v3.0.0 en prod (2026-05-07) — refonte UI complète
-Stack : FastAPI + Vite + React + Tailwind v4 (remplace Dash). Tower main archivée v2.3.0 (rollback OK). Worktree prod = `~/Pipeline/Aima-Tower-main`. Plan C en stand-by sur `feat/ui-refresh-c`. Détails : [project_v3_cutover.md](project_v3_cutover.md)
+Stack : FastAPI + Vite + React + Tailwind v4 (remplace Dash). Un seul worktree = `~/Pipeline/Aima-Tower/` sur `main`. Parachute rollback = tag `v2.3.0` (Dash mono-stack). Plan C et Plan G nettoyés (worktrees + branches supprimés le 2026-05-11). Détails : [project_v3_cutover.md](project_v3_cutover.md)
 
 ## Todo list — routing par section
 Todo list `~/.claude/projects/-home-blipinski/memory/todo-optimisation.md` a 4 parties : À faire / En cours / Complété / Stand-by. Afficher UNIQUEMENT la partie demandée, pas le fichier complet. Détails : [feedback_todo_sections.md](feedback_todo_sections.md)
 
-## Docker compose Tower main — project name figé à `aima-tower`
-Le compose de `Aima-Tower-main` contient `name: aima-tower` (override). Sans ça compose dérive du dossier (`aima-tower-main`) et taggue une image fantôme distincte des containers historiques. Détails : [feedback_compose_project_name.md](feedback_compose_project_name.md)
+## Docker compose Tower — project name figé à `aima-tower`
+Le compose contient `name: aima-tower` (override). Sans ça compose dérive du dossier et taggue une image fantôme distincte des containers historiques. Permet de renommer le worktree sans casser les volumes/réseaux nommés. Détails : [feedback_compose_project_name.md](feedback_compose_project_name.md)
 
 ## DuckDB Cross-DB Join Pattern
 
@@ -82,6 +82,9 @@ Depuis backfill EDAT Aima-Survey, toutes les vues (Day/Week/Month/Year/All) filt
 ## Guardant Health — stratégie Europe (2026-04-23)
 
 Snapshot : Guardant360 CDx seul IVDR-certifié (mai 2024). Reveal MRD = LDT via labs hospitaliers (VHIO, Royal Marsden, Gemelli) — **aucun partenariat France**. Shield MCED **absent Europe**, priorité Asie 2026 (Manulife). Signatera devance Guardant sur CRC France (CIRCULATE-PRODIGE-70). Fenêtres AIMA : MCED CRC sanguin méthylation + MRD CRC France via UNICANCER/CLCC. IVDR classe C se ferme 2028. Détails : [competitors_guardant_europe.md](competitors_guardant_europe.md)
+
+## Sens_Active redéfini = cancer_truth (2026-05-11, demande Michael)
+Tableau Sensibilité stratifiée VAF colonne "Cancer actif" utilise `cancer_truth` (mutated OR active_cancer) au lieu de `active_cancer_flag` strict. Diverge volontairement du pipeline R. Détails : [project_sens_active_cancer_truth.md](project_sens_active_cancer_truth.md)
 
 ## Refonte Exploration v2.3 (2026-04-30)
 

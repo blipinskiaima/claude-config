@@ -19,33 +19,33 @@ originSessionId: e7cf4774-71b7-41ae-a4bc-9bc5a148a559
 | v2.3.0 | ed13d27 | Dernière Dash, point de retour |
 | v3.0.0 | d91f80b | Refonte Plan G mergée sur main |
 
-## Worktrees
+## Worktree
+
+Un seul worktree depuis le 2026-05-11 (Plan C et Plan G nettoyés) :
 
 ```
-~/Pipeline/Aima-Tower       → feat/ui-refresh-c (Plan C, en stand-by, DMC sur Dash)
-~/Pipeline/Aima-Tower-g     → feat/ui-refresh-g (branche source Plan G, mergée dans main)
-~/Pipeline/Aima-Tower-main  → main v3.0.0 (= source du container prod actif)
+~/Pipeline/Aima-Tower → main v3.0.0 (= source du container prod actif)
 ```
 
-Le container `aima-tower-dashboard` est buildé depuis `Aima-Tower-main`. Les volumes `data/` et `overview/` sont symlinkés vers `Aima-Tower/` pour préserver claude-home, bookmarks, seen, S3.md.
+Le container `aima-tower-dashboard` est buildé depuis ce dossier. `.env` et `data/` sont des **vrais fichiers** dans ce dossier (plus de symlinks inter-worktrees).
 
 ## Why
 
-Boris a validé la refonte UI complète après comparaison cell-by-cell : Plan G ≡ Tower main (266 cancers / 192 healthy / Sens AI 84.6% / Spec AI 89.1%). Le Plan C reste vivant pour test ultérieur.
+Boris a validé la refonte UI complète après comparaison cell-by-cell : Plan G ≡ Tower main (266 cancers / 192 healthy / Sens AI 84.6% / Spec AI 89.1%). Plan C jamais utilisé en prod → supprimé. Plan G mergé dans main → supprimé. Tag `v2.3.0` sert de parachute en cas de besoin (Dash mono-stack).
 
 ## How to apply
 
-- Pour modifier le code prod : éditer dans `Aima-Tower-main` → `docker compose -p aima-tower build mini-tower && up -d`
+- Pour modifier le code prod : éditer dans `~/Pipeline/Aima-Tower` → `docker compose build mini-tower && docker compose up -d`
 - Pour rollback v2.3.0 :
   ```
-  cd ~/Pipeline/Aima-Tower-main
+  cd ~/Pipeline/Aima-Tower
   git stash && git checkout v2.3.0 -- .
-  docker compose -p aima-tower down
-  docker compose -p aima-tower build mini-tower
-  docker compose -p aima-tower up -d
+  docker compose down
+  docker compose build mini-tower
+  docker compose up -d
   ```
 - L'image `aima-tower-mini-tower:v3.0.0` est taguée pour identification (latest = v3 actuelle)
-- `--project-name aima-tower` impératif pour préserver les volumes Caddy (caddy_data, caddy_config = certificats Let's Encrypt)
+- Le project name `aima-tower` est figé dans le compose (override `name:`) → préserve volumes Caddy nommés (caddy_data, caddy_config = certificats Let's Encrypt) même si le worktree est renommé.
 
 ## v3.1.0 prévue : passer en systemd (sans Docker)
 
