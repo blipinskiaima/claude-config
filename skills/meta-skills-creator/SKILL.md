@@ -46,12 +46,16 @@ See [references/process/phase2-research-methodology.md](references/process/phase
 Choose the reference file structure based on the skill's domain:
 
 1. **Identify topics** — list every distinct area the skill covers
-2. **Group into sub-folders** — organize by function (fundamentals, operations, patterns, etc.)
-3. **One file per topic** — each file covers one focused subject
-4. **Design SKILL.md** — lean workflow + navigation table to references
+2. **Calibrate prescriptiveness** — pick degrees of freedom (high/medium/low) per area
+3. **Group into sub-folders** — organize by function (fundamentals, operations, patterns, etc.)
+4. **Decide bundled resources** — scripts/ for executables, assets/ for output materials
+5. **One file per topic** — each file covers one focused subject
+6. **Design SKILL.md** — lean workflow + navigation table to references
 
 See [references/architecture/file-structure.md](references/architecture/file-structure.md) for structure patterns.
 See [references/architecture/skillmd-template.md](references/architecture/skillmd-template.md) for the SKILL.md template.
+See [references/architecture/degrees-of-freedom.md](references/architecture/degrees-of-freedom.md) to calibrate prescriptiveness.
+See [references/architecture/bundled-resources.md](references/architecture/bundled-resources.md) for scripts/references/assets choices.
 
 ## Phase 4: Build
 
@@ -59,12 +63,14 @@ Execute in this order:
 
 1. **Initialize** with `init_skill.py` from the skill-creator
 2. **Clean up** example files (scripts/, assets/, example reference)
-3. **Create sub-folders** in references/
-4. **Write SKILL.md** first (workflow + navigation table)
-5. **Write all reference files** (in parallel when independent)
-6. **Remove empty directories**
+3. **Verify nothing forbidden** — no README, CHANGELOG, etc. (see anti-patterns)
+4. **Create sub-folders** in references/
+5. **Write SKILL.md** first (workflow + navigation table)
+6. **Write all reference files** (in parallel when independent)
+7. **Remove empty directories**
 
 See [references/patterns/writing-guidelines.md](references/patterns/writing-guidelines.md) for content standards.
+See [references/quality/anti-patterns.md](references/quality/anti-patterns.md) for what NOT to include.
 
 ## Phase 5: Validate
 
@@ -87,6 +93,29 @@ Present to the user:
 - **Summary** of what each sub-folder covers
 - **Source list** (official docs used for research)
 - **Invocation command** (`/skill-name`)
+
+Optional — package for distribution:
+```bash
+python3 {skill-creator-path}/scripts/package_skill.py {skill-path}
+```
+Use only if sharing with another machine or user (produces a `.skill` zip). Skills used locally don't need packaging.
+
+## Phase 7: Iterate
+
+Skills rarely land perfect on first build. Treat the first version as a draft.
+
+After real usage:
+1. **Observe** where Claude struggled, looped, or asked redundant questions
+2. **Identify** the gap — missing reference, unclear workflow step, wrong degree of freedom
+3. **Update** the affected file (SKILL.md or specific reference) — surgical, don't rewrite
+4. **Re-validate** with `quick_validate.py`
+5. **Re-test** on the failing case
+
+Common iteration triggers:
+- Claude loads a reference file that turns out unhelpful → tighten the description or remove
+- Claude misses a constraint repeatedly → move it from a reference to SKILL.md
+- Claude over-explains where it should act → reduce freedom in that section
+- Claude is rigid where flexibility is needed → increase freedom
 
 </workflow>
 
