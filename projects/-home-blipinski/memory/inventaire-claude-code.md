@@ -84,9 +84,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 | `web-design-guidelines` | Vercel — audit accessibilité + bonnes pratiques web. Trigger sur "check accessibility", "audit design". |
 | `react-best-practices` | Vercel — 57 règles perf React/Next.js. Peu pertinent pour stack Dash actuelle. |
 | `composition-patterns` | Vercel — compound components React, élimine anti-patterns boolean props. Peu pertinent pour Dash. |
-| `tailwind-v4-shadcn` | Tailwind v4 + shadcn/ui + Vite/React. Pertinent uniquement si migration vers React. |
+| `tailwind-v4-shadcn` | Tailwind v4 + shadcn/ui + Vite/React. **Directement pertinent pour Aima-Tower V3** (Vite + React 18 + TS + Tailwind v4 + AG Grid). |
 
-**Pour AIMA (stack Dash/Plotly + rapports Typst)** : `frontend-design`, `ui-ux-pro-max`, `design-review`, `web-design-guidelines` sont les 4 directement utiles. Les 3 React (`react-best-practices`, `composition-patterns`, `tailwind-v4-shadcn`) sont gardés pour usage futur ou expérimentation.
+**Pour AIMA** : tous les 7 sont pertinents depuis la refonte Aima-Tower V3 (mai 2026, stack Vite + React 18 + TypeScript + Tailwind v4 + AG Grid v35). Les rapports Typst restent dans le périmètre de `frontend-design` et `ui-ux-pro-max` pour la direction esthétique.
 
 ## Agents (4)
 
