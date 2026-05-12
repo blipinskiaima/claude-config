@@ -1,12 +1,12 @@
 ---
 name: Inventaire Claude Code AIMA
-description: Inventaire complet des outils Claude Code disponibles — skills, agents, MCP, rules, hooks, plugins. Mis à jour le 2026-04-20 après exploration profonde de .claude/.
+description: Inventaire complet des outils Claude Code disponibles — skills, agents, MCP, rules, hooks, plugins. Mis à jour le 2026-05-12 (ajout des 7 skills frontend).
 type: reference
 originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
-# Inventaire Claude Code — Boris Blipinski (2026-04-20)
+# Inventaire Claude Code — Boris Blipinski (2026-05-12)
 
-## Skills (29 globaux dans ~/.claude/skills/)
+## Skills (39 dossiers dans ~/.claude/skills/, dont 36 actifs)
 
 ### Bioinfo / AIMA — Global (10)
 | Skill | Usage |
@@ -74,6 +74,19 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 | `/meta-skills-creator` | Créer des skills professionnels (processus 6 étapes) |
 | `/subagent-creator` | Créer/configurer des sous-agents |
 | `/prompt-creator` | Ingénierie de prompts multi-LLM |
+
+### Frontend / UI Design — Global (7) [installé 2026-05-12]
+| Skill | Usage |
+|---|---|
+| `frontend-design` | Anthropic officiel. Force direction esthétique distinctive avant de coder (bannit Inter/Roboto/Arial). Trigger sur "build a website/dashboard/component". |
+| `ui-ux-pro-max` | 161 palettes, 57 font pairings, 99 directives UX, 50+ styles (glassmorphism, brutalism, bento...). Trigger sur "design", "review UI", styles spécifiques. |
+| `design-review` | Revue visuelle d'un site/page avec screenshots. Trigger sur "design review", "make it look better". Utile pour auditer un rendu Plotly/Dash. |
+| `web-design-guidelines` | Vercel — audit accessibilité + bonnes pratiques web. Trigger sur "check accessibility", "audit design". |
+| `react-best-practices` | Vercel — 57 règles perf React/Next.js. Peu pertinent pour stack Dash actuelle. |
+| `composition-patterns` | Vercel — compound components React, élimine anti-patterns boolean props. Peu pertinent pour Dash. |
+| `tailwind-v4-shadcn` | Tailwind v4 + shadcn/ui + Vite/React. Pertinent uniquement si migration vers React. |
+
+**Pour AIMA (stack Dash/Plotly + rapports Typst)** : `frontend-design`, `ui-ux-pro-max`, `design-review`, `web-design-guidelines` sont les 4 directement utiles. Les 3 React (`react-best-practices`, `composition-patterns`, `tailwind-v4-shadcn`) sont gardés pour usage futur ou expérimentation.
 
 ## Agents (4)
 
