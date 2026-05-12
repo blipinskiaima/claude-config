@@ -61,9 +61,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-05-12 — Audit & purge raw HCL bucket BAM
+## 2026-05-12 — Audit & purge raw HCL bucket BAM + trace-platform onboarding IRCCS
 
 - [x] **Purge raw HCL bucket BAM (111 NANO)** — audit complétude raw → liquid sur 37 NANO actifs (112 samples), correction de 2 mismatches (NANO14_N3 BAM + NANO22_N2b POD5 ~111 GB), sauvegarde de 29 rapports HTML MinKNOW localement, puis `aws s3 rm` + création `upload.done` (taille raw 0). Découverte chemin BAM mergé `processed/MRD/RetD/liquid/HCL/{sample}/BAM/`. Détails : `audit_nano_2026-05-11.md` + `suppression_raw.md` + `last_clean.sh`. Commit `a6312c1`.
+- [x] **trace-platform — onboarding IRCCS (Matteo) + 4 nouveaux UUID + scan** — ajout 5 users dans `export_labs_users.tsv` (1 PROD IRCCS Matteo Allegretti / 4 DEV dont 2e UUID Romain CGFL + 3 sandbox Unknown), `check --new` ajoute 36 samples (16 Bladder/FR Romain SUCCESSED, 12 baseline/c3d4 Romain SUCCESSED, 2 T0 Matteo, 3 Frederic, 3 sandbox FAILED). pt100/pt107 IRCCS forcés SUCCESSED manuellement (BAM uploadés sans `.bai`, override cascade).
+- [x] **trace-platform — fix `dorado_model_version` + feat GSheet manual columns** — `extract_metadata()` oubliait de copier `dorado_model_version` depuis samtools_meta (laissait None même quand BAM contenait `@v5.0.0`). Ajout colonnes manuelles `Commentaire` + `Cancer type` préservées entre exports (matching Sample+Patient+Client UUID, méta-catégorie `Informations complémentaires`). Commits `80b1a07` (typo Plateform→Platform), `c8a5cdc` (fix version), `300a239` (feat manual cols).
 
 ## 2026-05-09 — Aima-Tower fix Home stockage + URLs Scaleway + SampleSheetChecker consolidation NANO22-23
 
