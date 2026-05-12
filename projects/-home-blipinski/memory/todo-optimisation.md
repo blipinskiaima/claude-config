@@ -28,8 +28,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [ ] **Terminer reclassification concurrents (22 articles restants)** — script `~/Pipeline/Aima-Survey/scripts/reclassify_competitors.py` killé après 75/97 articles (2026-04-22). Les 22 restants ont `sector IS NULL` → cron daily Aima-Survey (`classify_pending`) les picke automatiquement. Vérifier demain que l'onglet Concurrence de `/survey` affiche bien les articles IMBdx (+ autres co-signatures concurrent). Si besoin relance manuelle : `bash ~/Pipeline/Aima-Survey/run_veille.sh --no-fetch --no-score --report`.
 - [ ] **Rotation secrets Aima-Tower compromis** — `.env` était tracked dans git jusqu'au 2026-04-21 (historique pushé sur `aima-dx/Aima-Tower`, repo privé). Révoquer `ANTHROPIC_API_KEY` (console.anthropic.com > API Keys) + `accessToken` Seqera (cloud.seqera.io > Tokens), regénérer les 2 et mettre à jour `.env` local + `docker compose restart`. Voir `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/project_env_leak.md`.
-- [ ] **Clean dossier `raw HCL` dans le bucket BAM** — nettoyage ciblé des fichiers obsolètes. ⚠️ Rappel golden rule S3 : aucune suppression sans confirmation explicite + lister les fichiers avant + vérifier qu'ils ne sont pas référencés dans trace-prod/trace-platform.
-
 ### Skills bioinformatiques
 - [ ] **Améliorer skills v1 avec /meta-skills-creator** — sample, debug-nf, check-consistency sont fonctionnels mais créés sans le processus rigoureux. Raffiner après usage.
 
@@ -62,6 +60,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-05-12 — Audit & purge raw HCL bucket BAM
+
+- [x] **Purge raw HCL bucket BAM (111 NANO)** — audit complétude raw → liquid sur 37 NANO actifs (112 samples), correction de 2 mismatches (NANO14_N3 BAM + NANO22_N2b POD5 ~111 GB), sauvegarde de 29 rapports HTML MinKNOW localement, puis `aws s3 rm` + création `upload.done` (taille raw 0). Découverte chemin BAM mergé `processed/MRD/RetD/liquid/HCL/{sample}/BAM/`. Détails : `audit_nano_2026-05-11.md` + `suppression_raw.md` + `last_clean.sh`. Commit `a6312c1`.
 
 ## 2026-05-09 — Aima-Tower fix Home stockage + URLs Scaleway + SampleSheetChecker consolidation NANO22-23
 
