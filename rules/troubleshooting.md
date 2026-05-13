@@ -17,6 +17,7 @@
 | `aws s3 sync` skip des fichiers (3-5 sur 23-90, aleatoire) | Bug Scaleway S3 | Retry en boucle jusqu'a `local_count == s3_count`. TOUJOURS verifier le nombre de fichiers apres sync. |
 | "An error occurred (SlowDown)" | Rate limiting Scaleway | Attendre 30s et retry. Reduire le parallelisme. |
 | Upload timeout | Fichiers > 5GB | Chunk size 100MB configure dans nextflow.config. Verifier connexion. |
+| Python hang sur `/mnt/aima-bam-data` (wchan=`request_wait_answer`) | Mount s3fs FUSE bloque sur `iterdir()`/listing de gros dossiers | Eviter `Path.iterdir()` sur des dossiers a 700+ entrees. Pour les listings de samples connus, query la DB DuckDB plutot que le filesystem. Pour S3 direct, utiliser `aws s3 ls` via subprocess (bypasse FUSE). |
 
 ## Nextflow
 
