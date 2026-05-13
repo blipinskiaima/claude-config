@@ -29,3 +29,4 @@ projects/**/tool-results/
 # Machine-specific settings
 settings.local.json
 mcp-needs-auth-cache.json
+image-cache/

@@ -1,5 +1,8 @@
 # Aima Tower — Auto Memory
 
+## Feature `/samples` + `/sample/:id` — Tower v4.2.0 (2026-05-13)
+Deux nouvelles pages : liste tous les samples R&D + détail enrichi 1-sample reproduisant le mockup `aima-tower-sample-detail.html`. Backend `DatabaseService.get_sample_detail()` JOIN 5 tables. Animation `aima-rise` cascade appliquée sur toutes les pages via `key={location.pathname}`. Décisions clés : TF=mvaf_v1, NEGATIVE/POSITIVE strict (==0/>0), depth threshold 0.25×, paths trace-prod `s3://aima-bam-data/processed/MRD/RetD/{type}/{labo}/{sample}/{REPORT|LOG}/`. Détails : [feature_sample_detail.md](feature_sample_detail.md)
+
 ## Spec ciblée vs Spec réalisée
 Slider `target_specificity` = ce qu'on demande. `Spec_AI` du tableau = ce qu'on obtient (= `nb_healthy_below_threshold / nb_healthy_total`). Diverge à cause de la quantification (seuil discret sur N healthy fini). Détails : [spec_ciblee_vs_realisee.md](spec_ciblee_vs_realisee.md)
 
