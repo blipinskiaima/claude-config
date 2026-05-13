@@ -61,6 +61,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-05-13 — Aima-Tower v4.2.0 pages /samples + /sample/:id
+
+- [x] **Pages /samples + /sample/:id Tower v4.2.0** — liste samples R&D (~1100, filtres labo/type/statut) + vue détail mockup-style avec KPIs trace-prod (TF=mvaf_v1, Negative/Positive strict ==0/>0, depth≥0.25×). Backend `DatabaseService.get_sample_detail()` JOIN 5 tables. Animation `aima-rise` cascade sur toutes les pages via `key={location.pathname}`. Commits `7a71ae0` + `a7cbf85`, tag `v4.2.0` (Docker rebuild prod healthy). Détails : `feature_sample_detail.md`.
+
 ## 2026-05-12 — Audit & purge raw HCL bucket BAM + trace-platform onboarding IRCCS
 
 - [x] **Purge raw HCL bucket BAM (111 NANO)** — audit complétude raw → liquid sur 37 NANO actifs (112 samples), correction de 2 mismatches (NANO14_N3 BAM + NANO22_N2b POD5 ~111 GB), sauvegarde de 29 rapports HTML MinKNOW localement, puis `aws s3 rm` + création `upload.done` (taille raw 0). Découverte chemin BAM mergé `processed/MRD/RetD/liquid/HCL/{sample}/BAM/`. Détails : `audit_nano_2026-05-11.md` + `suppression_raw.md` + `last_clean.sh`. Commit `a6312c1`.
