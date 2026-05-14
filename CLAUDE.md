@@ -120,6 +120,83 @@ For multi-step tasks, state a brief plan:
 2. [Step] → verify: [check]
 3. [Step] → verify: [check]
 ```
+# gstack
+
+gstack est installé dans `~/.claude/skills/gstack/` (binaire `bun` officiel, hors snap).
+
+## Règles d'utilisation
+
+- **Web browsing** : TOUJOURS utiliser le skill `/browse` de gstack (ou ses variantes `/qa`, `/scrape`, `/qa-only`). **JAMAIS** les outils `mcp__claude-in-chrome__*` — ils sont lents, non fiables, et redondants avec le binaire `browse` que gstack compile (Playwright Chromium, ~100ms par commande).
+- **Routage** : quand la demande de Boris matche un skill ci-dessous, invoquer ce skill via l'outil `Skill` plutôt que de faire le travail à la main.
+
+## Skills disponibles (47)
+
+**Planning & review (avant de coder)**
+- `/office-hours` — brainstorm produit (YC mode + builder mode)
+- `/plan-ceo-review` — review stratégie/scope d'un plan
+- `/plan-eng-review` — review architecture/exécution
+- `/plan-design-review` — review design d'un plan (avant code)
+- `/plan-devex-review` — review developer experience d'un plan
+- `/plan-tune` — tuning du plan généré
+- `/autoplan` — pipeline complet : CEO → design → eng
+- `/design-consultation` — design system from scratch
+- `/design-shotgun` — exploration visuelle (variantes)
+- `/design-html` — génération HTML/CSS
+
+**Code review & quality**
+- `/review` — pre-landing PR review (SQL safety, LLM trust, side effects)
+- `/cso` — audit sécurité (OWASP Top 10 + STRIDE)
+- `/codex` — second opinion via OpenAI Codex CLI
+- `/health` — dashboard qualité code (composite score)
+- `/learn` — gestion des learnings inter-sessions
+
+**Tests & QA**
+- `/qa` — QA + fix loop (test → fix → re-verify)
+- `/qa-only` — QA report-only (jamais de fix)
+- `/design-review` — audit visuel sur site live
+- `/devex-review` — test live de la DX (onboarding, docs)
+- `/benchmark` — perf regression (Core Web Vitals, bundle size)
+- `/benchmark-models` — comparaison Claude vs GPT vs Gemini
+
+**Browser**
+- `/browse` — navigation headless rapide (alias `gstack`)
+- `/connect-chrome` — lancer GStack Browser (Chromium visible + sidebar)
+- `/open-gstack-browser` — idem
+- `/scrape` — extraction read-only de données web
+- `/setup-browser-cookies` — import cookies pour QA authentifiée
+
+**Ship & deploy**
+- `/ship` — workflow complet : tests → review → bump → PR
+- `/land-and-deploy` — merge → deploy → canary verify
+- `/canary` — monitoring post-deploy
+- `/landing-report` — état file d'attente versions/PRs
+- `/setup-deploy` — config one-time du deploy
+
+**Debug & investigate**
+- `/investigate` — root-cause systématique (4 phases)
+- `/document-release` — sync docs après ship
+- `/retro` — rétrospective hebdo (commits, patterns, trends)
+
+**Context & state**
+- `/context-save` — sauvegarder l'état de travail
+- `/context-restore` — reprendre où on s'était arrêté
+
+**Safety modes**
+- `/careful` — warnings sur commandes destructives
+- `/freeze` — restreindre les édits à un dossier
+- `/unfreeze` — lever la restriction
+- `/guard` — careful + freeze combinés
+
+**Gbrain (knowledge graph)**
+- `/setup-gbrain` — install + init local
+- `/sync-gbrain` — réindexer le repo
+
+**Misc**
+- `/make-pdf` — markdown → PDF publication-quality
+- `/pair-agent` — partage tunnel ngrok (sidebar)
+- `/skillify` — créer un nouveau skill gstack
+- `/gstack-upgrade` — mise à jour gstack
+
 # graphify
 - **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
 When the user types `/graphify`, invoke the Skill tool with `skill: "graphify"` before doing anything else.
