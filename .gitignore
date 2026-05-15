@@ -30,3 +30,9 @@ projects/**/tool-results/
 settings.local.json
 mcp-needs-auth-cache.json
 image-cache/
+
+# Gstack vendor install (1.5GB, reinstall per machine via setup)
+skills/gstack/
+
+# Local backups
+*.bak

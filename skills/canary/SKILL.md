@@ -1,0 +1,1 @@
+/home/boris/.claude/skills/gstack/canary/SKILL.md

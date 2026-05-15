@@ -1,0 +1,1 @@
+/home/boris/.claude/skills/gstack/plan-eng-review/SKILL.md

@@ -1,0 +1,18 @@
+- [Tableau programme à jour](project_programme_actuel.md) — Boris dit "tableau programme" → lire docs/programme-actuel.md (source de vérité formatée)
+- [Project overview](project_overview.md) — App suivi nutrition + sport + pas pour ZTH P3, clone DCATrack étendu
+- [Project phasing](project_phasing.md) — 4 phases (0 Bootstrap ✅ · 1 Nutrition · 2 Sport · 3 Pas · 4 Supabase futur)
+- [Portage patterns](feedback_zthapp_patterns.md) — Patterns DCATrack confirmés Phase 0 + gotchas (create-next-app, sidebar+BottomNav, bootstrap anti-flash)
+- [Pas de dev server local](feedback_no_local_dev_server.md) — Jamais `npm run dev` (plante l'ordi). `npm run build` + push Vercel à la place
+- [Design system ZTH](project_design_system_zth.md) — Refonte Phase 6 (Editorial Sport) : tokens teal, Anton+Inter, composants signatures à réutiliser
+- [Coach IA](project_coach_ia.md) — Chatbot Gemini gratuit (provider Google AI) + Vercel AI SDK v6 + context user 30j auto-injecté · /coach + FAB
+- [Compte Supabase](user_account_zthapp.md) — Email ZTHapp = `boris.lipinski83@gmail.com` (PAS l'email global Claude Code)
+- [Paliers haltères Boris](feedback_paliers_haltere.md) — Haltères par incréments de 2 kg (10/12/14, pas 12.5/15). Barre = paliers 2.5 kg OK
+- [Édition standards via UI](feedback_standards_edit_via_ui.md) — Modifier les standards sport via /parametres/standards plutôt que SQL UPDATE
+- [Parallélisation agents](feedback_parallel_agents.md) — Gros chantiers : découper en vagues d'Agents parallèles avec périmètres disjoints
+- [ZTHapp2 sister project](project_zthapp2.md) — Fork TanStack Start + Convex de ZTHapp dans `/home/boris/App/ZTHapp2/` (bootstrap commit 8fcb0ac)
+- [TanStack Start + Convex gotchas](feedback_tanstack_convex_patterns.md) — Patterns appris en bootstrappant ZTHapp2 (named import Password, exclure convex/ du tsconfig racine, stub api.d.ts, etc.)
+- Context principal : `/home/boris/App/ZTHapp/CLAUDE.md` — point d'entrée du projet
+- Documentation détaillée : `/home/boris/App/ZTHapp/docs/` (transposition · dcatrack-template · nutrition-data · zth-program · zth-calculator)
+- Backend MFP (futur) : `/home/boris/App/Myfitnesspal/` — MCP avec 9 tools lecture/écriture journal MFP
+- Référence UI source : `/home/boris/App/DCATrack/` (Next.js 16 + Tailwind v4 + Recharts + Supabase + PWA)
+- Mémoire DCATrack source : `~/.claude/projects/-home-boris-App-DCATrack/memory/`

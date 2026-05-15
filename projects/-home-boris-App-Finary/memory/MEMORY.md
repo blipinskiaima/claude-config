@@ -1,0 +1,16 @@
+- [No credentials leak](feedback_no_credentials_leak.md) — Golden rule: never expose passwords, keys, or tokens anywhere
+- [PEA exclude CW8](feedback_pea_exclude_cw8.md) — Toujours masquer CW8 dans tout affichage/suivi PEA (ligne détenue mais non pilotée)
+- [Tableau récap](reference_tableau_recap.md) — ETF watchlist table to display on "tableau récap" command
+- [Tableau PEA](reference_tableau_pea.md) — Same format as tableau récap but filtered to current PEA holdings, on "tableau PEA" command
+- [Boris investor profile](user_boris_investor.md) — PEA Fortuneo, DCA 500€/mois, Nasdaq conviction
+- [PEA current state](project_pea_current.md) — 4 lines, 4,287€ total, snapshot May 2026 (PSP5 vendu, ETSZ ajouté)
+- [PEA strategy](project_pea_strategy.md) — Target: Nasdaq + Emerging + Europe + Gold, 4 active DCA lines
+- [CTO current state](project_cto_current.md) — Degiro, 7 lines, 5,443€ total
+- [Patrimoine global](project_patrimoine_global.md) — Full patrimony overview from Finary
+- [Finary API setup](reference_finary_api.md) — MCP server config, auth, endpoints, fallback method
+- [ETF compositions](reference_etf_compositions.md) — Holdings, geographic exposure, overlap analysis
+- [Watchlist justETF](reference_watchlist_justetf.md) — Private watchlist, best ETF per market segment
+- [Crash avril 2025](reference_crash_avril_2025.md) — Boris a acheté PSP5+PUST au plus bas du crash tarifs Liberation Day
+- [Tableau des soldes](reference_tableau_soldes.md) — ETF vs leur plus haut sur 4 fenêtres (52w, 6m, YTD, 1m)
+- [LQQ levier & decay](reference_lqq_levier_decay.md) — Ratio réel ~2.1x, decay absent en baisse directionnelle
+- [Data sources](feedback_data_sources.md) — Croiser justETF (historique) + stockanalysis (temps réel)

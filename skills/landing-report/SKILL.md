@@ -1,0 +1,1 @@
+/home/boris/.claude/skills/gstack/landing-report/SKILL.md

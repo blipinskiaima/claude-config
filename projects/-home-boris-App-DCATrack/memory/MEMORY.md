@@ -1,0 +1,24 @@
+- [Project overview](project_overview.md) — POC DCATrack multi-user, 28 ETF UCITS, Vercel + Supabase, indicateur DCA + allouable réel
+- [Routes & UX](reference_routes.md) — Home `/` (sélecteur + cards), détail `/etf/[isin]` (gros chart + breakdown du score), 3 presets PEA/Favoris/Custom + ISIN libre
+- [Theme system](reference_theme.md) — Light + dark via Tailwind v4 + ThemeToggle + bootstrap anti-flash
+- [Profil DCA](reference_profil_dca.md) — Profils multiples (PEA, CTO…), donut chart, localStorage avec migration ancienne clé
+- [Strategy Wizard](reference_strategy_wizard.md) — 7 étapes, 7 marchés (US/Europe/France/Emerging/Asia/World/Sectoriel), filtrage strict + preselectFromPool
+- [Side menu & navigation](reference_side_menu.md) — Drawer ☰ avec Vue Générale / DCATrack / Profil + Aide/Paramètres/À propos + Actions
+- [Independent indicators](feedback_independent_indicators.md) — Pas de verdict global, chaque ETF est évalué indépendamment, Boris échelonne dans le mois
+- [Stack et fichiers clés](reference_stack.md) — Architecture, libs choisies, fichiers cœur
+- [Score formula](reference_score_formula.md) — Composite drawdown + mean reversion, seuils 40/20
+- [justETF endpoint](reference_justetf_api.md) — URL, headers, shape de réponse
+- [Tableau récap & PEA](reference_tableau_recap.md) — WATCHLIST=28 ETF (9 favori=true + 19 false), PEA_PRESET=3 ISINs, user_favorites table Supabase
+- [Allouable réel](reference_allocation_real.md) — Algo computeAllocations(), flow priceByIsin server→client + usePrices hook, capture shares/price_at_execution à l'exécution
+- [Allocation display rule](feedback_allocation_display.md) — Target % + real % + real € partout, jamais target € — règle explicite de Boris
+- [Data sources évalués](reference_data_sources.md) — Comparatif gratuit/légal mai 2026 — Alpha Vantage = seule alt légale (clé en .env), justETF gardé pour POC
+- [Supabase schema](reference_supabase_schema.md) — 3 tables : dca_profiles, dca_executions (étendu shares/price), user_favorites (RLS user.id)
+- [GitHub auth](project_github_push.md) — Repo Lipinski-B/DCATrack, push manuel à faire (clé SSH AIMA non liée au compte perso)
+- [Git author for Vercel](feedback_git_author.md) — Tous les commits DCATrack doivent utiliser l'identité GitHub de Boris (Vercel Hobby refuse sinon)
+- [Commit style](feedback_commit_style.md) — Splitter chore/feat/fix en commits séparés (jamais bundler), git log doit raconter l'histoire
+- [Metric rigor](feedback_metric_rigor.md) — KPI financiers DCATrack honnêtes, pas naïfs (ex: drawdown anchored 1.0 vs naïf)
+- [Workflow skills](feedback_workflow_skills.md) — Features non-triviales : /office-hours → /plan-eng-review → code (outside-voice précieux)
+- [Portfolio page](reference_portfolio_page.md) — Route /portfolio, RSC + portfolio-timeline.ts + 28 tests vitest, pattern Promise.allSettled+warning UI
+- [Visual sketch before approve](feedback_visual_before_approve.md) — Générer un wireframe HTML AVANT l'AUQ "Approve" sur les designs UI, pas juste un MD
+- [Compose, don't reduce](feedback_compose_not_reduce.md) — Boris refuse de couper en refactor, garde tout en réorganisant (accordéon, sélecteur). Calibrer les options /office-hours
+- [Historique refonte](reference_historique_refonte.md) — /historique = narratif mois-par-mois + mini-embed /portfolio + grille events + accordéon, pattern variant prop DRY
