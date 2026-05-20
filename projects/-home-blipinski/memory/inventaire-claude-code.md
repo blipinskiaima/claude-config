@@ -7,7 +7,7 @@ originSessionId: prompt-creator-audit-2026-05-20
 
 # Inventaire Claude Code — Boris Blipinski (2026-05-20)
 
-## Skills (28 dans ~/.claude/skills/, 4 supplémentaires dans projets Pipeline)
+## Skills (89 sur disque : 73 trackés dans claude-config + 16 fournis par plugins gstack/superpowers/frontend-design ; 4 supplémentaires scopés projets Pipeline)
 
 ### Bioinfo / AIMA — Global (3)
 | Skill | Usage |

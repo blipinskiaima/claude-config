@@ -126,7 +126,7 @@ gstack est installé dans `~/.claude/skills/gstack/` (binaire `bun` officiel, ho
 
 ## Règles d'utilisation
 
-- **Web browsing** : TOUJOURS utiliser le skill `/browse` de gstack (ou ses variantes `/qa`, `/scrape`, `/qa-only`). **JAMAIS** les outils `mcp__claude-in-chrome__*` — ils sont lents, non fiables, et redondants avec le binaire `browse` que gstack compile (Playwright Chromium, ~100ms par commande).
+- **Web browsing** : pour QA/scraping/dogfooding rapide, utiliser le skill `/browse` de gstack (ou `/qa`, `/scrape`, `/qa-only`) — Playwright Chromium, ~100ms/commande. Les outils `mcp__claude-in-chrome__*` et `mcp__Claude_Preview__*` restent légitimes pour le travail Aima-Tower V3 (preview eval, batch DOM, screenshot itératif) — usage observé 119× sur 30j vs 2× `/browse`. Ne pas bloquer, mais préférer `/browse` quand le besoin est juste "ouvrir une URL et vérifier l'état".
 - **Routage** : quand la demande de Boris matche un skill ci-dessous, invoquer ce skill via l'outil `Skill` plutôt que de faire le travail à la main.
 
 ## Skills disponibles (47)
