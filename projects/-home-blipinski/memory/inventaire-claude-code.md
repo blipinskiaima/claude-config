@@ -7,7 +7,9 @@ originSessionId: prompt-creator-audit-2026-05-20
 
 # Inventaire Claude Code — Boris Blipinski (2026-05-20)
 
-## Skills (89 sur disque : 73 trackés dans claude-config + 16 fournis par plugins gstack/superpowers/frontend-design ; 4 supplémentaires scopés projets Pipeline)
+## Skills (42 sur disque après suppression gstack ecosystem 2026-05-20 : 27 trackés dans claude-config + 15 fournis par plugins superpowers/frontend-design/anthropic-skills ; 4 supplémentaires scopés projets Pipeline)
+
+> **Suppression ecosystem gstack (audit 2026-05-20 machine -home-boris)** : 46 wrappers symlinks supprimés + binaire 1.5 GB. Décision : ratio observé 119× MCP chrome / 2× `/browse` montrait que la stack gstack n'était pas le workflow naturel. Pour réinstaller : `gstack install` depuis bun.
 
 ### Bioinfo / AIMA — Global (3)
 | Skill | Usage |

@@ -1,1 +1,0 @@
-/home/boris/.claude/skills/gstack/design-consultation/SKILL.md

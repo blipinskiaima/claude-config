@@ -1,1 +1,0 @@
-/home/boris/.claude/skills/gstack/scrape/SKILL.md
