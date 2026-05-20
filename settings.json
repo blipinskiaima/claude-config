@@ -113,17 +113,6 @@
         ]
       }
     ],
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "notify-send 'Claude Code' \"$(cat | jq -r '.message // \"Action requise\"')\" --urgency=normal 2>/dev/null || true",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "hooks": [

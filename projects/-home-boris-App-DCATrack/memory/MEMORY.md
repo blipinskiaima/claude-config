@@ -8,12 +8,12 @@
 - [Stack et fichiers clés](reference_stack.md) — Architecture, libs choisies, fichiers cœur
 - [Score formula](reference_score_formula.md) — Composite drawdown + mean reversion, seuils 40/20
 - [justETF endpoint](reference_justetf_api.md) — URL, headers, shape de réponse
-- [Tableau récap & PEA](reference_tableau_recap.md) — WATCHLIST=28 ETF (9 favori=true + 19 false), PEA_PRESET=3 ISINs, user_favorites table Supabase
+- [Tableau récap & PEA](reference_tableau_recap.md) — WATCHLIST=32 ETF (13 favori=true + 19 false), PEA_PRESET=3 ISINs, user_favorites table Supabase
 - [Allouable réel](reference_allocation_real.md) — Algo computeAllocations(), flow priceByIsin server→client + usePrices hook, capture shares/price_at_execution à l'exécution
 - [Allocation display rule](feedback_allocation_display.md) — Target % + real % + real € partout, jamais target € — règle explicite de Boris
 - [Data sources évalués](reference_data_sources.md) — Comparatif gratuit/légal mai 2026 — Alpha Vantage = seule alt légale (clé en .env), justETF gardé pour POC
 - [Supabase schema](reference_supabase_schema.md) — 3 tables : dca_profiles, dca_executions (étendu shares/price), user_favorites (RLS user.id)
-- [GitHub auth](project_github_push.md) — Repo Lipinski-B/DCATrack, push manuel à faire (clé SSH AIMA non liée au compte perso)
+- [GitHub auth](project_github_push.md) — Repo Lipinski-B/DCATrack via HTTPS, `gh auth switch --user Lipinski-B` avant push puis re-switch blipinskiaima
 - [Git author for Vercel](feedback_git_author.md) — Tous les commits DCATrack doivent utiliser l'identité GitHub de Boris (Vercel Hobby refuse sinon)
 - [Commit style](feedback_commit_style.md) — Splitter chore/feat/fix en commits séparés (jamais bundler), git log doit raconter l'histoire
 - [Metric rigor](feedback_metric_rigor.md) — KPI financiers DCATrack honnêtes, pas naïfs (ex: drawdown anchored 1.0 vs naïf)
@@ -22,3 +22,4 @@
 - [Visual sketch before approve](feedback_visual_before_approve.md) — Générer un wireframe HTML AVANT l'AUQ "Approve" sur les designs UI, pas juste un MD
 - [Compose, don't reduce](feedback_compose_not_reduce.md) — Boris refuse de couper en refactor, garde tout en réorganisant (accordéon, sélecteur). Calibrer les options /office-hours
 - [Historique refonte](reference_historique_refonte.md) — /historique = narratif mois-par-mois + mini-embed /portfolio + grille events + accordéon, pattern variant prop DRY
+- [Merge safety tag](feedback_merge_safety_tag.md) — Avant de merger une feature UI-globale (layout/nav/globals.css), poser un tag `pre-<feature>` sur main pour rollback rapide
