@@ -34,5 +34,8 @@ image-cache/
 # Gstack vendor install (1.5GB, reinstall per machine via setup)
 skills/gstack/
 
+# Claude Code remote binaries (large, reinstall per machine)
+remote/
+
 # Local backups
 *.bak

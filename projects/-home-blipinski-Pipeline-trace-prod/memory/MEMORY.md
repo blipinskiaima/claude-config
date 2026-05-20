@@ -1,6 +1,7 @@
 # trace-prod Memory
 
 - [Rebasecalled POD5 — ne pas propager](feedback_rebasecalled_pod5.md) — laisser NULL après update-column stockage_pod5, ne pas copier depuis l'original
+- [Schema v6 — colonnes IV/QC](project_schema_v6_iv_qc.md) — 4 colonnes retd_suivis (read_start_time, ancestry, sex_proba, sex_predicted), path IV/ sœur de QC/
 
 ## Architecture
 - CLI entry: `database/check_samples.py` (Click)
