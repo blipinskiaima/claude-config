@@ -1,6 +1,6 @@
 ---
 name: claude-memory
-description: Expert en creation et optimisation du systeme de memoire de Claude Code. Initialise ou met a jour CLAUDE.md, auto memory (MEMORY.md), et les regles modulaires (.claude/rules/). Use when the user wants to set up Claude memory for a new project, optimize an existing CLAUDE.md, create modular rules, manage auto memory, or review and improve their Claude Code configuration. Also use when the user invokes /claude-memory or asks about memory best practices.
+description: Expert en creation et optimisation du systeme de memoire de Claude Code. Initialise ou met a jour CLAUDE.md (avec syntaxe @import pour factorisation), auto memory officielle (~/.claude/projects/<project>/memory/MEMORY.md + fichiers topiques), regles modulaires (.claude/rules/ avec frontmatter paths: pour scope path-based), et settings.json. Use when the user wants to set up Claude memory for a new project, optimize an existing CLAUDE.md, create or path-scope modular rules, manage auto memory, refresh stale memory entries, or review and improve their Claude Code configuration. Also use when the user invokes /claude-memory or asks about memory best practices.
 ---
 
 <objective>

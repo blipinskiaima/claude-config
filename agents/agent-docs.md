@@ -1,6 +1,6 @@
 ---
 name: agent-docs
-description: Documentation research agent using Context7 MCP. Fetches up-to-date, version-specific documentation and code examples directly from official library sources. Use when needing to look up API docs, library usage, framework documentation, or code examples for any library or tool.
+description: Documentation research agent using Context7 MCP. Use SPECIFICALLY for versioned library/framework documentation (e.g., Dash 2.14, modkit 0.4, Nextflow DSL2 syntax, Plotly 5.x, scikit-learn X.Y). Fetches up-to-date, version-specific docs and code examples directly from official sources. DO NOT use for general web research (→ use agent-websearch), bioinformatics literature (→ use pubmed MCP / skill /veille), or unversioned how-to questions.
 tools: mcp__context7__resolve-library-id, mcp__context7__get-library-docs, WebSearch, WebFetch, Read, Grep, Glob
 model: sonnet
 ---

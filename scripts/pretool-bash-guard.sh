@@ -13,11 +13,14 @@
 #  5. dd vers /dev/* (overwrite disque)
 #  6. xargs rm sur paths proteges
 #  7. Redirection > vers .pod5
+#  8. shred/truncate/mkfs sur paths absolus protégés
+#  9. nextflow run depuis ~/Pipeline/ (doit être lancé depuis ~/Run ou ~/Run2)
 
 set -euo pipefail
 
 input=$(cat)
 cmd=$(echo "$input" | jq -r '.tool_input.command // ""')
+cwd=$(echo "$input" | jq -r '.cwd // ""')
 
 # Pour debug : decommenter pour logger toutes les cmd verifiees
 # echo "[guard] $(date -Is) $cmd" >> ~/.claude/pretool-guard.log
@@ -70,6 +73,17 @@ fi
 if echo "$cmd" | grep -qE '\b(shred|truncate|mkfs|mkfs\.[a-z0-9]+)\b'; then
     if echo "$cmd" | grep -qE '(/scratch|~/Pipeline|/home/blipinski/Pipeline|~/Run|/dev/)'; then
         echo 'BLOCKED: shred/truncate/mkfs sur chemin protege' >&2
+        exit 2
+    fi
+fi
+
+# 9. nextflow run depuis ~/Pipeline/ (golden rule nextflow.md)
+#    Lancer Nextflow depuis ~/Pipeline/<projet>/ crée un workdir interne au repo
+#    qui pollue le code et empêche les runs parallèles. Toujours utiliser ~/Run
+#    ou ~/Run2 comme cwd.
+if echo "$cmd" | grep -qE '\bnextflow[[:space:]]+(-[a-zA-Z][^[:space:]]*[[:space:]]+)*run\b'; then
+    if echo "$cwd" | grep -qE '^/home/blipinski/Pipeline/'; then
+        echo 'BLOCKED: nextflow run depuis ~/Pipeline/ — golden rule nextflow.md : lancer depuis ~/Run ou ~/Run2 (cd ~/Run && nextflow run ~/Pipeline/<projet>/main.nf)' >&2
         exit 2
     fi
 fi

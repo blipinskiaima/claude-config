@@ -1,3 +1,12 @@
+---
+paths:
+  - "**/*.tex"
+  - "**/*.typ"
+  - "**/rapport*/**"
+  - "**/report*/**"
+  - "**/Aima-Tower/**"
+---
+
 # Charte graphique AIMA — Éxís ctDNA
 
 Palette hybride : structure AIMA corporate + accent produit Éxís.

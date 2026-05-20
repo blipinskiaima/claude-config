@@ -1,6 +1,6 @@
 ---
 name: vercel-react-best-practices
-description: React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.
+description: React and Next.js performance optimization guidelines from Vercel Engineering. Use when writing, reviewing, or refactoring React/Next.js code in any project — primary current stack is Aima-Tower V3 (Vite + React 18 + TypeScript + Tailwind v4 + AG Grid v35, cutover 2026-05-07), but applies to any React/Next.js project Boris works on. Triggers on React components, hooks, performance, memoization, AG Grid optim, bundle size, data fetching, Next.js pages, code splitting, server/client component boundaries.
 license: MIT
 metadata:
   author: vercel
