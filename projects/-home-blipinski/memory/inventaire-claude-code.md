@@ -1,29 +1,25 @@
 ---
 name: Inventaire Claude Code AIMA
-description: Inventaire complet des outils Claude Code disponibles — skills, agents, MCP, rules, hooks, plugins. Mis à jour le 2026-05-12 (ajout des 7 skills frontend).
+description: Inventaire complet des outils Claude Code disponibles — skills, agents, MCP, rules, hooks, plugins. Mis à jour le 2026-05-20 (cleanup audit -14 +3 skills).
 type: reference
-originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
+originSessionId: prompt-creator-audit-2026-05-20
 ---
-# Inventaire Claude Code — Boris Blipinski (2026-05-12)
 
-## Skills (39 dossiers dans ~/.claude/skills/, dont 36 actifs)
+# Inventaire Claude Code — Boris Blipinski (2026-05-20)
 
-### Bioinfo / AIMA — Global (10)
+## Skills (28 dans ~/.claude/skills/, 4 supplémentaires dans projets Pipeline)
+
+### Bioinfo / AIMA — Global (3)
 | Skill | Usage |
 |---|---|
 | `/sample <id>` | Statut cross-projet d'un sample (scores, QC, S3, metadata) |
-| `/batch-effect` | Analyse sources batch effect CGFL vs HCL |
-| `/compare-batches` | Compare métriques pipeline entre batchs (Wilcoxon, Fisher) |
-| `/check-consistency` | Validation croisée trace-prod / S3 / outputs Bam2Beta |
-| `/correlation` | Spearman/Pearson sur 2 métriques de samples |
-| `/qc-report` | Rapport QC standardisé markdown |
 | `/debug-nf` | Diagnostic run Nextflow échoué |
-| `/audit-trail` | Traçabilité ISO 15189 pour versions de pipeline |
 | `/veille` | Analyse rapports PubMed de veille scientifique |
 | `/seqera` | CLI Seqera AI en sous-agent (Nextflow, Platform, workflows) |
+| `/seqera-status` | **NEW** — Vérifie état MCP seqera + liste workflows Tower |
 
 ### Pipeline Bam2Beta — Scope projet (3)
-*Situés dans `~/Pipeline/Bam2Beta/.claude/skills/`, pas dans ~/.claude/skills/*
+*Situés dans `~/Pipeline/Bam2Beta/.claude/skills/`*
 | Skill | Usage |
 |---|---|
 | `/test-bam2beta` | Test non-régression avec Healthy_826 |
@@ -43,138 +39,138 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 | `/maj-todo-list` | Déplace une tâche vers "Complété" (section du jour) |
 | `/standby-todo-list` | Déplace vers/depuis "Stand-by" (avec raison de blocage) |
 
-### Git workflow — Global (5)
+### Workflow session — Global (4)
 | Skill | Usage |
 |---|---|
-| `/git-commit` | Commit rapide avec message clean |
-| `/git-create-pr` | Créer PR avec titre/description auto |
-| `/git-fix-pr-comments` | Implémenter les commentaires de review PR |
-| `/git-merge` | Merge de branches avec résolution conflits |
-| `/save-code` | Workflow fin de session (README, CLAUDE.md, mémoire, commit, push) |
+| `/commit-claude` | Git commit+push ~/.claude/ |
+| `/pull-claude` | Git pull ~/.claude/ |
+| `/save-code` | Workflow fin de session projet (README, CLAUDE.md, mémoire, commit, push) |
+| `/end-session` | Orchestrateur : save-code + commit-claude + maj-todo-list |
 
 ### Claude Code management — Global (3)
 | Skill | Usage |
 |---|---|
-| `/claude-memory` | Init/update système mémoire Claude |
-| `/commit-claude` | Git commit+push ~/.claude/ |
-| `/pull-claude` | Git pull ~/.claude/ |
+| `/claude-memory` | Init/update système mémoire (CLAUDE.md, auto memory, rules, @import) |
+| `/audit-config` | **NEW** — Audit complet ~/.claude/ + plan cleanup 3 commits |
+| `/subagent-creator` | Créer/configurer des sous-agents |
 
-### Développement généraliste — Global (5)
+### Docker / Infra — Global (1)
 | Skill | Usage |
 |---|---|
-| `/code-workflow-feature` | Workflow 4 étapes pour ajouter une feature |
-| `/workflow-apex` | Méthodologie APEX (Analyze-Plan-Execute-eXamine) |
-| `/utils-oneshot` | Implémentation rapide Explore→Code→Test |
-| `/python-refactor` | Refactoring Python |
-| `/utils-fix-grammar` | Fix grammaire/orthographe dans fichiers |
+| `/docker-restart` | **NEW** — Pattern docker compose down/build/up/logs Aima-Tower |
 
-### Meta-outils — Global (3)
+### Développement généraliste — Global (3)
+| Skill | Usage |
+|---|---|
+| `/code-workflow-feature` | Workflow 5 étapes pour ajouter une feature |
+| `/workflow-apex` | APEX (Analyze-Plan-Execute-eXamine, fix `name: apex` → `workflow-apex`) |
+| `/clean-skill` | Refactoring projet Pipeline avec checkpoint git auto |
+
+### Meta-outils — Global (2)
 | Skill | Usage |
 |---|---|
 | `/meta-skills-creator` | Créer des skills professionnels (processus 6 étapes) |
-| `/subagent-creator` | Créer/configurer des sous-agents |
 | `/prompt-creator` | Ingénierie de prompts multi-LLM |
 
-### Frontend / UI Design — Global (7) [installé 2026-05-12]
+### Frontend / UI Design — Global (6)
 | Skill | Usage |
 |---|---|
-| `frontend-design` | Anthropic officiel. Force direction esthétique distinctive avant de coder (bannit Inter/Roboto/Arial). Trigger sur "build a website/dashboard/component". |
-| `ui-ux-pro-max` | 161 palettes, 57 font pairings, 99 directives UX, 50+ styles (glassmorphism, brutalism, bento...). Trigger sur "design", "review UI", styles spécifiques. |
-| `design-review` | Revue visuelle d'un site/page avec screenshots. Trigger sur "design review", "make it look better". Utile pour auditer un rendu Plotly/Dash. |
-| `web-design-guidelines` | Vercel — audit accessibilité + bonnes pratiques web. Trigger sur "check accessibility", "audit design". |
-| `react-best-practices` | Vercel — 57 règles perf React/Next.js. Peu pertinent pour stack Dash actuelle. |
-| `composition-patterns` | Vercel — compound components React, élimine anti-patterns boolean props. Peu pertinent pour Dash. |
-| `tailwind-v4-shadcn` | Tailwind v4 + shadcn/ui + Vite/React. **Directement pertinent pour Aima-Tower V3** (Vite + React 18 + TS + Tailwind v4 + AG Grid). |
-
-**Pour AIMA** : tous les 7 sont pertinents depuis la refonte Aima-Tower V3 (mai 2026, stack Vite + React 18 + TypeScript + Tailwind v4 + AG Grid v35). Les rapports Typst restent dans le périmètre de `frontend-design` et `ui-ux-pro-max` pour la direction esthétique.
+| `frontend-design` | Anthropic — direction esthétique distinctive (utilisé 2× sur 11j) |
+| `ui-ux-pro-max` | 161 palettes, 57 font pairings, 99 directives UX |
+| `design-review` | Revue visuelle d'un site/page avec screenshots |
+| `web-design-guidelines` | Vercel — audit accessibilité + bonnes pratiques web |
+| `react-best-practices` | Vercel — perf React/Next.js (desc précisée Tower V3) |
+| `composition-patterns` | Vercel — compound components React |
+| `tailwind-v4-shadcn` | Tailwind v4 + shadcn/ui + Vite/React (directement Tower V3) |
 
 ## Agents (4)
 
 | Agent | Modèle | Usage |
 |---|---|---|
-| `agent-explore` | Sonnet | Exploration profonde + détection bioinfo (lancé auto au Session Start) |
-| `agent-explore-quick` | Haiku | Chargement rapide contexte (sessions suivantes) |
-| `agent-docs` | Sonnet | Recherche documentation via Context7 MCP |
-| `agent-websearch` | Sonnet | Recherche web structurée |
+| `agent-explore` | Sonnet | Exploration profonde (lancé auto au Session Start, 20× /11j) |
+| `agent-explore-quick` | Haiku | Chargement rapide (gardé override Boris malgré "jamais quick" CLAUDE.md) |
+| `agent-docs` | Sonnet | **DESC PRÉCISÉE** : SEULEMENT doc versionnée Context7, redirige sinon |
+| `agent-websearch` | Sonnet | Recherche web structurée (6× /11j) |
 
-## MCP Servers (6 actifs + 3 auth pending)
+## MCP Servers (7 actifs)
 
-### Actifs
-| MCP | Type | Fonction |
+### Connectés
+| MCP | Type | Usage 11j | Fonction |
+|---|---|---|---|
+| `Claude_in_Chrome` | via plugin | **13×** | Browser automation (le plus utilisé) |
+| `context7` | via plugin | 1× | Documentation librairies à jour |
+| `pubmed` | stdio | 0 | Recherche PubMed (pour `/veille`) |
+
+### Déclarés (auth pending ou faible usage)
+| MCP | Statut | Action |
 |---|---|---|
-| `seqera` | HTTP | API Seqera Tower (monitoring workflows NF) — le plus utilisé |
-| `pubmed` | stdio | Recherche PubMed (search, fetch_summary, get_fulltext) |
-| `memory` | stdio | Knowledge graph inter-projets (store, search, link facts) |
-| `context7` | stdio + plugin | Documentation librairies à jour |
-| `browser-tools` | stdio | Console/network/a11y audit web |
-| `playwright` | stdio | Automatisation navigateur |
+| `seqera` | ! auth pending depuis ~2 sem | À réauthentifier via `/seqera-status` |
+| `claude_ai_Gmail` | ! auth | Pour Aima-Survey futur |
+| `claude_ai_Google_Calendar` | ! auth | idem |
+| `claude_ai_Google_Drive` | ! auth | idem |
 
-### Déclarés mais auth non validée
-| MCP | Statut |
-|---|---|
-| `claude_ai_Gmail` | Auth pending |
-| `claude_ai_Google_Calendar` | Auth pending |
-| `claude_ai_Google_Drive` | Auth pending |
+### Supprimés (audit 2026-05-20)
+- ~~`memory`~~ — redondant avec auto memory officielle
 
 ## Rules (11 — 6 globales, 5 path-scoped)
 
 ### Toujours chargées
 | Rule | Contenu |
 |---|---|
-| `s3-safety.md` | 5 golden rules S3 (jamais supprimer/écraser, profil scw, retry sync) |
+| `s3-safety.md` | 5 golden rules S3 |
 | `duckdb.md` | CREATE TABLE AS SELECT ne préserve pas les PK |
-| `nextflow.md` | Jamais lancer NF depuis le pipeline dir, jamais hardcoder |
+| `nextflow.md` | Jamais lancer NF depuis le pipeline dir |
 | `secrets.md` | Jamais afficher/copier/committer des credentials |
-| `aliases.md` | Commandes fréquentes et chemins (tp, Pipeline, Run, scratch) |
-| `troubleshooting.md` | Problèmes récurrents DuckDB, S3, Nextflow, Docker, Pod2Bam |
+| `aliases.md` | Commandes fréquentes (tp, Pipeline, Run, scratch) |
+| `troubleshooting.md` | Problèmes récurrents DuckDB, S3, Nextflow, Docker |
 
-### Chargées selon le contexte (path-scoped)
-| Rule | Quand | Contenu |
-|---|---|---|
-| `bioinfo-tools.md` | Fichiers .nf, projets pipeline | Conventions modkit, dorado, samtools, raima |
-| `dorado-reference.md` | Pod2Bam, basecall | Images Docker, modèles, trimming |
-| `bedmethyl-format.md` | Bam2Beta, IA | 18 colonnes bedMethyl avec relations |
-| `stats-guide.md` | exploratory-analysis, IA, .R | Guide stats (Wilcoxon, ROC, Spearman, ComBat-met) |
-| `template-claude-md.md` | CLAUDE.md, .claude/ | Template pour nouveaux projets |
+### Path-scoped
+| Rule | Paths |
+|---|---|
+| `bioinfo-tools.md` | Fichiers .nf, projets pipeline |
+| `dorado-reference.md` | Pod2Bam, basecall |
+| `bedmethyl-format.md` | Bam2Beta, IA |
+| `stats-guide.md` | exploratory-analysis, IA, .R |
+| `template-claude-md.md` | CLAUDE.md, .claude/ |
+| `aima-brand.md` | **NEW path-scope** : .tex/.typ/rapport*/report*/Aima-Tower |
 
 ## Hooks (3)
 
 | Hook | Event | Fonction |
 |---|---|---|
-| Protection S3 | PreToolUse (Bash) | Bloque `aws s3 rm`, `aws s3 rb`, `aws s3 sync --delete` |
-| Notification | Notification (*) | `notify-send` quand Claude attend une action (timeout 5s) |
-| Auto-push session end | Stop | `~/.claude/scripts/auto-push-on-stop.sh` — commit+push whitelist memory/rules/scripts/CLAUDE.md (timeout 15s) |
+| `pretool-bash-guard.sh` | PreToolUse (Bash) | **9 règles** : S3 destructive, cd+rm, Python destructif, find -delete, dd, xargs rm, redirect .pod5, shred/mkfs, **nextflow run hors ~/Run (NEW)** |
+| Notification | Notification (*) | `notify-send` quand Claude attend une action |
+| `auto-push-on-stop.sh` | Stop | Commit+push whitelist ~/.claude/ (timeout 20s) |
 
-Scripts annexes : `archive-todo.sh`, `archive-todo-monthly.sh` (rotation todo-list).
+## Plugins (5 activés)
 
-## Plugins (6 installés, 3 activés)
+| Plugin | Source | Apporte |
+|---|---|---|
+| feature-dev | claude-plugins-official | Skill /feature-dev |
+| code-review | claude-plugins-official | Skill /code-review |
+| context7 | claude-plugins-official | MCP context7 |
+| superpowers | claude-plugins-official | brainstorming, TDD, debugging, verification, plans... |
+| frontend-design | claude-plugins-official | Skill /frontend-design + MCP Claude_in_Chrome |
 
-### Activés dans settings.json
-| Plugin | Source |
-|---|---|
-| feature-dev | claude-plugins-official |
-| code-review | claude-plugins-official |
-| context7 | claude-plugins-official |
+## Permissions notables
 
-### Installés mais non activés
-| Plugin | Source |
-|---|---|
-| frontend-design | claude-plugins-official |
-| code-simplifier | claude-plugins-official |
-| example-skills | marketplace Anthropic |
-
-## Permissions notables (settings.json)
-
-- **Allow globales** : Read/Edit/Write/Glob/Grep + ~50 Bash whitelistés (git, docker, nextflow, aws, samtools, tmux, python3, nvidia-smi)
-- **Variables d'env inline autorisées** : `BAM=`, `UBAM=`, `S3=`, `WORKDIR=`, `DEMUX_DIR=` — révèle des workflows bash manuels de debug NF
-- **Flag expérimental actif** : `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
-- **Aucun deny explicite** → sécurité S3 repose sur le hook PreToolUse
+- **Allow globales** : ~50 Bash whitelistés (git, docker, nextflow, aws, samtools, tmux, python3)
+- **Allow local** : 111 entries (à réduire via `/fewer-permission-prompts`)
+- **Deny** : **20 deny rules** (S3, rm POD5, rm -rf paths critiques, dd, shred, mkfs)
+- **Flag actif** : `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 
 ## Automatisations
 
 | Automatisation | Fréquence | Détail |
 |---|---|---|
-| Veille PubMed (Aima-Survey) | Daily 8h00 | Rapports markdown + scoring Claude Haiku 4.5 + email |
+| Veille PubMed (Aima-Survey) | Daily 8h00 | Rapports markdown + scoring Claude Haiku + email |
 | Veille résumé hebdo | Lundi 8h05 | Résumé des 7 derniers jours |
-| Exploration auto | Chaque session | `agent-explore` deep lancé en background au 1er message |
-| Auto-push `.claude/` | Chaque fin de session | Hook Stop → push whitelist |
+| Exploration auto | Chaque session | `agent-explore` deep en background |
+| Auto-push `.claude/` | Chaque fin de session | Hook Stop |
+
+## Historique des audits
+
+| Date | Type | Résultat |
+|---|---|---|
+| 2026-05-09 | Audit comportemental 30j | 100 sessions, 19 skills à 0 invoc, 25 actions priorisées |
+| 2026-05-20 | Cleanup itératif avec Boris | -14 skills, -1 MCP, +3 skills, hook étendu, 1 rule path-scopée |

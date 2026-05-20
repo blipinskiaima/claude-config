@@ -12,11 +12,12 @@
 
 ## Inventaire
 
-- [Inventaire Claude Code](inventaire-claude-code.md) — 24 skills, 4 agents, 3 MCP, 11 rules, 2 hooks, 3 plugins (2026-04-13)
+- [Inventaire Claude Code](inventaire-claude-code.md) — 28 skills, 4 agents, 7 MCP, 11 rules (2 path-scopées), 3 hooks (PreToolUse étendu 9 règles), 5 plugins (2026-05-20)
 
 ## Audit
 
-- [Audit Claude Code 2026-05-09](audit-claude-code-2026-05-09.md) — 30j transcripts + 7 changelogs hebdo Claude Code (w13-w19) + Code w/ Claude 06/05. 100 sessions, 19 skills à 0 invoc, 25 actions priorisées (top : `/fewer-permission-prompts`, Remote Control + push mobile, MCP DuckDB read-only, hook PreToolUse `if:` étendu, skill docker-restart)
+- [Audit Cleanup 2026-05-20](audit-claude-code-2026-05-20.md) — 3 commits sur main de claude-config : -14 skills, -1 MCP (memory), +3 skills (docker-restart, audit-config, seqera-status), +6 optims. Couverture hooks Bash 9/9 golden rules
+- [Audit Claude Code 2026-05-09](audit-claude-code-2026-05-09.md) — 30j transcripts + 7 changelogs hebdo (w13-w19) + Code w/ Claude. 100 sessions, 19 skills à 0 invoc, 25 actions priorisées
 
 ## Todo
 
