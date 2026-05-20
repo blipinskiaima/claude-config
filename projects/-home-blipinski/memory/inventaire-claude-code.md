@@ -7,9 +7,12 @@ originSessionId: prompt-creator-audit-2026-05-20
 
 # Inventaire Claude Code — Boris Blipinski (2026-05-20)
 
-## Skills (42 sur disque après suppression gstack ecosystem 2026-05-20 : 27 trackés dans claude-config + 15 fournis par plugins superpowers/frontend-design/anthropic-skills ; 4 supplémentaires scopés projets Pipeline)
+## Skills (37 sur disque après tri itératif 2026-05-20 : 27 trackés dans claude-config + 10 fournis par plugins design/officiels ; 4 supplémentaires scopés projets Pipeline)
 
-> **Suppression ecosystem gstack (audit 2026-05-20 machine -home-boris)** : 46 wrappers symlinks supprimés + binaire 1.5 GB. Décision : ratio observé 119× MCP chrome / 2× `/browse` montrait que la stack gstack n'était pas le workflow naturel. Pour réinstaller : `gstack install` depuis bun.
+> **Audit 2026-05-20 machine -home-boris (3 actions)** :
+> 1. Suppression ecosystem gstack — 46 wrappers symlinks + binaire 1.5 GB. Décision : ratio observé 119× MCP chrome / 2× `/browse` montrait que la stack gstack n'était pas le workflow naturel. Réinstaller : `gstack install`.
+> 2. Tri skill par skill (37/42 retenus). Suppressions plugins design : `frontend-ui-engineering` (doublon frontend-design), `imagegen-frontend-web`, `industrial-brutalist-ui` (pas le style AIMA), `minimalist-ui` (doublon impeccable), `stitch-design-taste` (Google Stitch spécifique).
+> 3. 27 skills trackés gardés intégralement (Bioinfo AIMA, Todo perso, Workflow session, Claude management, Dev/Meta, Docker, Frontend).
 
 ### Bioinfo / AIMA — Global (3)
 | Skill | Usage |
