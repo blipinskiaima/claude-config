@@ -44,3 +44,6 @@ remote/
 
 # Local backups
 *.bak
+
+# Runtime session data (PID/sessionId/cwd, ephemeral)
+sessions/
