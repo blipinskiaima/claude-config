@@ -22,7 +22,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Intégrer rapport Typst V2 dans Bam2Beta** — créer `Dockerfile.rapportv4` (Typst + cetz + IBM Plex) + remplacer `rmarkdown::render` dans `workflow/beta.nf:309` par `typst compile` + switcher `conf/{base,prod}.config` vers `rapportv4:latest`. **Lundi 2026-05-11**. Source : `test/V2final/report-grail-v2.typ`.
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
 - [ ] **Bam2Beta V1.2.0 — release lundi 2026-05-11** — commit + tag (raima 0.4.17 + suppression Sniffles/Severus/Decoil + nouveau module IV). Pipeline déjà testé OK sur Healthy_826.
-- [ ] **Vérifier qualité IV via trace-prod** — intégrer `sex.tsv` + `ancestry.tsv` dans trace-prod pour valider sur cohorte. Prérequis : release V1.2.0.
 
 ## Moyenne priorité
 
@@ -60,6 +59,16 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-05-21 — trace-prod schema v7 short_read + skill add-trace-prod
+
+- [x] **trace-prod schema v7 — colonne `short_read`** — tracke le subsampling 75-200 bp (liquid uniquement) via listing récursif S3 sur bucket mirror `{LABO}_short_read` : OK si les 6 dossiers (BAM, BETA, CNV, QC, REPORT, ichorCNA) sont présents et non vides. Pattern preserve sur erreur S3 (`_update_short_read` dédié). Gotcha attrapé : `aws s3 ls --recursive` retourne clés S3 complètes → stripper avec `sample_prefix`. Commit `71937aa` (+496 lignes dont 381 de doc README v2→v7).
+- [x] **Skill `add-trace-prod`** — workflow guidé pour reproduire l'ajout de colonne trace-prod : 5 étapes A→E avec validation utilisateur entre chaque, arrêt avant exécution rétrospective. 10 fichiers (SKILL.md + 4 steps/ + 3 patterns/ + 1 decisions/ + 1 gotchas/). Validé via `quick_validate.py`. Skill global `~/.claude/skills/add-trace-prod/`.
+- [x] **Memory trace-prod compactée** — MEMORY.md passé de 222 → 146 lignes (sous la limite 200). 13 sections détaillées déportées vers nouveau topic `project_columns_index.md` (v2-v7 synthèse + patterns transversaux : collision mapping, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT, BAM completude fallback).
+
+## 2026-05-20 — trace-prod schema v6 IV/QC (4 colonnes retd_suivis)
+
+- [x] **trace-prod schema v6 — colonnes IV/QC (Vérifier qualité IV via trace-prod)** — ajout `read_start_time`, `ancestry`, `sex_proba`, `sex_predicted` dans `retd_suivis` (VARCHAR libre, pas STATUS_COLUMNS). Sources : `IV/{sample}.ancestry.tsv` (argmax sur 18 ancestries), `IV/{sample}.sex.tsv` (proba arrondie au millième + F/M selon seuil 0.5), `QC/Samtools/{sample}.read_start_time.tsv` (check présence sans lecture, fichier 3-4 GB). Path IV/ : **sœur de QC/, pas dedans**. Câblé dans `Liquid` + `SolidChecker`, 4 entrées `COLUMN_CHECKERS`. Commit `c5aa8a2`. Détails : `project_schema_v6_iv_qc.md`.
 
 ## 2026-05-13 — Aima-Tower v4.2.0 pages /samples + /sample/:id
 
