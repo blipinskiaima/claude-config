@@ -21,9 +21,25 @@ Auteur unique de 20 projets dans `~/Pipeline/`. Bus factor = 1 sur tout le stack
 
 ## Session Start
 
-À chaque premier message sur un projet avec du code source, lancer automatiquement en **background** (`run_in_background: true`) le subagent `agent-explore` (exploration profonde). Toujours une exploration **deep**, jamais quick.
+À chaque premier message sur un projet avec du code source, lancer automatiquement en **background** (`run_in_background: true`) le subagent approprié selon l'**intent** détecté dans le premier message.
 
-Répondre immédiatement à l'utilisateur sans attendre l'exploration. Intégrer les résultats quand le subagent termine.
+### Routing par intent
+
+| Intent | Mots-clés / commandes déclencheurs | Agent(s) lancé(s) |
+|---|---|---|
+| **Par défaut** — exploration, brainstorm, question, debug, status | "explique", "comment", "pourquoi", "c'est quoi", "statut", "inventaire", "où en est", "debug", "explain", "what", "how", "why", "status", "list", `/debug-nf`, `/sample`, `/veille` | `agent-explore-quick` seul (Haiku, ~30s, ~5-10k tokens) |
+| **Implémentation / refactor** — création de feature, modification de structure | "/code-workflow-feature", "/clean-skill", "implémente", "implémenter", "ajoute une feature", "nouvelle fonctionnalité", "refactor", "refactorise", "réorganise", "implement", "add feature", "new feature", "build", "create component" | `agent-explore-quick` (Haiku) **PUIS** `agent-explore` deep (Sonnet) en parallèle |
+
+### Règles
+
+- Répondre **immédiatement** à Boris sans attendre les agents
+- Intégrer les résultats des agents quand ils terminent
+- Si `agent-explore-quick` retourne `→ Recommend agent-explore deep`, escalader en lançant `agent-explore` en background
+- Ne **jamais** lancer `agent-explore` deep seul — `agent-explore-quick` charge en amont le contexte documenté (CLAUDE.md, MEMORY.md, rules), évitant que le deep le redécouvre
+
+### Justification
+
+`agent-explore` deep est coûteux (Sonnet, 5-15 min, ~50-100k tokens). Sur les 250 invocations Pipeline/114j, ~80% sont des questions où le contexte documenté suffit. Routing : Haiku par défaut → économie ~85% sur l'exploration automatique.
 
 ## Compaction
 
