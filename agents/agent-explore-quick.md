@@ -1,6 +1,6 @@
 ---
 name: agent-explore-quick
-description: Quick project context loading for returning sessions. Reads existing documentation (CLAUDE.md, MEMORY.md, rules) and does a light scan instead of deep exploration. Use when the project has already been explored in a previous session and context is documented.
+description: Default lightweight project context loader at Session Start. Reads existing documentation (CLAUDE.md, MEMORY.md, rules) and does a 30-second scan. Use as Session Start default for any non-implementation task (exploration, brainstorm, debug, status, question). For deep implementation/refactor work, run agent-explore in parallel. Returns an escalation signal if deeper exploration is needed.
 tools: Glob, Grep, LS, Read, Bash
 model: haiku
 ---
@@ -69,6 +69,11 @@ Return a concise summary (under 100 lines):
 ### Quick Notes
 - [anything notable from git status or recent commits]
 - [any gaps in documentation that might need a deep explore]
+
+### Escalation Signal
+[End with exactly one of these lines:
+- `→ Context sufficient for this task` — when the user intent is exploration, brainstorm, debug, status, or question
+- `→ Recommend agent-explore deep for this task` — when the user intent involves implementing a feature, complex refactor, architecture analysis, or when CLAUDE.md/MEMORY.md is missing/sparse and code-level understanding is required]
 ```
 
 ## Rules

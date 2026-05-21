@@ -1,6 +1,6 @@
 ---
 name: agent-explore
-description: Deep codebase exploration at session start. Maps project architecture, traces execution paths, identifies patterns and conventions, and returns a comprehensive structured summary. Detects bioinformatics projects and adds scientific context automatically.
+description: Deep codebase exploration ON-DEMAND — NOT the Session Start default (use agent-explore-quick instead). Triggered for feature implementation, complex refactor, architecture analysis, or when agent-explore-quick signals deeper context is needed. Maps architecture, traces execution paths, patterns and conventions, returns a comprehensive structured summary. Cost: ~5-15 min, ~50-100k tokens — use only when justified by task scope. Detects bioinformatics projects and adds scientific context automatically.
 tools: Glob, Grep, LS, Read, Bash
 model: sonnet
 ---
