@@ -16,7 +16,26 @@ Then provide your final answer.
 ```
 
 **When to use**: complex reasoning, math, multi-step logic, debugging.
-**When to skip**: simple lookups, factual questions, models with built-in reasoning (GPT o-series, Claude with extended thinking).
+**When to skip**: simple lookups, factual questions, models with built-in reasoning (GPT o-series, Claude with adaptive thinking).
+
+## Adaptive Thinking + Effort Param (Claude 4.6+)
+
+Sur Claude Sonnet 4.6 et Opus 4.7, le raisonnement interne est contrôlé par le paramètre `effort` plutôt que par des prompts CoT explicites.
+
+```python
+# Au lieu d'écrire "think step by step" dans le prompt :
+output_config={"effort": "high"}    # max | xhigh | high | medium | low
+thinking={"type": "adaptive"}
+```
+
+Valeurs `effort` :
+- `max` — pas de contrainte sur la profondeur
+- `xhigh` — exploration étendue (Opus 4.7 uniquement)
+- `high` — raisonnement profond (défaut, recommandé pour code/agentic)
+- `medium` — équilibré, skip thinking sur queries simples
+- `low` — rapide, skip thinking sur tâches simples
+
+Pour les détails complets, voir [anthropic-best-practices.md](anthropic-best-practices.md).
 
 ## Scratchpad (Anthropic)
 

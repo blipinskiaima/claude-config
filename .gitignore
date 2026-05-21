@@ -24,6 +24,7 @@ plugins/
 daemon.log
 daemon/
 jobs/
+scheduled_tasks.lock
 
 # Projects: ignore session logs, keep memory/
 projects/**/*.jsonl
