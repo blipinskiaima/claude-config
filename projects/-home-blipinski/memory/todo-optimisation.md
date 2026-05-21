@@ -60,11 +60,13 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-05-21 — trace-prod schema v7 short_read + skill add-trace-prod
+## 2026-05-21 — trace-prod schema v7 + skill add-trace-prod + démo platform Bladder/Breast
 
 - [x] **trace-prod schema v7 — colonne `short_read`** — tracke le subsampling 75-200 bp (liquid uniquement) via listing récursif S3 sur bucket mirror `{LABO}_short_read` : OK si les 6 dossiers (BAM, BETA, CNV, QC, REPORT, ichorCNA) sont présents et non vides. Pattern preserve sur erreur S3 (`_update_short_read` dédié). Gotcha attrapé : `aws s3 ls --recursive` retourne clés S3 complètes → stripper avec `sample_prefix`. Commit `71937aa` (+496 lignes dont 381 de doc README v2→v7).
 - [x] **Skill `add-trace-prod`** — workflow guidé pour reproduire l'ajout de colonne trace-prod : 5 étapes A→E avec validation utilisateur entre chaque, arrêt avant exécution rétrospective. 10 fichiers (SKILL.md + 4 steps/ + 3 patterns/ + 1 decisions/ + 1 gotchas/). Validé via `quick_validate.py`. Skill global `~/.claude/skills/add-trace-prod/`.
 - [x] **Memory trace-prod compactée** — MEMORY.md passé de 222 → 146 lignes (sous la limite 200). 13 sections détaillées déportées vers nouveau topic `project_columns_index.md` (v2-v7 synthèse + patterns transversaux : collision mapping, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT, BAM completude fallback).
+- [x] **Démo samples client CGFL — 82 Bladder + 4 Breast** — copié `aima-bam-data/processed/MRD/RetD/liquid/CGFL/{Bladder_Blood_*,Bladder_Urine_*,Breast_*}` vers `aima-platform/data/198e71d4-.../MRD/` (3-4 fichiers/sample + metadata.json depuis trace-prod). Patient `Breast_Demo` avec 4 mVAF diversifiés (0 / 0.41 / 1.06 / 2.58). Schema metadata.json final : 9 champs (suppression `nb_reads_epic` + `ratio_percent`).
+- [x] **eCRF_bladder.csv** — export 82 samples Bladder × 48 colonnes depuis trace-prod (`samples` + `metadata`) à la racine de trace-platform. Commit `a7efc7d`.
 
 ## 2026-05-20 — trace-prod schema v6 IV/QC (4 colonnes retd_suivis)
 
