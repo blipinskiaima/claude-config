@@ -92,6 +92,12 @@ Phase 3 — Synthesis: Combine findings into a coherent answer with citations
 
 ## When NOT to Force Reasoning
 
-- Don't use "think step by step" on GPT o-series or o3 — they already reason internally
-- Don't use it on Claude with extended/adaptive thinking enabled — redundant and causes over-thinking
-- Don't force CoT on simple classification or lookup tasks — it adds latency without benefit
+**Pas de "think step by step" sur ces modèles** :
+- **OpenAI o-series** (o3, o4-mini) — raisonnement interne natif. Recommandation officielle : *"prompting them to 'think step by step' is unnecessary."*
+- **Claude avec adaptive thinking** — utiliser `effort: high` (ou `xhigh` sur Opus 4.7) plutôt que des instructions CoT manuelles.
+
+**Pas de CoT non plus pour** :
+- Classification ou lookup simples — ajoute de la latence sans bénéfice
+- Tâches déjà bien définies — Claude 4.6+ et GPT-5.x raisonnent déjà efficacement par défaut
+
+Voir [openai-best-practices.md](openai-best-practices.md) pour la distinction reasoning vs standard models et [anthropic-best-practices.md](anthropic-best-practices.md) pour l'utilisation détaillée du paramètre `effort`.
