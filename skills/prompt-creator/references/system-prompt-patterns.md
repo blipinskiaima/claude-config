@@ -26,6 +26,36 @@ Patterns specifically for designing effective system prompts.
 </guardrails>
 ```
 
+## Developer Message vs System Message (modèles reasoning OpenAI)
+
+Sur **o3 / o4-mini**, le rôle `system` a été remplacé par le rôle `developer`. Les premiers o1 ne supportaient ni l'un ni l'autre.
+
+```python
+# Modèles standard (GPT-5.5, GPT-4o, Claude)
+messages = [{"role": "system", "content": "..."}]
+
+# Reasoning models (o3, o4-mini)
+messages = [{"role": "developer", "content": "..."}]
+```
+
+Source officielle : *"Developer messages are the new system messages for reasoning models. They specify instructions or context for the model to follow, such as defining tone, style and other behavioral guidance."*
+
+Pour les patterns spécifiques aux reasoning models, voir [openai-best-practices.md](openai-best-practices.md).
+
+## Literalisme Opus 4.7
+
+**Important pour les system prompts ciblant Opus 4.7** : le modèle interprète les instructions plus littéralement qu'Opus 4.6, surtout à `effort` bas. Le modèle ne généralise pas silencieusement et n'infère pas les requêtes que vous n'avez pas faites.
+
+```
+# Ambigu sur Opus 4.7
+Use this formatting style.
+
+# Explicite (recommandé Opus 4.7)
+Apply this formatting to **every section** of the response, not just the first one.
+```
+
+Citation officielle : *"It will not silently generalize an instruction from one item to another, and it will not infer requests you didn't make."*
+
 ## Role + Behavioral Anchoring
 
 Define both identity AND behavior:
