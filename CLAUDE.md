@@ -35,7 +35,7 @@ Auteur unique de 20 projets dans `~/Pipeline/`. Bus factor = 1 sur tout le stack
 - Répondre **immédiatement** à Boris sans attendre les agents
 - Intégrer les résultats des agents quand ils terminent
 - Si `agent-explore-quick` retourne `→ Recommend agent-explore deep`, escalader en lançant `agent-explore` en background
-- Ne **jamais** lancer `agent-explore` deep seul — `agent-explore-quick` charge en amont le contexte documenté (CLAUDE.md, MEMORY.md, rules), évitant que le deep le redécouvre
+- Ne **jamais** lancer `agent-explore` deep seul **en routing automatique** — `agent-explore-quick` charge en amont le contexte documenté (CLAUDE.md, MEMORY.md, rules), évitant que le deep le redécouvre. **Exception** : invocation manuelle via `/explore-projet`, où la Phase 1 du deep recharge elle-même le contexte
 
 ### Justification
 
