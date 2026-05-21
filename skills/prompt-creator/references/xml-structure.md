@@ -2,6 +2,10 @@
 
 XML tags are the most effective way to structure prompts, especially for Claude. They create clear boundaries between sections and prevent instruction bleed.
 
+**Gain documenté officiellement** (docs.anthropic.com — prompt engineering): placing queries at the end of long-context prompts improves response quality by **up to 30% in tests, especially with complex, multi-document inputs**.
+
+Note: Anthropic's official docs do not publish a specific "+X%" metric for XML tags vs other formats — the benefit of XML tags themselves is qualitative (unambiguous parsing, clear structure, instruction-data separation).
+
 ## Basic Section Tags
 
 ```xml
