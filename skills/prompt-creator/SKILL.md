@@ -4,7 +4,7 @@ description: Expert prompt engineering for creating effective prompts for Claude
 ---
 
 <objective>
-Create highly effective prompts using proven techniques from Anthropic (Claude 4.6), OpenAI (GPT-5.2), and Google (Gemini 3) research. Every prompt created should be clear, specific, and optimized for the target model.
+Create highly effective prompts using proven techniques from Anthropic (Claude Opus 4.7 / Sonnet 4.6), OpenAI (GPT-5.5 / o-series), and Google (Gemini 3.x) research. Every prompt created should be clear, specific, and optimized for the target model.
 
 This skill covers all major prompting methodologies: clarity, structure, examples, reasoning, and advanced patterns.
 </objective>
