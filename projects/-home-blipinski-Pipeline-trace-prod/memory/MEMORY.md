@@ -2,6 +2,8 @@
 
 - [Rebasecalled POD5 — ne pas propager](feedback_rebasecalled_pod5.md) — laisser NULL après update-column stockage_pod5, ne pas copier depuis l'original
 - [Schema v6 — colonnes IV/QC](project_schema_v6_iv_qc.md) — 4 colonnes retd_suivis (read_start_time, ancestry, sex_proba, sex_predicted), path IV/ sœur de QC/
+- [Schema v7 — short_read](project_schema_v7_short_read.md) — colonne retd_suivis.short_read, vérifie 6 dossiers S3 dans bucket mirror {labo}_short_read (liquid uniquement)
+- [Colonnes v2-v7 — index](project_columns_index.md) — synthèse des colonnes ajoutées + patterns transversaux (collision mapping, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
 
 ## Architecture
 - CLI entry: `database/check_samples.py` (Click)
@@ -126,26 +128,6 @@
 - S3 read-only via `_s3_read_text()`, fallback NFS
 - [STATUS_COLUMNS gotcha](feedback_status_columns.md)
 
-## mVAF v1.2 Column (mars 2026)
-- Column: `mvaf_v12` in `retd_suivis` — VARCHAR, NOT in STATUS_COLUMNS
-- Value: raima score v1.2 with comma decimal (ex: "0,0105373") or "KO" if absent
-- Source: `{sample_dir}/BETA/{sample}.merged.epic.raima_score.V1.2.tsv`, line 2, col 2 (tab-separated)
-- S3 read-only via `_s3_read_text()`, fallback NFS
-- Export position: between "mVAF v1" and "mVAF v2"
-
-## Barcode Fallback via bam_list.txt (mars 2026)
-- When no `.bam` files in `origin_dir`, `BAMExtractor._barcode_from_bam_list()` reads `{sample}_bam_list.txt`
-- Extracts barcode from first line filename (regex `barcode\d+`)
-- S3-first via `_s3_read_text()`, fallback NFS
-- For rebasecalled samples: barcode copied from original sample (same run = same barcode)
-- HCL rebasecalled POD5 columns also copied from original (same POD5 data)
-
-## BAM Completude Fallback via bam_list.txt (mars 2026)
-- When `_update_bam_sizes()` finds no BAM on S3, `_bam_count_from_list()` reads `{sample}_bam_list.txt`
-- Counts `.bam` lines and extracts max index from filename (`_{N}.bam` suffix)
-- Completude = count / (max_index + 1) × 100
-- Affects Bladder_Blood samples where BAM raw no longer on S3 (only txt files remain)
-
 ## Conventions
 - Valid combos: liquid×(CGFL|HCL), solid×CGFL only
 - Status: OK, KO, WARNING
@@ -153,69 +135,12 @@
 - Missing: "NA" in exports, NULL in DB
 - samples table: colonne `sample_type` (pas `type`)
 
-## Schema v2/v3/v4/v5 Migration (avril-mai 2026)
-- SCHEMA_VERSION bumped 1→2→3→4→5 dans `lib/duckdb.py`
-- Migration idempotente dans `DuckDBService._init_schema()` : `ALTER TABLE ... ADD COLUMN` si absent
-- v2 : `qc_metrics.mvaf_v1_10m/20m`, `retd_suivis.frag_mode1/2`, `bam_metadata.bam_horaire`, `metadata.{gene1_detailed_variant,active_cancer_clinical,stage,commentaire_global}`
-- v3 : `metadata.grade` — source "Grade" gsheet metadata_CGFL VAF, HCL reste NULL
-- v4 : `metadata.speedvac` — `SpeedVac` (CGFL) + `SpeedVAc` (HCL, casse), harmonisé `Yes/No`
-- v4 (fix bonus) : `"Stage" → stage` ajouté (CGFL stage était 100% NULL avant)
-- v5 (mai 2026) : `metadata.cohort` — source col `Cohorte` (col 48 dans les 2 gsheets), mapping unique `"Cohorte" → cohort`. Valeurs : Validation tech, AlCapone, Bladder, Brenus, MSD, Lung-DI précoce. `HARMONIZATION_RULES["cohort"]` défensif (casse/accent). Coverage liquid : CGFL 479/644 (165 manquants = Lung_Alc absents DB), HCL 445/449 (4 vides en gsheet). Rempli uniquement via `import-metadata` (workflow `check` → `import-metadata`).
+## Schemas v2-v7 + patterns transversaux
+Détails déportés vers [columns-index](project_columns_index.md) :
+- v2 (mVAF raréfiée, frag_mode, bam_horaire, 4 metadata cols)
+- v3-v5 (metadata gsheet : grade, speedvac, cohort)
+- v6 (IV/QC : read_start_time, ancestry, sex_proba, sex_predicted)
+- v7 (short_read)
+- Patterns : collision mapping TSV_TO_DB, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT, BAM completude fallback
 
-## Mapping Collision Fix (`upsert_metadata`, avril 2026)
-- Plusieurs `tsv_col` peuvent pointer vers le même `db_col` (ex: `"Stage"` et `"Stage (I, II...)"` → `stage` ; `"SpeedVac"` et `"SpeedVAc"` → `speedvac`)
-- Avant : 2e itération écrasait la valeur précédente même avec `None` (col absente côté un labo)
-- Après : `if new is not None or db_col not in data: data[db_col] = new` — préserve la 1re valeur non-None
-- Sans ce fix, ajouter un mapping casse silencieusement les imports précédents
-
-## Export ONT Sample (avril 2026)
-- Commande `export-ont-samples` : DuckDB.metadata fusionnée (CGFL+HCL liquid) → onglet `'ONT Sample'` de la gsheet trace-prod (`1gm_vB7vTzAq38dgkJFNpgA3Cy_XRlUqunMgoBvKnh6M`)
-- Filtre : `sample_type='liquid'`, rebasecalled exclus par défaut (flag `--include-rebasecalled` pour les inclure)
-- Méthode DB : `DuckDBService.get_metadata_unified(exclude_rebasecalled=True)` — JOIN metadata + samples, ORDER BY labo, sample_name
-- Méthode export : `GSheetsService.export_ont_samples(rows)` — 51 cols (3 tech + 44 metadata dédupliquées + 2 calculées)
-- Headers metadata : déduplication par `db_col` en gardant la 1re entrée de `TSV_TO_DB_METADATA` (gère les collisions `"SpeedVac"/"SpeedVAc"` et `"Stage"/"Stage (I, II, III...)"`)
-- Config : entrée `ont_samples` dans `gsheets_config.json`
-- Coverage : 687 lignes (357 CGFL + 330 HCL), SpeedVac 687/687, Stage 365/687
-
-## bam_horaire Column (avril 2026)
-- Col `bam_metadata.bam_horaire` VARCHAR DEFAULT 'KO'. Tracks présence BAM raw horaires S3.
-- Update dédié : `update-column bam_horaire {type} {labo}` — UPDATE chirurgical de la seule colonne via `_update_bam_horaire()`, ne touche JAMAIS nb_bam/taille_bam/bam_completude
-- Logique : liste `s3://aima-bam-data/data/{labo}/{type}/{sample}/` via `aws s3 ls --recursive --profile scw`. `OK` si ≥1 `.bam`, `clean` si listing OK et 0 `.bam`, inchangé si erreur S3
-- `update-column taille_bam` side-effect : tag aussi `bam_horaire='OK'` quand il observe des BAM raw
-
-## mVAF Rarefied 10M/20M (avril 2026)
-- Cols `qc_metrics.mvaf_v1_10m`, `mvaf_v1_20m` DECIMAL(10,4)
-- Sources : `BETA/{sample}.10M.epic.raima_score.V2.tsv` et `.20M.epic.raima_score.V2.tsv`
-- Extraction via `BaseChecker.get_mvaf_rarefied(depth)` — réutilise `TSVExtractor.extract_mvaf()`
-- Export headers : "mVAF v1 10M" / "mVAF v1 20M" dans `_LIQUID_QC` et `_SOLID_QC`
-- `update-column mvaf_v1_10m|mvaf_v1_20m` supportés
-
-## Frag Modes (avril 2026)
-- Cols `retd_suivis.frag_mode1`, `frag_mode2` VARCHAR DEFAULT 'NA' (**PAS dans STATUS_COLUMNS**)
-- Source : `Fragmentomics/filtered/{sample}.fragmentomics_modes.tsv`, ligne 2, col 1 (mode1) et col 2 (mode2)
-- Format : virgule décimale, "NA" si fichier absent/colonne vide
-- Méthodes `BaseChecker.check_frag_mode1/2` + `_check_frag_mode(col_idx)` (S3-first via `_s3_read_text`, fallback NFS)
-- Export : "Frag Mode1" / "Frag Mode2" entre "IchorCNA" et "BAM" dans `_LIQUID_QC` et `_SOLID_QC`
-
-## gene1_vaf Raima Logic (avril 2026, BREAKING)
-- Avant : `gene1_vaf = gene1_freq` si gene1_vaf absent (toujours rempli)
-- Après : `gene1_vaf = max(gene1_freq.split(" / "))` **uniquement si `gene1_mutation_status == "Tumoral"`**, sinon NULL
-- Raison : les freq Non-tumoral/Unknown ne doivent pas alimenter la VAF raima
-- Impact : réimporter les metadata peut vider des gene1_vaf qui étaient précédemment remplis
-
-## Metadata Rebasecalled Propagation (avril 2026, updated)
-- `import-metadata` : après l'import principal, re-propage les metadata depuis le sample original vers **TOUTES** les variantes `{sample}_rebasecalled*` (pas seulement celles sans metadata)
-- Raison : les rebasecalled ne sont jamais dans la gsheet → seule la propagation les touche. Sans re-propagation systématique, leur metadata se fige au moment de la 1re propagation et diverge de l'original dès qu'une valeur ou colonne change
-- Exemple constaté : `Lung_10` original avec `stage="IV"`, rebasecalled figé à `"stade IV"` (ancien format) ; `Colon_32` original avec `stage="III"`, rebasecalled à NULL (colonne ajoutée après propagation)
-- Résultat à chaque import : 113 CGFL + 71 HCL = 184 rebasecalled re-propagés
-- Regex `_rebasecalled.*$` → `base_name`, lookup `get_sample(base_name, type, labo)`, copie complète avec `sample_id` remplacé via `_upsert_table("metadata", ...)`
-
-## Metadata Import Lookup Fallback (avril 2026)
-- Si lookup via "Old sample name" échoue → retente avec "Sample name" (était : seulement si Old était vide)
-- Nécessaire pour les `*bis` : gsheet a `Old sample name = "Breast_1_bis"` (legacy avec underscore), DB stocke `"Breast_1bis"` (format court)
-- Fix : +4 samples `*bis` récupérés (Breast_1bis, Lung_9bis, Lung_10bis, Lung_11bis), +4 rebasecalled propagés
-
-## NFS-First Priority (avril 2026, BREAKING)
-- `TSVExtractor._read_lines()` lit NFS d'abord, S3 en fallback (avant : S3 d'abord)
-- Raison : sur ce serveur, NFS est plus rapide que S3 pour les petits TSV quand le mount est dispo
-- `_s3_read_text()` reste utilisé ailleurs (checkers comme `check_ichorcna`, `check_mvaf_v12`) avec priorité S3
+Sections détaillées par colonne : voir `~/Pipeline/trace-prod/README.md` Tables 2/3/4 et `~/Pipeline/trace-prod/CLAUDE.md`.

@@ -20,6 +20,11 @@ todos/
 backups/
 plugins/
 
+# Runtime daemon (machine-specific state)
+daemon.log
+daemon/
+jobs/
+
 # Projects: ignore session logs, keep memory/
 projects/**/*.jsonl
 projects/**/subagents/
