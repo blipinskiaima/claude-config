@@ -1,11 +1,13 @@
 ---
 name: explore-projet
-description: Raccourci pour lancer agent-explore deep en background sur le projet courant. Équivaut à demander verbalement "explore en profondeur le projet en background" — force le mode deep sans passer par le routing automatique du Session Start. Use when the user says "/explore-projet", "explore le projet", "explore en profondeur", "exploration profonde", "deep explore", "explore deep", "explore-projet", or wants to manually trigger a full codebase deep dive on the current project.
+description: Raccourci pour relancer manuellement l'exploration standard (light, Haiku) sur le projet courant — équivaut au routing automatique du Session Start. Utile pour rafraîchir le contexte en cours de session sans rouvrir Claude. Use when the user says "/explore-projet", "explore le projet", "relance l'exploration", "refresh contexte", "recharge le projet", "explore-projet", or wants to manually trigger a lightweight project context reload during an active session.
 allowed-tools: Agent, Bash(pwd:*), Bash(basename:*)
 ---
 
 <objective>
-Lancer immédiatement le subagent `agent-explore` (Sonnet, deep) en background sur le projet correspondant au cwd courant. Court-circuite le routing automatique Session Start qui aurait sinon lancé `agent-explore-quick` (Haiku). Utilisé quand Boris a explicitement besoin de la profondeur deep, indépendamment de l'intent inféré.
+Lancer immédiatement le subagent `agent-explore-quick` (Haiku, ~30s, ~5-10k tokens) en background sur le projet correspondant au cwd courant. Permet de **rafraîchir le contexte standard** à tout moment de la session, sans rouvrir Claude. Aligné sur le comportement par défaut du routing Session Start (CLAUDE.md).
+
+**Note** : pour forcer une exploration profonde (Sonnet, deep), il faut soit invoquer un workflow qui le justifie (`/code-workflow-feature`, `/clean-skill`), soit utiliser les mots-clés feature/refactor en langage naturel.
 </objective>
 
 <workflow>
@@ -18,41 +20,40 @@ Lancer immédiatement le subagent `agent-explore` (Sonnet, deep) en background s
 
 Si le cwd n'est pas dans un projet (ex: `~` directement) ou est un dossier non-code, demander confirmation à Boris avant de lancer.
 
-## Step 2: Lancer agent-explore en background
+## Step 2: Lancer agent-explore-quick en background
 
 **Actions:**
 1. Invoquer le tool `Agent` avec :
-   - `subagent_type: "agent-explore"`
+   - `subagent_type: "agent-explore-quick"`
    - `run_in_background: true`
-   - `description: "Deep explore {project name}"` (≤ 5 mots)
-   - `prompt:` — instruction d'exploration deep selon le workflow standard de l'agent (voir bloc ci-dessous)
+   - `description: "Quick refresh {project name}"` (≤ 5 mots)
+   - `prompt:` — instruction d'exploration light selon le workflow standard de l'agent (voir bloc ci-dessous)
 
 **Prompt à passer à l'agent :**
 ```
-Effectue une exploration profonde du projet à {cwd}.
+Effectue un rafraîchissement rapide du contexte projet à {cwd}.
 
-Suis ton workflow standard en 6 phases :
-1. Load existing context (CLAUDE.md, MEMORY.md, rules, git log)
-2. Map project structure
-3. Detect project type (bioinfo AIMA si applicable) & find entry points
-4. Analyze architecture
-5. Identify patterns & conventions
-6. (Si bioinfo) Pipeline context AIMA — position dans le flow, Docker containers, S3 paths, Nextflow processes, dépendances inter-projets
+Suis ton workflow standard light en 3 étapes :
+1. Lis la documentation existante (CLAUDE.md, MEMORY.md, .claude/rules/*.md, topic files de la mémoire)
+2. Light git scan (git log --oneline -10, git status --short, git branch --show-current)
+3. Quick structure check uniquement si la doc est incomplète
 
-Retourne le résumé structuré complet selon ton template (Project Overview, Architecture, Entry Points, Key Files, Patterns, Data Flow, Commands, Gotchas, Pipeline Context si bioinfo).
+Retourne ton résumé concis (sous 100 lignes) avec le signal d'escalation à la fin :
+- "→ Context sufficient for this task" si la doc charge suffit
+- "→ Recommend agent-explore deep for this task" si du code-level deep est nécessaire
 ```
 
 ## Step 3: Confirmer à Boris
 
 **Actions:**
-1. Une phrase courte : « Exploration profonde lancée en background sur **{nom projet}** (Sonnet, ~5-15 min, ~50-100k tokens). Tu peux continuer à travailler — j'intégrerai le résumé quand l'agent termine. »
+1. Une phrase courte : « Rafraîchissement du contexte lancé en background sur **{nom projet}** (Haiku, ~30s, ~$0.02). »
 2. Ne **pas** attendre la fin de l'agent — rendre la main immédiatement à Boris
 
 ## Step 4: Intégration différée
 
 **Actions:**
 1. Quand l'agent termine (notification système), intégrer son résumé dans le contexte de la conversation
-2. Si Boris est en train de travailler sur autre chose, ne pas l'interrompre — mentionner brièvement que l'exploration est terminée et le résumé disponible
+2. Si l'agent retourne `→ Recommend agent-explore deep for this task`, en informer Boris brièvement (sans lancer le deep automatiquement — c'est sa décision)
 
 </workflow>
 
@@ -62,30 +63,29 @@ Retourne le résumé structuré complet selon ton template (Project Overview, Ar
 
 | Cas | Pourquoi |
 |---|---|
-| Nouveau projet récemment cloné ou récupéré | Pas de contexte mémorisé, le quick serait insuffisant |
-| Reprise d'un projet après une longue absence | Vérifier que la mémoire reste alignée avec le code actuel |
-| Override volontaire du routing Session Start | Le quick a démarré par défaut mais Boris veut le deep |
-| Préparation d'un gros refactor ou ajout structurel | Avoir le contexte complet avant d'attaquer |
-| Quand `agent-explore-quick` a signalé "→ Recommend agent-explore deep" | Suivre la recommandation explicite |
+| Reprise d'un projet après quelques heures de pause | Recharger CLAUDE.md, MEMORY.md, git status récents |
+| Tu as switché de projet et veux le contexte à jour | Skip le redémarrage de session |
+| Tu as fait des commits/modifs et veux que Claude « voie » l'état actuel | Refresh git log et status |
+| Tu sors d'une compaction et veux le contexte propre | Rebase rapide sur la doc |
 
 ## Quand NE PAS utiliser
 
-- Question simple ou status check → laisser le routing auto faire `agent-explore-quick`
-- Debug ponctuel → lecture ciblée des logs/code, pas d'exploration
-- Si un `agent-explore` deep est déjà en cours dans la session courante → inutile de relancer
+- Au tout début d'une session → le routing Session Start auto le fait déjà
+- Pour une exploration **profonde** (deep architecture, traces d'exécution) → utiliser plutôt `/code-workflow-feature` ou taper "implémente / refactor X" pour déclencher le deep via routing
 
 ## Différence avec le routing automatique
 
-| Mécanisme | Déclencheur | Agent lancé |
+| Mécanisme | Quand | Agent lancé |
 |---|---|---|
-| **Session Start auto** (CLAUDE.md) | 1er message Boris avec intent feature/refactor | `agent-explore-quick` + `agent-explore` deep |
-| **Session Start auto** (CLAUDE.md) | 1er message Boris avec intent question/brainstorm | `agent-explore-quick` seul |
-| **`/explore-projet`** (ce skill) | Invocation explicite, à tout moment | `agent-explore` deep **directement** |
+| **Session Start auto** (CLAUDE.md) | 1er message Boris, intent question/brainstorm | `agent-explore-quick` |
+| **Session Start auto** (CLAUDE.md) | 1er message Boris, intent feature/refactor | `agent-explore-quick` + `agent-explore` deep |
+| **`/explore-projet`** (ce skill) | À tout moment en cours de session | `agent-explore-quick` seul |
+| **`/code-workflow-feature`** | Pour implémenter une feature | déclenche le deep via routing |
 
 ## Coût indicatif
 
-- Une invocation `/explore-projet` = **~$0.30-0.80** (Sonnet, ~50-100k tokens)
-- À comparer aux ~$0.02 d'un `agent-explore-quick`
-- À utiliser quand le bénéfice (compréhension architecture complète) justifie le coût
+- Une invocation `/explore-projet` = **~$0.02** (Haiku, ~5-10k tokens, ~30s)
+- À comparer aux ~$0.30-0.80 d'un `agent-explore` deep
+- Pas de hausse de coût si tu invoques le skill plusieurs fois dans la même session — c'est précisément son rôle
 
 </quick_reference>
