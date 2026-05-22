@@ -15,6 +15,8 @@
 #  7. Redirection > vers .pod5
 #  8. shred/truncate/mkfs sur paths absolus protégés
 #  9. nextflow run depuis ~/Pipeline/ (doit être lancé depuis ~/Run ou ~/Run2)
+# 10. Injection patterns : curl|wget piped to shell, eval $(curl|wget|nc),
+#     source/bash <(curl|wget) — execution de code distant
 
 set -euo pipefail
 
@@ -86,6 +88,21 @@ if echo "$cmd" | grep -qE '\bnextflow[[:space:]]+(-[a-zA-Z][^[:space:]]*[[:space
         echo 'BLOCKED: nextflow run depuis ~/Pipeline/ — golden rule nextflow.md : lancer depuis ~/Run ou ~/Run2 (cd ~/Run && nextflow run ~/Pipeline/<projet>/main.nf)' >&2
         exit 2
     fi
+fi
+
+# 10. Injection patterns (curl|bash, eval $(curl), source/bash <(curl))
+#     Bloque l'execution de code distant via pipe ou substitution de processus.
+if echo "$cmd" | grep -qE '(curl|wget)[[:space:]]+[^|;&]*\|[[:space:]]*(bash|sh|zsh)([[:space:]]|$)'; then
+    echo 'BLOCKED: pipe curl/wget vers shell — execution de code distant non autorisee' >&2
+    exit 2
+fi
+if echo "$cmd" | grep -qE 'eval[[:space:]]+["'\'']?\$\([[:space:]]*(curl|wget|nc)\b'; then
+    echo 'BLOCKED: eval $(curl|wget|nc) — execution de code distant non autorisee' >&2
+    exit 2
+fi
+if echo "$cmd" | grep -qE '(source[[:space:]]+|\bbash[[:space:]]+|(^|[[:space:]])\.[[:space:]]+)<\([[:space:]]*(curl|wget)\b'; then
+    echo 'BLOCKED: source/bash <(curl|wget) — execution de code distant non autorisee' >&2
+    exit 2
 fi
 
 exit 0
