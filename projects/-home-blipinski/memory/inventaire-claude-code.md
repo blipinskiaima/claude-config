@@ -1,11 +1,11 @@
 ---
 name: Inventaire Claude Code AIMA
-description: Inventaire complet des outils Claude Code disponibles — skills, agents, MCP, rules, hooks, plugins. Mis à jour le 2026-05-20 (cleanup audit -14 +3 skills).
+description: Inventaire complet des outils Claude Code disponibles — skills, agents, MCP, rules, hooks, plugins. Mis à jour le 2026-05-22 (audit qualitatif : sécurisation wildcards, cleanup settings.local, path-scope rules).
 type: reference
 originSessionId: prompt-creator-audit-2026-05-20
 ---
 
-# Inventaire Claude Code — Boris Blipinski (2026-05-20)
+# Inventaire Claude Code — Boris Blipinski (2026-05-22)
 
 ## Skills (37 sur disque après tri itératif 2026-05-20 : 27 trackés dans claude-config + 10 fournis par plugins design/officiels ; 4 supplémentaires scopés projets Pipeline)
 
@@ -119,19 +119,17 @@ originSessionId: prompt-creator-audit-2026-05-20
 ### Supprimés (audit 2026-05-20)
 - ~~`memory`~~ — redondant avec auto memory officielle
 
-## Rules (11 — 6 globales, 5 path-scoped)
+## Rules (12 — 4 globales golden, 8 path-scoped)
 
-### Toujours chargées
+### Toujours chargées (golden rules non négociables — 26 lignes total)
 | Rule | Contenu |
 |---|---|
 | `s3-safety.md` | 5 golden rules S3 |
 | `duckdb.md` | CREATE TABLE AS SELECT ne préserve pas les PK |
 | `nextflow.md` | Jamais lancer NF depuis le pipeline dir |
 | `secrets.md` | Jamais afficher/copier/committer des credentials |
-| `aliases.md` | Commandes fréquentes (tp, Pipeline, Run, scratch) |
-| `troubleshooting.md` | Problèmes récurrents DuckDB, S3, Nextflow, Docker |
 
-### Path-scoped
+### Path-scoped (chargees selon contexte — 602 lignes total)
 | Rule | Paths |
 |---|---|
 | `bioinfo-tools.md` | Fichiers .nf, projets pipeline |
@@ -139,13 +137,15 @@ originSessionId: prompt-creator-audit-2026-05-20
 | `bedmethyl-format.md` | Bam2Beta, IA |
 | `stats-guide.md` | exploratory-analysis, IA, .R |
 | `template-claude-md.md` | CLAUDE.md, .claude/ |
-| `aima-brand.md` | **NEW path-scope** : .tex/.typ/rapport*/report*/Aima-Tower |
+| `aima-brand.md` | .tex/.typ/rapport*/report*/Aima-Tower |
+| `aliases.md` | **NEW 2026-05-22** : Pipeline/Run/Run2/scratch (commandes tp + chemins) |
+| `troubleshooting.md` | **NEW 2026-05-22** : Pipeline/Run/Run2/scratch (DuckDB, S3, NF, Docker) |
 
 ## Hooks (3)
 
 | Hook | Event | Fonction |
 |---|---|---|
-| `pretool-bash-guard.sh` | PreToolUse (Bash) | **9 règles** : S3 destructive, cd+rm, Python destructif, find -delete, dd, xargs rm, redirect .pod5, shred/mkfs, **nextflow run hors ~/Run (NEW)** |
+| `pretool-bash-guard.sh` | PreToolUse (Bash) | **10 règles** : S3 destructive, cd+rm, Python destructif, find -delete, dd, xargs rm, redirect .pod5, shred/mkfs, nextflow run hors ~/Run, **injection patterns curl\|bash/eval $(curl)/source <(curl) (NEW 2026-05-22)** |
 | Notification | Notification (*) | `notify-send` quand Claude attend une action |
 | `auto-push-on-stop.sh` | Stop | Commit+push whitelist ~/.claude/ (timeout 20s) |
 
@@ -161,8 +161,8 @@ originSessionId: prompt-creator-audit-2026-05-20
 
 ## Permissions notables
 
-- **Allow globales** : ~50 Bash whitelistés (git, docker, nextflow, aws, samtools, tmux, python3)
-- **Allow local** : 111 entries (à réduire via `/fewer-permission-prompts`)
+- **Allow globales** : 82 entries — Bash whitelistés (git, docker, nextflow, aws, samtools, tmux, python3) + wildcards `cd ~/Pipeline/**` et autres paths AIMA (sécurisés 2026-05-22, plus de `cd * && *` ni `git * && *`)
+- **Allow local** : **43 entries** (cleanup 2026-05-22 : -68 one-shots morts depuis 111)
 - **Deny** : **20 deny rules** (S3, rm POD5, rm -rf paths critiques, dd, shred, mkfs)
 - **Flag actif** : `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 
@@ -181,3 +181,4 @@ originSessionId: prompt-creator-audit-2026-05-20
 |---|---|---|
 | 2026-05-09 | Audit comportemental 30j | 100 sessions, 19 skills à 0 invoc, 25 actions priorisées |
 | 2026-05-20 | Cleanup itératif avec Boris | -14 skills, -1 MCP, +3 skills, hook étendu, 1 rule path-scopée |
+| 2026-05-22 | Audit qualitatif (best practices) | Sécurisation wildcards (cd/git * && *), hook règle 10 anti-injection, settings.local 111→43 entries, +2 rules path-scopées (aliases, troubleshooting). Items 🟡 restants : MCP auth pending, archive audit 2026-05-09, 12 skills non-trackés, déplacer aima-value-analysis. |
