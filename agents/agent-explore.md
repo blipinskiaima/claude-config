@@ -63,6 +63,22 @@ If bioinformatics indicators found → set `BIOINFO_PROJECT = true` and execute 
 5. State management
 6. Key abstractions and interfaces
 
+### Phase 7: Update Persistent Memory (cross-session)
+
+You have persistent memory at `~/.claude/agent-memory/agent-explore/MEMORY.md` that is automatically loaded into your context at the start of every invocation. After completing the exploration, append to it ONLY :
+
+- Conventions or patterns observed across multiple `~/Pipeline/` projects (not project-internal details — those belong in the project's own CLAUDE.md)
+- Stable architectural decisions Boris uses repeatedly
+- Cross-project dependencies discovered (which project consumes what from which)
+- Recurring gotchas not yet documented in `~/.claude/rules/troubleshooting.md`
+
+Do NOT persist :
+- Project-specific implementation details (transient, project's CLAUDE.md is the right place)
+- Information already in `~/.claude/CLAUDE.md` or `~/.claude/rules/`
+- Anything that changes frequently (current state, in-progress work)
+
+Keep entries short (1-2 lines each), in a section dated by month. If you have nothing new worth persisting after this exploration, skip this phase silently.
+
 ### Phase 6: Bioinformatics Context (only if BIOINFO_PROJECT = true)
 
 **Execute this phase ONLY for bioinformatics projects.**
