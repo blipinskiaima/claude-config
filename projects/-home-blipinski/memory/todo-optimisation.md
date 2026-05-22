@@ -60,10 +60,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-05-22 — Skills save-context/get-context + câblage end-session & agent-explore-quick + trace-prod schema v8 short_read_metrics
+## 2026-05-22 — Skills save-context/get-context + câblage end-session & agent-explore-quick + trace-prod schema v8 short_read_metrics + Projet Dilution (480 BAMs in silico)
 
 - [x] **Skills save-context + get-context** — pattern save/restore du contexte de tâche en cours (comble le trou entre MEMORY.md long terme et agent-explore-quick live). Câblage : `/end-session` Step 2 = `/save-context`, `agent-explore-quick` Étape 2 = lecture inline du snapshot. Snapshots stockés dans `~/.claude/projects/-home-blipinski/memory/context/{projet}.md`. Commits 8a581f0 + 4ba2729.
 - [x] **trace-prod schema v8 — table `short_read_metrics`** — nouvelle table 28 colonnes (10 DECIMAL + 16 probs v1 epic) + CLI `check-short-read {liquid} {CGFL|HCL}` indépendante du `check` standard. `ShortReadChecker(BaseChecker)` override seulement 4 méthodes (prefix `merged`→`minLen75_maxLen200`, copie 1:1 du pattern initial). Backfill complet : 426/728 CGFL + 384/471 HCL avec mvaf_v1 extraite. Commit `9af554b`. Détails : [project_schema_v8_short_read_metrics.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v8_short_read_metrics.md).
+- [x] **Projet Dilution — Phase 1 + tooling Phase 2** — création from scratch `~/Pipeline/Dilution` pour génération de 480 BAMs dilués in silico (3 tumeurs × 40 healthy × 4 targets). Worker `generate_dilution.sh` (cache flock, log S3, samtools `-@ 2`) + orchestrateur `run_all.sh` (filtres `--tumor`/`--target`). Phase 1 (`Colon_7_Healthy_807_target_1_0`) uploadée S3 + validée end-to-end Bam2Beta (mVAF=0 cohérent sous seuil à 0.28% VAF effective). Bug `bash pipefail/SIGPIPE` en command substitution identifié + fix via fichier temp (commit `30ff946`). Détails : `~/Pipeline/Dilution/docs/design.md` + memory `feedback_bash_pipefail_sigpipe.md`.
 
 ## 2026-05-21 — trace-prod schema v7 + skill add-trace-prod + démo platform Bladder/Breast
 
