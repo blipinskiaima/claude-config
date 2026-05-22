@@ -12,7 +12,7 @@
 
 ## Inventaire
 
-- [Inventaire Claude Code](inventaire-claude-code.md) — 28 skills, 4 agents, 7 MCP, 11 rules (2 path-scopées), 3 hooks (PreToolUse étendu 9 règles), 5 plugins (2026-05-20)
+- [Inventaire Claude Code](inventaire-claude-code.md) — 28 skills, 4 agents, 7 MCP, 12 rules (4 golden + 8 path-scopées), 3 hooks (PreToolUse 10 règles +injection), settings.local 43 entries (2026-05-22)
 
 ## Audit
 
