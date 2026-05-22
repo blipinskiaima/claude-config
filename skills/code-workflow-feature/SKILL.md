@@ -72,7 +72,7 @@ Construire le contexte necessaire pour implementer la feature. Utilise les subag
 
 1. **Explorer le codebase** — lancer `agent-explore` deep en background (ou `agent-explore-quick` si le projet est deja documente). Si quick est insuffisant, relancer une exploration profonde.
 
-2. **Knowledge graph** — si codebase large (> 50 fichiers) ou question architecturale transverse : lancer `/graphify` en background. Pertinent pour trace-prod, Bam2Beta, Aima-Tower.
+2. **Exploration architecturale approfondie** — si codebase large (> 50 fichiers) ou question architecturale transverse : lancer `agent-explore` deep avec un prompt focalisé sur le data flow et les dépendances inter-modules. Pertinent pour trace-prod, Bam2Beta, Aima-Tower.
 
 3. **Identifier les libraries** — si la feature utilise des libraries (existantes ou nouvelles), lancer `agent-docs` pour chercher la documentation via Context7.
 
@@ -212,7 +212,7 @@ Verifier le code, recapituler les modifications, sauvegarder le contexte.
 4. **Code review (au choix)** :
    - Rapide local : `superpowers:requesting-code-review` (gratuit, dans la session)
    - Approfondi cloud : `/ultrareview` (paye apres 3 free runs Pro, ~$5-20/run)
-   - Si UI Aima-Tower : `design-review` + `web-design-guidelines`
+   - Si UI Aima-Tower : `impeccable` + `web-design-guidelines`
    - Si changement securite : `/security-review`
 
 5. **Presenter le recap a l'utilisateur.**
