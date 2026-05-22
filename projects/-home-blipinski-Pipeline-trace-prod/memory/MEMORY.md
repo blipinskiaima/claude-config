@@ -3,6 +3,7 @@
 - [Rebasecalled POD5 — ne pas propager](feedback_rebasecalled_pod5.md) — laisser NULL après update-column stockage_pod5, ne pas copier depuis l'original
 - [Schema v6 — colonnes IV/QC](project_schema_v6_iv_qc.md) — 4 colonnes retd_suivis (read_start_time, ancestry, sex_proba, sex_predicted), path IV/ sœur de QC/
 - [Schema v7 — short_read](project_schema_v7_short_read.md) — colonne retd_suivis.short_read, vérifie 6 dossiers S3 dans bucket mirror {labo}_short_read (liquid uniquement)
+- [Schema v8 — short_read_metrics](project_schema_v8_short_read_metrics.md) — nouvelle table 28 colonnes (10 DECIMAL + 16 probs) pour métriques quantitatives short read, CLI check-short-read indépendante du check standard
 - [Colonnes v2-v7 — index](project_columns_index.md) — synthèse des colonnes ajoutées + patterns transversaux (collision mapping, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
 
 ## Architecture
