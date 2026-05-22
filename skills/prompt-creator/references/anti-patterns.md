@@ -11,10 +11,14 @@ Common prompting mistakes to avoid. These waste tokens, confuse models, or produ
 | JSON for wrapping long documents | Performance degrades vs XML/markdown (OpenAI research) | Use XML tags or markdown for document context |
 | Vague length constraints ("be concise") | Subjective, produces inconsistent results | Use concrete limits ("max 5 bullets, each under 15 words") |
 | Over-specifying trivial decisions | Wastes context, limits flexibility | Constrain only what matters for output quality |
-| Anti-laziness on Claude 4.6 | Model is already proactive, causes runaway execution | Remove "be thorough" / "do not be lazy" prompts |
+| Anti-laziness on Claude 4.6+ | Model is already proactive, causes runaway execution and overtriggering | Remove "be thorough" / "do not be lazy" / "CRITICAL" prompts. Use plain phrasing |
 | Forcing tool use with aggressive language | Over-triggers on newer models | Use "when it would be helpful" instead of "you MUST use" |
 | Compound multi-task sentences | Later tasks get ignored or partially executed | One instruction per sentence, numbered if sequential |
-| Copy-pasting from older model guides | Techniques that helped GPT-3.5 may hurt GPT-5.2 / Claude 4.6 | Use model-specific best practices for current generation |
+| Copy-pasting from older model guides | Techniques that helped GPT-3.5 may hurt GPT-5.x / Claude 4.6+ / o-series | Use model-specific best practices for current generation |
 | Excessive examples (>5) | Causes overfitting, model mimics examples too literally | Use 2-3 varied examples covering different cases |
 | Bribes ("I'll tip you $100") | No proven improvement, wastes tokens | Clear instructions produce better results than incentives |
 | Repeating the same instruction 3 times | Wastes context, doesn't improve adherence | State once clearly, optionally remind at end of long prompts |
+| String matching downstream sur format texte | Casse au moindre changement de phrasing, fragile | Utiliser Structured Outputs (JSON schema strict OpenAI, tool_use Anthropic, responseSchema Gemini) |
+| Prompts prescriptifs pas-à-pas pour modèles reasoning (o3, o4-mini, Claude adaptive thinking) | Contraint le processus interne, peut dégrader le raisonnement | Décrire le résultat désiré, pas les étapes |
+| "You are an expert in X" seul comme optimisation | Améliore l'alignement (tone, style) mais peut dégrader l'accuracy (paper PRISM, mars 2026) | Contexte riche + exemples > persona seule. Garder la persona pour le ton, pas pour la précision |
+| Sur-emphasis CAPS / "CRITICAL" / "MUST" sur Claude 4.6+ | Overtriggering documenté officiellement (anti-laziness) | Instructions normales : "Use X when..." plutôt que "You MUST use X" |
