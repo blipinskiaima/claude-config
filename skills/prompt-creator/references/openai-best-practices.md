@@ -1,16 +1,35 @@
-# OpenAI Best Practices (GPT-5.2)
+# OpenAI Best Practices (GPT-5.5 / o-series, mai 2026)
 
-Techniques and recommendations specific to GPT-5.x models.
+Techniques pour les modèles OpenAI actuels.
 
-## CTCO Pattern
+Sources primaires :
+- [Reasoning best practices — OpenAI](https://developers.openai.com/api/docs/guides/reasoning-best-practices)
+- [GPT-5 Prompting Guide — Cookbook](https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_prompting_guide)
+- [Prompt caching — OpenAI](https://developers.openai.com/api/docs/guides/prompt-caching)
 
-The most reliable structure for GPT prompts:
-- **Context**: who is the model, background state
-- **Task**: single, atomic action required
-- **Constraints**: negative constraints, scope limits
-- **Output**: exact format expected
+## Modèles actuels (mai 2026)
 
-## Recommended Prompt Structure
+| Modèle | Type | Note |
+|---|---|---|
+| **GPT-5.5 Instant** | Standard | Modèle par défaut ChatGPT (sorti mai 2026) |
+| GPT-5.5 / 5.4 / 5.2 | Standard | API |
+| **o3 / o4-mini** | Reasoning | Raisonnement interne natif |
+
+**Le prompting diffère fondamentalement** selon le type (standard vs reasoning). Lire les deux sections.
+
+---
+
+## Modèles standard (GPT-5.5, GPT-4o, GPT-5.x)
+
+### CTCO Pattern
+
+Structure éprouvée pour les prompts GPT :
+- **Context** : qui est le modèle, état de fond
+- **Task** : action atomique unique
+- **Constraints** : limites, scope
+- **Output** : format exact attendu
+
+### Structure recommandée
 
 ```markdown
 # Role and Objective
@@ -23,57 +42,149 @@ The most reliable structure for GPT prompts:
 # Final instructions (reminder)
 ```
 
-## Instruction Placement
+Markdown headings = délimiteur principal (vs XML pour Claude).
 
-Place critical instructions at BOTH the beginning AND end of long contexts. If only one: before context outperforms after.
+### Verbosity vs reasoning_effort
 
-## Explicit Length Constraints
+GPT-5.x expose **deux paramètres distincts** :
 
-GPT-5.2 responds best to concrete limits:
-- Simple questions: 1-2 sentences
-- Standard answers: 3-6 sentences
-- Detailed analysis: 1 overview paragraph + max 5 bullets
+| Paramètre | Contrôle | Valeurs |
+|---|---|---|
+| `verbosity` | Longueur de la **réponse finale** | low / medium (défaut) / high |
+| `reasoning_effort` | Profondeur du **raisonnement interne** | none / minimal / low / medium / high / xhigh |
 
-## Markdown as Primary Delimiter
+```python
+# Réponse courte mais raisonnement profond
+{"verbosity": "low", "reasoning_effort": "high"}
 
-Use H1-H4 headings for hierarchy. Inline backticks and code blocks for technical content. Lists for enumerated rules.
-
-## Instruction-Following Precision
-
-GPT-5.2 follows instructions more literally than predecessors:
-- Make instructions literal and explicit
-- Don't rely on implicit intent
-- Don't overuse ALL CAPS, bribes, or penalties
-- Demonstrate important behavior in examples AND cite it in rules
-
-## Tool-Calling Best Practices
-
-- Use the API `tools` field, don't inject tool descriptions manually
-- Name tools clearly with detailed descriptions
-- Put usage examples in the system prompt, not in tool descriptions
-
-## Agentic Persistence
-
-```
-Keep working until the task is fully resolved. Do not yield control back until done or genuinely blocked.
+# Réponse détaillée avec peu de raisonnement
+{"verbosity": "high", "reasoning_effort": "minimal"}
 ```
 
-## Self-Check for High-Stakes
+Sur GPT-5.5 : `reasoning_effort` défaut = `none`. Sur GPT-5 original : défaut `medium`.
+
+### Instruction Placement (long contexte)
+
+Pour les prompts longs (> 10k tokens) : placer les instructions critiques au **DÉBUT ET FIN**. Si une seule option : début > fin.
+
+### Prompt Caching (automatique)
+
+Le caching est **automatique** pour les prompts ≥ 1024 tokens. Pour maximiser le cache hit :
 
 ```
-Before finalizing, scan your answer for unstated assumptions, ungrounded numbers, and overly strong language. Soften or qualify as needed.
+[Contenu STATIQUE — début du prompt]   ← cache hit garanti
+  - System prompt
+  - Few-shot examples
+  - Instructions générales
+
+[Contenu VARIABLE — fin du prompt]      ← per-call
+  - Données utilisateur
+  - Question spécifique
 ```
 
-## Reasoning Effort Control
+Source officielle : *"Place static content like instructions and examples at the beginning of your prompt, and put variable content at the end."*
 
-Use `reasoning_effort` parameter (none → low → medium → high) to balance quality vs latency. Lower effort for simple tasks, higher for complex reasoning.
+### Structured Outputs
 
-## Scope Discipline
+`response_format` avec `strict: true` pour du JSON strict :
+
+```python
+response_format={
+    "type": "json_schema",
+    "json_schema": {
+        "name": "extraction",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {...},
+            "required": [...]
+        }
+    }
+}
+```
+
+Plus fiable que demander du JSON en plain text. Disponible sur GPT-4o et GPT-5.x.
+
+---
+
+## Modèles reasoning (o3, o4-mini)
+
+**Règles fondamentalement différentes** des modèles standard.
+
+### Developer message, PAS system message
+
+```python
+# Standard models (GPT-5.5, GPT-4o)
+messages = [{"role": "system", "content": "..."}]
+
+# Reasoning models (o3, o4-mini)
+messages = [{"role": "developer", "content": "..."}]
+```
+
+Citation officielle : *"Developer messages are the new system messages for reasoning models."*
+
+### Ne JAMAIS écrire "think step by step"
+
+Les modèles reasoning raisonnent déjà en interne. L'instruction CoT manuelle est superflue et peut dégrader.
+
+```
+# Anti-pattern sur reasoning models
+"Think step by step before answering..."
+"Explain your reasoning..."
+
+# Pattern correct
+[Description claire et directe de la tâche]
+[Format de sortie attendu]
+```
+
+Citation officielle : *"prompting them to 'think step by step' or 'explain your reasoning' is unnecessary."*
+
+### Prompts COURTS et DIRECTS
+
+| Standard models | Reasoning models |
+|---|---|
+| Instructions détaillées OK | Prompts courts |
+| Few-shot utile | **Zero-shot first** |
+| Explicit Chain-of-Thought | Ne PAS forcer CoT |
+| Step-by-step prescriptif | Outcome-oriented |
+| System message | Developer message |
+
+### Few-shot RAREMENT utile
+
+Recommandation officielle :
+> *"Reasoning models often don't need few-shot examples. Try writing prompts WITHOUT examples first. If you have complex requirements for output format, include a few examples of inputs and desired outputs."*
+
+### Reasoning items persistence (Responses API)
+
+Préserver les reasoning items entre les tours pour réduire les tokens de raisonnement :
+
+```python
+response = client.responses.create(
+    model="o3",
+    messages=[...],
+    store=True   # préserve les reasoning items
+)
+```
+
+Citation officielle : *"The `store: true` parameter maintains state from turn to turn, preserving reasoning and tool context in the Responses API."*
+
+---
+
+## Patterns communs (standard + reasoning)
+
+### Scope Discipline
 
 ```
 No extra features, no added components, no UX embellishments beyond what was specified.
 ```
 
-## File Diff Format
+### Agentic Persistence
 
-GPT models trained on V4A diff format. Use 3-line context, `@@` operators, never line numbers.
+```
+Keep working until the task is fully resolved.
+Do not yield control until done or genuinely blocked.
+```
+
+### File Diff Format (pour les modifications de code)
+
+GPT a été entraîné sur le format V4A diff. Utiliser : 3 lignes de contexte, opérateurs `@@`, **jamais de numéros de ligne**.
