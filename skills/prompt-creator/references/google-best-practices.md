@@ -1,4 +1,4 @@
-# Google Best Practices (Gemini 3)
+# Google Best Practices (Gemini 3.x)
 
 Techniques and recommendations specific to Gemini 3.x models.
 
@@ -37,7 +37,7 @@ Pick one structural format (XML tags, markdown) and stick with it throughout. Mi
 
 ## Temperature Settings
 
-- Keep default 1.0 for Gemini 3 (recommended by Google)
+- Garder le **défaut du modèle** (aucun "1.0 by default" universel n'est documenté officiellement par Google)
 - Lower (near 0) for deterministic/factual tasks only
 - Higher for creative tasks
 
@@ -68,7 +68,7 @@ If results aren't good:
 - State knowledge cutoff explicitly
 - Restrict responses to provided context when needed
 
-## Agentic Patterns (Gemini 3)
+## Agentic Patterns (Gemini 3.x)
 
 - Logical decomposition: analyze prerequisites and operation order
 - Problem diagnosis: encourage abductive reasoning
