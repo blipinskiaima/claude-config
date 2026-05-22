@@ -95,7 +95,7 @@ originSessionId: prompt-creator-audit-2026-05-20
 | `agent-explore` | Sonnet | Exploration profonde (lancé auto au Session Start, 20× /11j). **memory: user** depuis 2026-05-22 |
 | `agent-explore-quick` | Haiku | Chargement rapide (gardé override Boris malgré "jamais quick" CLAUDE.md) |
 | `agent-websearch` | Sonnet | Recherche web structurée (6× /11j) |
-| `agent-pipeline-cartographer` | Sonnet | **NEW 2026-05-22** — cartographie cross-projets ~/Pipeline/, memory: user, à invoquer manuellement |
+| `agent-pipeline-cartographer` | Sonnet | **NEW 2026-05-22** — cartographie cross-projets + knowledge curator single-projet ~/Pipeline/ (répondre à des questions sans ouvrir une session dans le projet), memory: user |
 
 > **Audit 2026-05-22** : `agent-docs` supprimé (1 invoc/30j, Context7 appelé direct par main thread). `memory: user` ajouté à `agent-explore` (reco pendante 2026-05-09 #18). `agent-pipeline-cartographer` créé pour répondre aux questions cross-projets (S3, Docker images, dépendances entre projets ~/Pipeline/) sans polluer le contexte main.
 
