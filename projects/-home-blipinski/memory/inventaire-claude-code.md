@@ -88,14 +88,15 @@ originSessionId: prompt-creator-audit-2026-05-20
 | `composition-patterns` | Vercel — compound components React |
 | `tailwind-v4-shadcn` | Tailwind v4 + shadcn/ui + Vite/React (directement Tower V3) |
 
-## Agents (4)
+## Agents (3)
 
 | Agent | Modèle | Usage |
 |---|---|---|
-| `agent-explore` | Sonnet | Exploration profonde (lancé auto au Session Start, 20× /11j) |
+| `agent-explore` | Sonnet | Exploration profonde (lancé auto au Session Start, 20× /11j). **memory: user** depuis 2026-05-22 |
 | `agent-explore-quick` | Haiku | Chargement rapide (gardé override Boris malgré "jamais quick" CLAUDE.md) |
-| `agent-docs` | Sonnet | **DESC PRÉCISÉE** : SEULEMENT doc versionnée Context7, redirige sinon |
 | `agent-websearch` | Sonnet | Recherche web structurée (6× /11j) |
+
+> **Audit 2026-05-22** : `agent-docs` supprimé (1 invoc/30j, Context7 appelé direct par main thread). `memory: user` ajouté à `agent-explore` (reco pendante 2026-05-09 #18).
 
 ## MCP Servers (7 actifs)
 
