@@ -4,7 +4,7 @@
 
 - [Profil technique](profil-technique.md) — Stack, compétences, workflow, préférences de développement
 - [Profil scientifique](profil-scientifique.md) — AIMA Diagnostics, méthylation, liquid biopsy, pipeline intégré
-- [Feedback Claude Code](feedback-claude-usage.md) — Retours d'expérience, ce qui fonctionne/ne fonctionne pas
+- [Journal feedbacks & incidents](feedback-claude-usage.md) — Règles validées par retour terrain (incidents, décisions stratégiques, évolutions)
 
 ## Contexte professionnel
 
@@ -34,4 +34,4 @@
 - Norme ISO 15189 visée pour Bam2Beta → maîtrise personnelle maximale du pipeline
 - Priorités : batch effect CGFL vs HCL, Aima-Tower biologistes, veille scientifique auto
 - Claude optimise, ne remplace pas l'expertise de Boris
-- Toujours exploration deep au démarrage, réponses en français, schémas avec flèches
+- Routing Session Start par intent (quick par défaut, deep parallèle pour feature/refactor), réponses en français, schémas avec flèches
