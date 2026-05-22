@@ -1,16 +1,16 @@
 ---
 name: end-session
-description: Workflow complet de cloture de session — execute successivement les 3 skills /save-code, /commit-claude et /maj-todo-list, dans l'ordre, jusqu'au bout. Use when the user types /end-session.
+description: Workflow complet de cloture de session — execute successivement les 4 skills /save-code, /save-context, /commit-claude et /maj-todo-list, dans l'ordre, jusqu'au bout. Use when the user types /end-session.
 disable-model-invocation: true
 ---
 
 # Skill : End Session
 
-Orchestre la cloture complete d'une session de travail en enchainant les 3 skills de sauvegarde dans un ordre strict.
+Orchestre la cloture complete d'une session de travail en enchainant les 4 skills de sauvegarde dans un ordre strict.
 
 ## Objectif
 
-Reproduire exactement l'effet de taper successivement `/save-code`, puis `/commit-claude`, puis `/maj-todo-list` dans le prompt — sans intervention de Boris pour declencher chaque skill individuellement.
+Reproduire exactement l'effet de taper successivement `/save-code`, puis `/save-context`, puis `/commit-claude`, puis `/maj-todo-list` dans le prompt — sans intervention de Boris pour declencher chaque skill individuellement.
 
 ## Sequence d'execution (stricte)
 
@@ -32,7 +32,25 @@ Ce skill prend en charge :
 
 **Ne pas passer a Step 2 tant que Step 1 n'est pas termine** (commit pushe, working tree clean).
 
-### Step 2 : `/commit-claude`
+### Step 2 : `/save-context`
+
+Invoquer le skill via le tool `Skill` :
+
+```
+Skill({ skill: "save-context" })
+```
+
+Ce skill prend en charge :
+- Snapshot court de l'etat mental de la tache en cours (Ou j'en suis / Ce qui marche-foire / Prochaine etape)
+- Ecriture dans `~/.claude/projects/-home-blipinski/memory/context/{projet}.md` (ecrase l'eventuel snapshot precedent)
+
+**Boris valide le contenu du snapshot avant ecriture.**
+
+Place a Step 2 (et pas a la fin) pour que le snapshot ecrit dans `~/.claude/` soit ensuite commite par `/commit-claude` a Step 3.
+
+**Ne pas passer a Step 3 tant que Step 2 n'est pas termine.**
+
+### Step 3 : `/commit-claude`
 
 Invoquer le skill via le tool `Skill` :
 
@@ -41,14 +59,14 @@ Skill({ skill: "commit-claude" })
 ```
 
 Ce skill prend en charge :
-- Verification des changements dans `~/.claude/`
+- Verification des changements dans `~/.claude/` (inclut le snapshot ecrit a Step 2)
 - Commit + push vers `github.com/blipinskiaima/claude-config.git`
 
 Skill rapide et direct — pas de confirmation requise sauf si changements inhabituels.
 
-**Ne pas passer a Step 3 tant que Step 2 n'est pas termine.**
+**Ne pas passer a Step 4 tant que Step 3 n'est pas termine.**
 
-### Step 3 : `/maj-todo-list`
+### Step 4 : `/maj-todo-list`
 
 Invoquer le skill via le tool `Skill` (sans argument) :
 
@@ -64,7 +82,7 @@ Ce skill prend en charge :
 
 ## Regles importantes
 
-- **Sequence stricte** : Step 1 → Step 2 → Step 3, dans cet ordre, jamais en parallele
+- **Sequence stricte** : Step 1 → Step 2 → Step 3 → Step 4, dans cet ordre, jamais en parallele
 - **Aller jusqu'au bout de chaque skill** : ne pas tronquer, ne pas sauter d'etapes internes
 - **Respecter les confirmations utilisateur** : chaque skill enfant peut demander des validations a Boris, attendre sa reponse avant de continuer
 - **Stop en cas d'echec** : si un skill echoue (push rejete, hook qui bloque, etc.), s'arreter immediatement et ne pas executer les suivants. Reporter l'erreur a Boris.
@@ -72,6 +90,6 @@ Ce skill prend en charge :
 
 ## Anti-patterns
 
-- ❌ Ne pas paralleliser les 3 skills — l'ordre est important (les commits doivent etre propres avant la mise a jour de la todo)
+- ❌ Ne pas paralleliser les 4 skills — l'ordre est important (le snapshot doit etre ecrit avant le commit ~/.claude/, et les commits doivent etre propres avant la mise a jour de la todo)
 - ❌ Ne pas inventer des etapes intermediaires non prevues par les skills enfants
 - ❌ Ne pas modifier le comportement des skills enfants — `/end-session` est un orchestrateur, pas un skill autonome

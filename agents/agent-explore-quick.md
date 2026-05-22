@@ -28,7 +28,25 @@ Read these files if they exist — they contain the bulk of project context:
 .claude/rules/*.md (list, read only titles/headers)
 ```
 
-### 2. Light Git Scan
+### 2. Load Previous Task Context (snapshot)
+
+Check for a snapshot saved by `/save-context` in the previous session. This implements the same logic as the `/get-context` skill (the Skill tool isn't available to subagents, so it's inlined here).
+
+```bash
+PROJECT=$(basename "$(pwd)")
+CTX=~/.claude/projects/-home-blipinski/memory/context/${PROJECT}.md
+if [ -f "$CTX" ]; then
+  AGE_DAYS=$(( ($(date +%s) - $(stat -c %Y "$CTX")) / 86400 ))
+  echo "SNAPSHOT_FOUND age=${AGE_DAYS}d"
+else
+  echo "NO_SNAPSHOT"
+fi
+```
+
+- If `NO_SNAPSHOT` → skip silently, continue with Step 3
+- If `SNAPSHOT_FOUND` → Read the file content. If `AGE_DAYS > 7`, prefix with `⚠ stale (Nd)`. Include the snapshot in the final summary under section `### Previous Task Context (📌 snapshot)` so Boris immediately sees where he left off.
+
+### 3. Light Git Scan
 
 ```bash
 git log --oneline -10        # Last 10 commits
@@ -36,7 +54,7 @@ git status --short           # Current state
 git branch --show-current    # Active branch
 ```
 
-### 3. Quick Structure Check (only if CLAUDE.md lacks architecture info)
+### 4. Quick Structure Check (only if CLAUDE.md lacks architecture info)
 
 Only if CLAUDE.md does NOT document the project structure:
 - `ls` at root
@@ -45,7 +63,7 @@ Only if CLAUDE.md does NOT document the project structure:
 
 Skip this entirely if CLAUDE.md already has an Architecture section.
 
-### 4. Update Persistent Memory (rare, conditional)
+### 5. Update Persistent Memory (rare, conditional)
 
 You have persistent memory at `~/.claude/agent-memory/agent-explore-quick/MEMORY.md` auto-loaded into your context at startup. Append to it ONLY in these cases :
 
@@ -68,6 +86,9 @@ Return a concise summary (under 100 lines):
 ## Context Summary
 
 **Project**: [name] | **Stack**: [framework + language] | **Branch**: [current]
+
+### Previous Task Context (📌 snapshot)
+[If a snapshot was found in Step 2, paste it here verbatim — including the timestamp and the "Où j'en suis / Ce qui marche-foire / Prochaine étape" sections. If stale (>7d), prefix with ⚠. Omit this entire section if NO_SNAPSHOT.]
 
 ### Recent Activity
 - [last 3-5 commits summarized in one line each]

@@ -73,10 +73,19 @@
       "Bash(set *)",
       "Bash(if *)",
       "Bash(/usr/local/bin/aws *)",
+      "Bash(AWS_PROFILE=scw aws s3 ls *)",
+      "Bash(claude mcp list*)",
       "Bash(cd * && git *)",
-      "Bash(cd * && *)",
-      "Bash(git * && git *)",
-      "Bash(git * && *)"
+      "Bash(cd ~/Pipeline/** && *)",
+      "Bash(cd ~/Run && *)",
+      "Bash(cd ~/Run2 && *)",
+      "Bash(cd ~/Run/** && *)",
+      "Bash(cd ~/Run2/** && *)",
+      "Bash(cd ~/.claude && *)",
+      "Bash(cd ~/.claude/** && *)",
+      "Bash(cd /scratch/** && *)",
+      "Bash(cd /tmp/** && *)",
+      "Bash(git * && git *)"
     ],
     "deny": [
       "Bash(aws s3 rm:*)",
