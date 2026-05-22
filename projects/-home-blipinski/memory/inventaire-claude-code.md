@@ -88,15 +88,16 @@ originSessionId: prompt-creator-audit-2026-05-20
 | `composition-patterns` | Vercel — compound components React |
 | `tailwind-v4-shadcn` | Tailwind v4 + shadcn/ui + Vite/React (directement Tower V3) |
 
-## Agents (3)
+## Agents (4)
 
 | Agent | Modèle | Usage |
 |---|---|---|
 | `agent-explore` | Sonnet | Exploration profonde (lancé auto au Session Start, 20× /11j). **memory: user** depuis 2026-05-22 |
 | `agent-explore-quick` | Haiku | Chargement rapide (gardé override Boris malgré "jamais quick" CLAUDE.md) |
 | `agent-websearch` | Sonnet | Recherche web structurée (6× /11j) |
+| `agent-pipeline-cartographer` | Sonnet | **NEW 2026-05-22** — cartographie cross-projets ~/Pipeline/, memory: user, à invoquer manuellement |
 
-> **Audit 2026-05-22** : `agent-docs` supprimé (1 invoc/30j, Context7 appelé direct par main thread). `memory: user` ajouté à `agent-explore` (reco pendante 2026-05-09 #18).
+> **Audit 2026-05-22** : `agent-docs` supprimé (1 invoc/30j, Context7 appelé direct par main thread). `memory: user` ajouté à `agent-explore` (reco pendante 2026-05-09 #18). `agent-pipeline-cartographer` créé pour répondre aux questions cross-projets (S3, Docker images, dépendances entre projets ~/Pipeline/) sans polluer le contexte main.
 
 ## MCP Servers (7 actifs)
 
