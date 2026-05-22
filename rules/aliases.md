@@ -1,3 +1,11 @@
+---
+paths:
+  - "**/Pipeline/**"
+  - "**/Run/**"
+  - "**/Run2/**"
+  - "/scratch/**"
+---
+
 # Aliases et raccourcis AIMA
 
 Boris utilise ces raccourcis fréquemment. Les utiliser dans les commandes quand approprié.

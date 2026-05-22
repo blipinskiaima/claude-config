@@ -1,3 +1,11 @@
+---
+paths:
+  - "**/Pipeline/**"
+  - "**/Run/**"
+  - "**/Run2/**"
+  - "/scratch/**"
+---
+
 # Troubleshooting — Problemes recurrents AIMA
 
 **Regle** : Claude DOIT consulter ce fichier AVANT de proposer des solutions aux erreurs connues. Ne pas reinventer la roue.

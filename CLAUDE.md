@@ -18,6 +18,22 @@ Auteur unique de 20 projets dans `~/Pipeline/`. Bus factor = 1 sur tout le stack
 - Utiliser des **schémas avec des flèches** (diagrammes ASCII, flux visuels) pour expliquer
 - Être **concret et synthétique** — pas de théorie abstraite
 - Claude **optimise mais ne remplace pas** l'expertise de Boris — plus la criticité réglementaire est haute (ISO 15189), plus Boris garde la main
+- Pas de résumé en fin de réponse — Boris lit le diff
+
+## Préférences opérationnelles par projet
+
+### Pipelines cliniques (Bam2Beta, Pod2Bam)
+- Demander **item par item** sur les modifications structurelles — refuser le batch implicite
+- Ne **jamais paralléliser** les jobs GPU (basecall) — résultats tronqués observés
+- Boris garde la main, Claude propose et explique
+
+### Aima-Tower & outils internes
+- Full autonomie Claude acceptée
+- Pas d'audit ISO requis
+
+### Jobs longs (basecall, rebasecalling, sync S3 massif)
+- Lancer dans `tmux` par défaut (jamais en foreground bloquant)
+- Si retry boucle nécessaire (`aws s3 sync`), encapsuler dans le tmux
 
 ## Session Start
 
