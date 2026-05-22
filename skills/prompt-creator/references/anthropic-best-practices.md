@@ -1,69 +1,139 @@
-# Anthropic Best Practices (Claude 4.6)
+# Anthropic Best Practices (Claude Sonnet 4.6 / Opus 4.7)
 
-Techniques and recommendations specific to Claude Opus 4.6 and Sonnet 4.6.
+Techniques et recommandations spécifiques aux modèles Claude actuels (mai 2026).
 
-## XML Tags Are First-Class
+Source primaire : [docs.anthropic.com — Prompting Best Practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
 
-Claude excels with XML-structured prompts. Use descriptive tag names:
-`<context>`, `<task>`, `<rules>`, `<examples>`, `<output_format>`, `<guardrails>`
+## Modèles actuels (mai 2026)
+
+| Modèle | API ID | Cas d'usage |
+|---|---|---|
+| Claude Opus 4.7 | `claude-opus-4-7` | Coding et agentic — raisonnement complexe |
+| Claude Sonnet 4.6 | `claude-sonnet-4-6` | Speed + intelligence (équilibre) |
+| Claude Haiku 4.5 | `claude-haiku-4-5-20251001` | Vitesse maximale |
+
+Legacy disponibles mais en dépréciation : Opus 4.6, Sonnet 4.5, Opus 4.5, Opus 4.1. Sonnet 4 et Opus 4 sont **deprecated** (retraite 2026-06-15).
+
+## Adaptive Thinking (remplace Extended Thinking)
+
+`thinking.type: "enabled"` avec `budget_tokens` est **déprécié** sur Opus 4.6 / Sonnet 4.6 et **supprimé** sur Opus 4.7 (retourne erreur 400).
+
+```python
+# Déprécié
+thinking={"type": "enabled", "budget_tokens": 32000}
+
+# Actuel
+thinking={"type": "adaptive"}
+output_config={"effort": "high"}
+```
+
+Valeurs `effort` (officielles) :
+
+| Valeur | Comportement | Disponibilité |
+|---|---|---|
+| `max` | Pas de contrainte sur la profondeur | Sonnet 4.6, Opus 4.6, Opus 4.7 |
+| `xhigh` | Exploration étendue | **Opus 4.7 uniquement** |
+| `high` (défaut) | Raisonnement profond sur tâches complexes | Tous |
+| `medium` | Pensée modérée, skip sur queries simples | Tous |
+| `low` | Pensée minimale, priorité vitesse | Tous |
+
+## XML Tags First-Class
+
+Claude excelle avec les prompts XML-structurés. Tags recommandés :
+
+```xml
+<context>...</context>
+<task>...</task>
+<rules>...</rules>
+<examples>...</examples>
+<output_format>...</output_format>
+<thinking>...</thinking>
+<answer>...</answer>
+```
+
+**Bénéfice documenté** : queries placées en fin de prompt = jusqu'à **+30% sur tâches complexes multi-documents** (citation officielle docs.anthropic.com).
 
 ## Context Motivation
 
-Explain WHY a rule matters — Claude generalizes from the explanation better than from the rule alone.
+Expliquer le POURQUOI d'une règle fonctionne mieux que la règle seule.
 
-## Remove Anti-Laziness Prompts
+```
+# Pas optimal
+Ne jamais utiliser d'ellipses.
 
-Claude 4.6 is already proactive. Instructions like "be thorough", "think carefully", "do not be lazy" cause over-execution and runaway thinking. Remove them.
+# Optimal
+Ne jamais utiliser d'ellipses car la sortie sera lue par un moteur TTS
+qui ne sait pas les prononcer.
+```
 
-## Soften Tool-Use Language
+## Plus de prefilled responses (Claude 4.6+)
 
-Replace "You MUST use [tool]" with "Use [tool] when it would enhance your understanding." Tools that under-triggered in older models now trigger appropriately.
+Sur Claude 4.6+, le prefill du dernier message assistant retourne **erreur 400** : `"Prefilling assistant messages is not supported for this model."`
 
-## Don't Force Thinking
+Alternatives :
+- Instructions directes : "Respond directly without preamble."
+- Structured Outputs pour le format
+- Tool calling pour la sortie contrainte
 
-Remove "use the think tool to plan your approach" — Claude 4.6 thinks effectively without being told to. Forced thinking causes over-planning.
+## Opus 4.7 — Literalisme strict
 
-## Effort as Primary Control
+Opus 4.7 interprète les prompts **plus littéralement** qu'Opus 4.6, surtout à `effort` bas. Le modèle ne généralise pas silencieusement.
 
-If Claude is too aggressive after prompt cleanup, lower the `effort` parameter rather than adding prompt constraints.
+```
+# Ambigu sur Opus 4.7
+Use this formatting style.
+
+# Explicite (recommandé Opus 4.7)
+Apply this formatting to every section, not just the first one.
+```
+
+Citation officielle : *"It will not silently generalize an instruction from one item to another, and it will not infer requests you didn't make."*
+
+## Anti-laziness — Softening obligatoire
+
+Claude 4.6+ est déjà proactif. Les instructions agressives causent **overtriggering**.
+
+```
+# Anti-pattern Claude 4.6+
+CRITICAL: You MUST use the search tool every time...
+Be thorough and use all available tools aggressively.
+
+# Pattern correct
+Use the search tool when it would enhance understanding.
+```
+
+Citation officielle : *"Where you might have said 'CRITICAL: You MUST use this tool when...', you can use more normal prompting like 'Use this tool when...'"*
 
 ## Parallel Tool Calling
 
-Claude excels at parallel execution. Boost to ~100% with:
+Claude 4.x excelle en parallel tool calling natif. Snippet officiel pour booster à ~100% :
+
 ```xml
 <use_parallel_tool_calls>
-If you intend to call multiple tools and there are no dependencies between the calls, make all independent calls in parallel.
+If you intend to call multiple tools and there are no dependencies between the tool calls, make all of the independent tool calls in parallel.
+Maximize use of parallel tool calls where possible to increase speed and efficiency.
+Never use placeholders or guess missing parameters in tool calls.
 </use_parallel_tool_calls>
 ```
 
-## Overeagerness Prevention
+## Subagent Spawning Policy
 
-Claude 4.6 tends to over-engineer. Add scope discipline:
+Contrôler quand le modèle doit spawner des sous-agents. La syntaxe n'est pas un tag XML standardisé, c'est du texte libre dans le system prompt :
+
 ```
-Only make changes directly requested. No extra features, no refactoring, no "improvements" beyond what was asked.
+Spawn multiple subagents in the same turn when fanning out across independent items or reading multiple files.
+
+Do NOT spawn a subagent for work you can complete directly in a single response (e.g., refactoring a function you can already see).
 ```
 
-## Hallucination Mitigation
-
-```xml
-<investigate_before_answering>
-Never speculate about code you have not opened. Read the file before answering. Give grounded, hallucination-free answers.
-</investigate_before_answering>
-```
+Source officielle : section "Controlling subagent spawning" des docs.
 
 ## Output Formatting
 
-- Tell what to do instead of what not to do
-- Use XML format indicators for output sections
-- Match prompt style to desired output style
-
-## No More Prefills
-
-Claude 4.6 no longer supports prefilled assistant responses. Instead:
-- Use direct instructions: "Respond directly without preamble."
-- Use structured outputs or XML tags for format control
-- Use tool calling for constrained outputs
+- Dire CE QU'IL FAUT FAIRE plutôt que ce qu'il NE FAUT PAS FAIRE (positif > négatif)
+- Utiliser des indicateurs XML pour les sections de sortie
+- Faire matcher le style du prompt avec celui de la sortie
 
 ## Vision
 
-Give Claude a crop/zoom tool for image analysis — consistent uplift on image evaluations.
+Donner un outil de crop/zoom pour l'analyse d'images — uplift mesuré et constant sur les évaluations d'images (recommandation officielle).
