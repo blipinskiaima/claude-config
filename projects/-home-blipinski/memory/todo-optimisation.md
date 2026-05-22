@@ -60,6 +60,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-05-22 — Skills save-context/get-context + câblage end-session & agent-explore-quick
+
+- [x] **Skills save-context + get-context** — pattern save/restore du contexte de tâche en cours (comble le trou entre MEMORY.md long terme et agent-explore-quick live). Câblage : `/end-session` Step 2 = `/save-context`, `agent-explore-quick` Étape 2 = lecture inline du snapshot. Snapshots stockés dans `~/.claude/projects/-home-blipinski/memory/context/{projet}.md`. Commits 8a581f0 + 4ba2729.
+
 ## 2026-05-21 — trace-prod schema v7 + skill add-trace-prod + démo platform Bladder/Breast
 
 - [x] **trace-prod schema v7 — colonne `short_read`** — tracke le subsampling 75-200 bp (liquid uniquement) via listing récursif S3 sur bucket mirror `{LABO}_short_read` : OK si les 6 dossiers (BAM, BETA, CNV, QC, REPORT, ichorCNA) sont présents et non vides. Pattern preserve sur erreur S3 (`_update_short_read` dédié). Gotcha attrapé : `aws s3 ls --recursive` retourne clés S3 complètes → stripper avec `sample_prefix`. Commit `71937aa` (+496 lignes dont 381 de doc README v2→v7).
