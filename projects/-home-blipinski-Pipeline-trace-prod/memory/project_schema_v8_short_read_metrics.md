@@ -37,4 +37,11 @@ Nouvelle table DuckDB (28 colonnes) qui stocke les valeurs quantitatives produit
 - HCL liquid : 384/471 samples (82% — 87 NULL), 210/384 signal, médiane 0.34, max 19.78
 - HCL plus avancé côté pipeline (82% vs 58%), CGFL avec valeurs plus élevées (cohorte chargée Lung-DI/AlCapone)
 
+**Export gsheet `Short Read Like`** (ajouté immédiatement après v8) :
+- Commande CLI : `python3 database/check_samples.py export-short-read-like` (pas d'argument, fusion auto CGFL+HCL)
+- Méthode `DuckDBService.get_short_read_unified()` : `LEFT JOIN samples + short_read_metrics + qc_metrics`, filtre `sample_type='liquid'`, tri `labo, sample_name`. Inclut `qc_metrics.mvaf_v1 AS mvaf_v1_initial` pour comparaison côte à côte avec `mvaf_v1_short_read`.
+- Méthode `GSheetsService.export_short_read_like(rows)` : pattern aligné sur `export_ont_samples` (clear + update). Constante `_SHORT_READ_LIKE_HEADERS` = 13 paires `(display, key)`. Format `None → "NA"` + `Decimal → "1,3870"` (virgule euro via `str(val).replace(".", ",")`).
+- Config : entrée `short_read_like` dans `database/gsheets_config.json` (même spreadsheet trace-prod `1gm_vB7vTzAq38dgkJFNpgA3Cy_XRlUqunMgoBvKnh6M`, worksheet `Short Read Like`).
+- **Hors scope export** : Score CNV, Frag Mode1/2 (non extraits short read, choix Boris de les mettre de côté). 1199 samples exportés (728 CGFL + 471 HCL).
+
 Liens : [[schema-v7-short-read]] (flag de complétude, table parente), [[columns-index]] (synthèse cross-schemas).
