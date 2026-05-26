@@ -60,6 +60,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-05-26 — trace-prod export-short-read-like
+
+- [x] **trace-prod export-short-read-like** — nouvel export gsheet fusionné CGFL+HCL liquid (1199 samples, 13 colonnes) vers l'onglet 'Short Read Like' de la gsheet trace-prod. Inclut `mVAF v1` initial côte à côte avec `mVAF v1 short read` pour comparaison directe. Pattern strictement aligné sur `export-ont-samples`. Commit `3ff5373`. Détails : section Export dans [project_schema_v8_short_read_metrics.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v8_short_read_metrics.md).
+
 ## 2026-05-22 — Skills save-context/get-context + câblage end-session & agent-explore-quick + trace-prod schema v8 short_read_metrics + Projet Dilution (480 BAMs in silico)
 
 - [x] **Skills save-context + get-context** — pattern save/restore du contexte de tâche en cours (comble le trou entre MEMORY.md long terme et agent-explore-quick live). Câblage : `/end-session` Step 2 = `/save-context`, `agent-explore-quick` Étape 2 = lecture inline du snapshot. Snapshots stockés dans `~/.claude/projects/-home-blipinski/memory/context/{projet}.md`. Commits 8a581f0 + 4ba2729.
