@@ -1,17 +1,19 @@
-# Context — trace-prod — 2026-05-26T14:00:00+00:00
+# Context — trace-prod — 2026-05-27 (fin de session)
 
 **Branche** : main
-**Dernier commit** : 3ff5373 — feat: export-short-read-like — gsheet fusionnée CGFL+HCL liquid (13 cols)
-**Status** : clean (code), 14 untracked (artifacts dev/backup/rapports HTML, non-pertinents)
+**Dernier commit** : 36748ac — fix: sex_predicted — inversion labels M/F (logique p<0.5 → M, p≥0.5 → F)
+**Status** : clean (tracked) — 13 untracked préexistants (.claude workspace, backups, dev CSV, rapports)
 
 ## Où j'en suis
-Session de maintenance DB après livraison schema v8 + export Short Read Like. Suppression de 5 samples Twist test (Twist_0%/0.1%/0.25%/0.5%/1%) demandés par Boris, conservation de `Twist_1pct`. Re-export liquid CGFL → gsheet (737 samples). Aucune modification de code.
+Session terminée avec succès. 3 batchs `update-column` IV/QC livrés + fix bug `sex_predicted` (labels F/M inversés) appliqué partout (code, doc, mémoire, DB, 3 gsheets régénérées). Tout commité et pushé.
 
 ## Ce qui marche / ce qui foire
-- ✓ 5 samples Twist supprimés (cascade sur toutes les tables liées via `delete_sample()` qui inclut bien `short_read_metrics` depuis le sync v8)
-- ✓ `Twist_1pct` confirmé toujours en DB (le bon Twist à garder)
-- ✓ Export liquid CGFL pushé sur gsheet : 737 samples (728 initiaux + N nouveaux entre les sessions − 5 Twist supprimés)
-- ⚠️ Précision ichorcna_short_read tronquée à 4 décimales (DECIMAL(10,4)) — décision encore en attente si on bumpe à (10,6)
+- ✓ Fix `check_sex_predicted` propagé sur les 3 entry points (LiquidChecker, SolidChecker, update-column dispatch) — automatique pour futurs samples
+- ✓ DB swap atomique F↔M via UPDATE SQL : 732↔567 (NULL=60 préservés)
+- ✓ Exports gsheet : liquid CGFL 741, liquid HCL 471, solid CGFL 147 (= 1359 samples corrigés)
+- ✓ Spot-check 5 samples post-swap cohérent (p=0,997→F, p=0,194→M, etc.)
+- ✗ Pipeline IV/QC non lancé pour 29 samples HCL liquid récents (Lung_104-120 + Lung_133-144) — à vérifier côté Bam2Beta upstream
+- ✗ `read_start_time` quasi vide sur HCL (5/109 OK seulement) vs 20/56 OK sur CGFL — pipeline Samtools moins avancé côté HCL
 
 ## Prochaine étape
-Décision Boris : (a) relancer `check-short-read liquid {labo}` quand le pipeline short read aura progressé (UPSERT idempotent remplit les NULLs), (b) analyser les corrélations mvaf_v1 initial vs short read sur la gsheet 'Short Read Like', (c) commencer une nouvelle feature, (d) bump précision ichorcna en DECIMAL(10,6).
+Si besoin de relancer une maj IV/QC : workflow validé est `update-column ancestry|sex_proba|sex_predicted|read_start_time liquid {labo} -s sample1 -s sample2 ...` (séquentiel, single writer lock DuckDB) puis `export {type} {labo} --gsheet`. Sinon, à investiguer : pourquoi le pipeline IV n'a pas tourné sur Lung_104-120 + Lung_133-144 HCL (upstream Bam2Beta).

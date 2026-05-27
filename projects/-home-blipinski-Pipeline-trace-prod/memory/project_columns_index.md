@@ -28,7 +28,7 @@ Référence rapide. Détails complets dans `~/Pipeline/trace-prod/README.md` (Ta
 - `read_start_time` DEFAULT 'KO' — présence `QC/Samtools/{sample}.read_start_time.tsv` (3-4 GB, pas de lecture)
 - `ancestry` DEFAULT 'NA' — argmax sur `IV/{sample}.ancestry.tsv` (18 ancestries)
 - `sex_proba` DEFAULT 'NA' — proba arrondie au millième
-- `sex_predicted` DEFAULT 'NA' — F si p<0.5, M si p≥0.5
+- `sex_predicted` DEFAULT 'NA' — M si p<0.5, F si p≥0.5
 
 Path IV/ : **sœur de QC/, pas dedans**. Voir [[schema-v6-iv-qc]].
 

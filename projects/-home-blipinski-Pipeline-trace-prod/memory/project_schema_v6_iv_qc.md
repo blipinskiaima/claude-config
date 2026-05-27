@@ -14,7 +14,7 @@ Schema v6 ajoute 4 colonnes dans `retd_suivis` (toutes VARCHAR, hors STATUS_COLU
 | `read_start_time` | 'KO' | `QC/Samtools/{sample}.read_start_time.tsv` | OK/KO (présence, **pas de lecture** ~3-4 GB) |
 | `ancestry` | 'NA' | `IV/{sample}.ancestry.tsv` | nom de colonne argmax ligne 2 (header + 1 ligne, 18 ancestries) |
 | `sex_proba` | 'NA' | `IV/{sample}.sex.tsv` | p arrondi au millième, virgule (PAS de header, 1 valeur ligne 1) |
-| `sex_predicted` | 'NA' | dérivé de `check_sex_proba()` | F si p<0.5, M si p≥0.5 |
+| `sex_predicted` | 'NA' | dérivé de `check_sex_proba()` | M si p<0.5, F si p≥0.5 (fixé 27-05-2026 : labels inversés avant ce commit) |
 
 **Why:** Boris a ajouté l'extraction IV (ancestry + sex predicted depuis méthylation) au pipeline Bam2Beta. Les 4 colonnes sont indépendamment populables via `update-column` (un seul appel par colonne, pas besoin de re-check complet).
 

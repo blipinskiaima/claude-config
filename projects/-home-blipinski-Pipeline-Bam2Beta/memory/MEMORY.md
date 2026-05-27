@@ -2,7 +2,7 @@
 
 ## Key Facts
 
-- Current version: **V1.3.0** (tag 2026-05-27, absorbe V1.2.0 prepare 2026-05-11)
+- Current version: **V1.3.1** (tag 2026-05-27, ajout metadata.json natif dans Raima_report)
 - Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest`
 - Raima package version: **0.4.17** dans raima:latest depuis rebuild 2026-05-27 (avant: 0.4.13 par accident de build du 2026-05-09)
   - Retrocompatibilite 0.4.13 -> 0.4.17 confirmee bit-a-bit sur Healthy_826 CGFL liquid (test 2026-05-27 vs V1.1.2)
@@ -179,6 +179,33 @@ Cleanup cible code mort post-refactor BAM_Count/Read_ST/Raima_score_all. Validat
 
 ### Validation
 - Test `/test_bam2beta` Healthy_826 CGFL liquid: TEST OK (RUN + QUALIF CONFORME bit-a-bit)
+
+## metadata.json natif (V1.3.1, 2026-05-27)
+
+Le pipeline Bam2Beta genere desormais nativement un `metadata.json` dans `REPORT/` pour chaque sample (DEPTH=merged uniquement), schema trace-platform 10 champs complet :
+
+- `client_uuid` (string, vide par defaut, surchargeable via `--client_uuid`)
+- `analysis_name` (string, vide par defaut, surchargeable via `--analysis_name`)
+- `patient_name` (= `params.patient_id`, default "DEV")
+- `sample_name` (= ${ID})
+- `nb_reads_total` (int, depuis BAM_Count `${ID}.nb_reads_total.tsv`)
+- `nb_reads_aligned` (int, depuis cramino `${SAMPLE}.merged.cramino.tsv` col 6)
+- `depth` (float, depuis mosdepth summary.txt col 4 ligne `total`)
+- `coverage_percent` (float, depuis mosdepth global.dist.txt ou `$1==total && $2==1` * 100)
+- `mvaf` (float, depuis raima_score.V2.tsv col 3 ligne `v1`)
+- `generated_at` (ISO 8601 UTC, `date -u +%Y-%m-%dT%H:%M:%SZ`)
+
+Remplace le script externe `~/Pipeline/trace-platform/scripts/build_metadata_json.sh` (generation desormais native dans le process Nextflow `Raima_report`).
+
+**Implementation** :
+- `Mosdepth_qc` emit additionnel `dist_tuple` (tuple ID/DEPTH/path pour global.dist.txt)
+- `BAM_Count` emit additionnel `nb_reads_total_tuple` (tuple ID/path)
+- `Beta_epic` `combined_results` chain : +2 joins (`.join(dist, by:1)` + `.combine(nb_reads_total_tuple, by:0)`)
+- `Raima_report` input etendu (+2 paths) + output `metadata.json` `optional: true` + bloc script conditionnel `if [ "${DEPTH}" == "merged" ]`
+
+**Gotcha** : utiliser `.combine(by: 0)` (pas `.join(by: 0)`) pour broadcaster `nb_reads_total` (1 file/sample) sur les N entrees de `combined_results` (1 par depth) — sinon N-1 entrees sont dropped.
+
+Test `/test_bam2beta` Healthy_826 CGFL liquid 2026-05-27 : TEST OK (RUN + QUALIF CONFORME bit-a-bit vs V1.3.0) + metadata.json 10 champs valides.
 
 ## Feedback
 
