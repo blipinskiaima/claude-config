@@ -60,6 +60,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-05-27 — Dilution worker hardening
+
+- [x] **Dilution worker — 3 fixes + audit complet** — fixes accumulés depuis le 22/05 : `e023058` aws s3 ls filter par basename exact (prefix match écartait .bai), `fa9ff27` seed tumor varie par healthy_id (40 réplicats tumoraux indépendants au lieu d'un set partagé), `e3c38cb` @SQ check via capture en variable + test bash pur (même bug pipefail/SIGPIPE que MM/ML). Audit complet validé : aucune commande destructive S3, 40 healthys + 3 tumors paths vérifiés, 480 OUTPUT_NAME uniques. CLAUDE.md gotcha #3 généralisé (`1c2314d`). Détails : memory `feedback_bash_pipefail_sigpipe.md` + `project_phase1_state.md`.
+
 ## 2026-05-26 — trace-prod export-short-read-like + cleanup samples Twist
 
 - [x] **trace-prod export-short-read-like** — nouvel export gsheet fusionné CGFL+HCL liquid (1199 samples, 13 colonnes) vers l'onglet 'Short Read Like' de la gsheet trace-prod. Inclut `mVAF v1` initial côte à côte avec `mVAF v1 short read` pour comparaison directe. Pattern strictement aligné sur `export-ont-samples`. Commit `3ff5373`. Détails : section Export dans [project_schema_v8_short_read_metrics.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v8_short_read_metrics.md).
