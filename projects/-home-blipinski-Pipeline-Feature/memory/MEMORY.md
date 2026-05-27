@@ -1,4 +1,5 @@
-- [Tableau final KPI Feature](tableau-final-kpi.md) — référence pour tout nouveau test de feature, ligne = KPI / colonne = feature
+- [Livrables actuels](livrables-actuels.md) — référence à jour 26/05 (combined_v2_probs adopté, combined_v4_short_read recommandé adoption pool)
+- [Tableau final KPI Feature](tableau-final-kpi.md) — historique 7 mai 2026 (pré-tri, avec score_cnv etc.) — référence archivée
 - [Cascade des filtres cohorte](cohort-filters-cascade.md) — 7 étapes 1309 → 454 samples, à exposer dans Aima-Tower
 - [Target specificity convention](target-specificity.md) — `Sens@95%` standard ISO, `Sens@90%` complément
 - [trace-prod schema](trace-prod-schema.md) — référence colonnes des 7 tables

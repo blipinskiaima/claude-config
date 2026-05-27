@@ -1,26 +1,29 @@
-# Context — Dilution — 2026-05-22T17:13+02:00
+# Context — Dilution — 2026-05-25T17:40+02:00
 
 **Branche** : master
-**Dernier commit** : 139f475 — Add README.md + CLAUDE.md
+**Dernier commit** : 1c2314d — CLAUDE.md : généralise gotcha #3 (pipefail/SIGPIPE)
 **Status** : clean
 
 ## Où j'en suis
-Projet Dilution créé from scratch dans la session (génération 480 BAMs dilués in silico).
-Phase 1 (1 BAM A→Z) ✓ validée end-to-end (BAM + Bam2Beta downstream OK). Phase 2 (479 BAMs
-restants) tentée via 1 tmux mais ARRÊTÉE par Boris après que le worker a fail "MM:Z absent"
-sur 4 jobs successifs (bug pipefail/SIGPIPE en command substitution — fix commité 30ff946).
+Session de débogage du worker Phase 2 + audit complet. 3 fixes commités depuis le 22/05
+(`e023058` upload size, `fa9ff27` seed tumor varie, `e3c38cb` @SQ check) + CLAUDE.md
+gotcha #3 généralisé. Audit final : aucun risque destructif S3, 40 healthys + 3 tumors
+paths vérifiés, 480 OUTPUT_NAME uniques. Boris a stoppé un run en cours par interruption.
 
 ## Ce qui marche / ce qui foire
-- ✓ Phase 1 : `Colon_7_Healthy_807_target_1_0` sur S3, validé Bam2Beta (mVAF=0 sous seuil, normal à 1%)
-- ✓ Worker `scripts/generate_dilution.sh` (cache flock + log S3 + -@ 2 threads) + run_all.sh
-- ✓ Fix MM/ML check via fichier temp (commit 30ff946) — VÉRIFIÉ OK sur le BAM failed
-- ✓ Cache `/scratch/boris/dilution-cache/` populé : Colon_7 + Healthy_807 (~11 Go)
-- ✗ Workdirs partiels à nettoyer dans `/scratch/boris/dilution/Colon_7_Healthy_{756,780,807,823}_target_5_0/`
-- ✗ Pas de remote git pour ce projet (local seulement)
+- ✓ Worker robuste : 5 bugs fixés, plus aucun pattern `cmd | grep -q` ou `cmd | head` buggy
+- ✓ Audit complet validé : no aws s3 rm/rb/mv/sync, sources S3 read-only par construction
+- ✓ Design dilution clarifié : seed tumor varie par healthy_id → 40 réplicats indépendants,
+  dilutions emboîtées par couple (tumor, healthy) à différents targets
+- ✗ 5 workdirs partiels dans `/scratch/boris/dilution/` :
+    - 3 Breast_34+Healthy_807 (target 5_0, 1_0, 0_5) → BAMs finaux VALIDES (failed sur le
+      check @SQ buggy, fix dans e3c38cb)
+    - 2 Lung_4+Healthy_780 (target 5_0, 1_0) → incomplets, à cleanup
+- ✓ Cache scratch populé : 3 tumors + 7 healthys + lock files
 
 ## Prochaine étape
-1. Cleanup workdirs partiels : `rm -rf /scratch/boris/dilution/Colon_7_Healthy_*_target_5_0/`
-2. Re-lancer 1 tmux test pour valider le fix :
-   `tmux new -d -s dil_colon_50 'cd ~/Pipeline/Dilution && ./scripts/run_all.sh --tumor Colon_7 --target 5_0; bash'`
-3. Si OK → lancer les 11 autres tmux (cf `./scripts/run_all.sh --help`)
-4. Après les 12 tmux finis → `rm -rf /scratch/boris/dilution-cache/`
+1. Décider entre (a) manual finish des 3 Breast valides (upload + manifest) ou
+   (b) `rm -rf /scratch/boris/dilution/*` et relancer proprement avec le worker fixé.
+2. Cleanup Lung_4+780 partiels dans tous les cas.
+3. Relancer les 12 tmux (`./scripts/run_all.sh --help`).
+4. Après les 12 tmux finis : `rm -rf /scratch/boris/dilution-cache/`.
