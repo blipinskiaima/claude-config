@@ -19,9 +19,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 ## Haute priorité
 
-- [ ] **Intégrer rapport Typst V2 dans Bam2Beta** — créer `Dockerfile.rapportv4` (Typst + cetz + IBM Plex) + remplacer `rmarkdown::render` dans `workflow/beta.nf:309` par `typst compile` + switcher `conf/{base,prod}.config` vers `rapportv4:latest`. **Lundi 2026-05-11**. Source : `test/V2final/report-grail-v2.typ`.
+- [ ] **Intégrer rapport Typst V2 dans Bam2Beta** — créer `Dockerfile.rapportv4` (Typst + cetz + IBM Plex) + remplacer `rmarkdown::render` dans `workflow/beta.nf:309` par `typst compile` + switcher `conf/{base,prod}.config` vers `rapportv4:latest`. Source : `bin/rapport/test/V2final/report-grail-v2.typ` (centralisé V1.3.0).
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
-- [ ] **Bam2Beta V1.2.0 — release lundi 2026-05-11** — commit + tag (raima 0.4.17 + suppression Sniffles/Severus/Decoil + nouveau module IV). Pipeline déjà testé OK sur Healthy_826.
 
 ## Moyenne priorité
 
@@ -60,9 +59,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-05-27 — Dilution worker hardening
+## 2026-05-27 — Dilution worker hardening + Bam2Beta V1.3.0 release
 
 - [x] **Dilution worker — 3 fixes + audit complet** — fixes accumulés depuis le 22/05 : `e023058` aws s3 ls filter par basename exact (prefix match écartait .bai), `fa9ff27` seed tumor varie par healthy_id (40 réplicats tumoraux indépendants au lieu d'un set partagé), `e3c38cb` @SQ check via capture en variable + test bash pur (même bug pipefail/SIGPIPE que MM/ML). Audit complet validé : aucune commande destructive S3, 40 healthys + 3 tumors paths vérifiés, 480 OUTPUT_NAME uniques. CLAUDE.md gotcha #3 généralisé (`1c2314d`). Détails : memory `feedback_bash_pipefail_sigpipe.md` + `project_phase1_state.md`.
+- [x] **Bam2Beta release V1.3.0** — V1.3.0 absorbe V1.2.0 (raima 0.4.17 effectif dans `raima:latest` après rebuild — image était restée 0.4.13 par accident de build du 09/05) + module IV + archive SV modules. QUALIF officielle CONFORME bit-à-bit vs V1.1.2. Tag V1.3.0 + release GitHub publiés. Cross-validation : Healthy_826, Bladder_Blood_02_110, Bladder_Urine_02_050 tous identiques bit-à-bit vs RetD baseline.
+- [x] **Refactor architecture Bam2Beta V1.3.0** — 5 refactors structurels : `Raima_score_all` (fusion 3 process en 1, -50% containers Docker BETA), `Beta_epic` (encapsule `BAM_Count` + `Read_Start_Time`), `Merge` (chain propre `BAM_sort → BAM_index` sans redondance `samtools index`), `QC` (`BAM_Count` regroupé dans `qc.nf`, découplé MERGE), suppression workflow `Beta_filter` (R&D non maintenu). 14 commits, 133 fichiers (+2826 / -19339 lignes net).
 
 ## 2026-05-26 — trace-prod export-short-read-like + cleanup samples Twist + Feature/ pool étendu short_read
 
