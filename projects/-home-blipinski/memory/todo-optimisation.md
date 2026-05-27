@@ -64,10 +64,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [x] **Dilution worker — 3 fixes + audit complet** — fixes accumulés depuis le 22/05 : `e023058` aws s3 ls filter par basename exact (prefix match écartait .bai), `fa9ff27` seed tumor varie par healthy_id (40 réplicats tumoraux indépendants au lieu d'un set partagé), `e3c38cb` @SQ check via capture en variable + test bash pur (même bug pipefail/SIGPIPE que MM/ML). Audit complet validé : aucune commande destructive S3, 40 healthys + 3 tumors paths vérifiés, 480 OUTPUT_NAME uniques. CLAUDE.md gotcha #3 généralisé (`1c2314d`). Détails : memory `feedback_bash_pipefail_sigpipe.md` + `project_phase1_state.md`.
 
-## 2026-05-26 — trace-prod export-short-read-like + cleanup samples Twist
+## 2026-05-26 — trace-prod export-short-read-like + cleanup samples Twist + Feature/ pool étendu short_read
 
 - [x] **trace-prod export-short-read-like** — nouvel export gsheet fusionné CGFL+HCL liquid (1199 samples, 13 colonnes) vers l'onglet 'Short Read Like' de la gsheet trace-prod. Inclut `mVAF v1` initial côte à côte avec `mVAF v1 short read` pour comparaison directe. Pattern strictement aligné sur `export-ont-samples`. Commit `3ff5373`. Détails : section Export dans [project_schema_v8_short_read_metrics.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v8_short_read_metrics.md).
 - [x] **Cleanup samples Twist test** — suppression de 5 samples Twist (Twist_0%, Twist_0.1%, Twist_0.25%, Twist_0.5%, Twist_1%) via `delete liquid CGFL -s {sample} -f` (cascade sur 6 tables liées), conservation de `Twist_1pct`. Re-export liquid CGFL → gsheet (737 samples).
+- [x] **Feature/ — pool étendu 7→11 + 3 livrables + skill `/run-new-feature`** — ajout probs_epic (bloc 16 EPIC v1), probs_loyfer (bloc 31 Loyfer 28M), mvaf_v1_short_read, ichor_short_read_x100 ; infrastructure blocs (`source_cols` pluriel) dans grid_search.py via expand_features(). 3 livrables rule 07 : combined_v2_probs (probes +14.5 pp KPI Sens@95% Active_NoMut), combined_v3 (exploratoire 76% couverture), combined_v4 (rigoureux 99.6%, +4.6 pp KPI). Commit `55c4136` + push initial `github.com/aima-dx/Feature.git`. Skill `/run-new-feature` créé pour orchestrer les futurs tests (9 briques), testé 2 fois. Détails : memory `livrables-actuels.md`.
+- [x] **Feature/ documentation visuelle** — WORKFLOW.md Mermaid 9 briques (rendu Cursor/GitHub) + README.md actualisé avec arborescence livrables et mode automatisé. Skill `mermaid-diagrams` installé (softaworks/agent-toolkit, 4.1K installs).
 
 ## 2026-05-22 — Skills save-context/get-context + câblage end-session & agent-explore-quick + trace-prod schema v8 short_read_metrics + Projet Dilution (480 BAMs in silico)
 
