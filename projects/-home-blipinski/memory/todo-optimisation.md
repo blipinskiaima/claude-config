@@ -59,11 +59,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-05-27 — Dilution worker hardening + Bam2Beta V1.3.0 release
+## 2026-05-27 — Dilution worker hardening + Bam2Beta V1.3.0 release + trace-prod fix sex_predicted
 
 - [x] **Dilution worker — 3 fixes + audit complet** — fixes accumulés depuis le 22/05 : `e023058` aws s3 ls filter par basename exact (prefix match écartait .bai), `fa9ff27` seed tumor varie par healthy_id (40 réplicats tumoraux indépendants au lieu d'un set partagé), `e3c38cb` @SQ check via capture en variable + test bash pur (même bug pipefail/SIGPIPE que MM/ML). Audit complet validé : aucune commande destructive S3, 40 healthys + 3 tumors paths vérifiés, 480 OUTPUT_NAME uniques. CLAUDE.md gotcha #3 généralisé (`1c2314d`). Détails : memory `feedback_bash_pipefail_sigpipe.md` + `project_phase1_state.md`.
 - [x] **Bam2Beta release V1.3.0** — V1.3.0 absorbe V1.2.0 (raima 0.4.17 effectif dans `raima:latest` après rebuild — image était restée 0.4.13 par accident de build du 09/05) + module IV + archive SV modules. QUALIF officielle CONFORME bit-à-bit vs V1.1.2. Tag V1.3.0 + release GitHub publiés. Cross-validation : Healthy_826, Bladder_Blood_02_110, Bladder_Urine_02_050 tous identiques bit-à-bit vs RetD baseline.
 - [x] **Refactor architecture Bam2Beta V1.3.0** — 5 refactors structurels : `Raima_score_all` (fusion 3 process en 1, -50% containers Docker BETA), `Beta_epic` (encapsule `BAM_Count` + `Read_Start_Time`), `Merge` (chain propre `BAM_sort → BAM_index` sans redondance `samtools index`), `QC` (`BAM_Count` regroupé dans `qc.nf`, découplé MERGE), suppression workflow `Beta_filter` (R&D non maintenu). 14 commits, 133 fichiers (+2826 / -19339 lignes net).
+- [x] **trace-prod fix sex_predicted labels F/M inversés** — bug détecté par Boris en relisant la gsheet : `check_sex_predicted` retournait F si p<0.5 (devait être M, convention biologique). Fix 6 lignes (`lib/checkers.py:309` + docstring + CLAUDE.md + 3 mentions README) + UPDATE SQL atomique swap F↔M sur `retd_suivis.sex_predicted` (732↔567 lignes, NULL=60 préservés) + 3 exports gsheet régénérés (liquid CGFL 741 + liquid HCL 471 + solid CGFL 147 = 1359 samples corrigés). Commit `36748ac`.
 
 ## 2026-05-26 — trace-prod export-short-read-like + cleanup samples Twist + Feature/ pool étendu short_read
 
