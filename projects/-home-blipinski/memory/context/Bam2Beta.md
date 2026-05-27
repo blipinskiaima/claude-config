@@ -1,30 +1,27 @@
-# Context — Bam2Beta — 2026-05-27T15:10:00+02:00
+# Context — Bam2Beta — 2026-05-27T16:30:00+02:00
 
 **Branche** : main
-**Dernier commit** : 6baeb2c — docs: update CHANGELOG, README and CLAUDE.md for V1.3.0
-**Status** : clean (working tree)
+**Dernier commit** : 98ff63f — chore(dev): backfill scripts (Bladder/Twist samples START_TIME + IV)
+**Status** : clean
 
 ## Où j'en suis
-V1.3.0 officiellement releasée et qualifiée. La session a livré 5 refactors structurels majeurs
-(Raima_score_all fusion, Beta_epic encapsule BAM_Count/Read_ST, Merge chain BAM_sort→BAM_index,
-QC découplé de MERGE, suppression Beta_filter) + absorption de V1.2.0 (module IV + bump raima
-0.4.17 effectif après rebuild raima:latest). Tag V1.3.0 pushé, release GitHub publiée, QUALIF
-officielle promue dans `s3://...QUALIF/V1.3.0/`. Aucune tâche en cours.
+V1.3.1 release + qualif officielle terminées. Patch qui ajoute la génération native
+d'un metadata.json (10 champs schema trace-platform) dans Raima_report, remplaçant
+le script externe `trace-platform/scripts/build_metadata_json.sh`. Tag V1.3.1 +
+release GitHub publiés, QUALIF officielle promue `s3://...QUALIF/V1.3.1/`. Aucune
+tâche en cours.
 
 ## Ce qui marche / ce qui foire
-- ✓ 14 commits propres V1.1.2 → V1.3.0, working tree clean, tout pushé sur origin/main + tag V1.3.0
-- ✓ raima:latest contient maintenant raima 0.4.17 (rebuild 27/05, était 0.4.13 par accident depuis 9 mai)
-- ✓ 6× /test_bam2beta TEST OK bit-à-bit identique vs V1.1.2 sur Healthy_826
-- ✓ Cross-validation Bladder_Blood_02_110 : 44/44 fichiers identiques vs RetD baseline (9 avril)
-- ✓ Cross-validation Bladder_Urine_02_050 : 25/25 fichiers identiques vs RetD baseline (26 mai)
-- ✓ /qualif_bam2beta : QUALIF OK (RUN + QUALIF CONFORME vs V1.1.2)
-- ✓ Containers Docker BETA : -50% (3 Raima_process → 1 Raima_score_all)
-- ⚠ `raima:latest` (0.4.17) pas encore pushée sur Docker Hub → si distrib via Seqera Tower / autres workers, faire `docker push blipinskiaima/raima:latest`
-- ⚠ 3 tags lightweight pollueurs git : `bam2beta-pre-qc-refactor`, `checkpoint-pre-cleanup`, `pre-raima-refactor` (à nettoyer optionnellement)
+- ✓ V1.3.1 release : 2 commits feat + docs, pushés sur main + tag V1.3.1 + release GitHub
+- ✓ /qualif_bam2beta : QUALIF OK (RUN + QUALIF CONFORME bit-à-bit vs V1.3.0)
+- ✓ metadata.json natif testé : 10 champs valides en QUALIF (patient_name="QUALIF")
+- ✓ Pattern Nextflow appris : `.combine(by:0)` pour broadcast 1 file/sample sur N entries
+- ⚠ `~/Pipeline/trace-platform/scripts/build_metadata_json.sh` à marquer DEPRECATED (le pipeline le génère désormais nativement). Adapter le code trace-platform qui l'invoque.
+- ⚠ Image `raima:latest` (raima 0.4.17) toujours pas pushée sur Docker Hub
+- ⚠ 3 tags lightweight pollueurs git : `bam2beta-pre-qc-refactor`, `checkpoint-pre-cleanup`, `pre-raima-refactor` (cleanup optionnel)
 
 ## Prochaine étape
 Aucune tâche bloquée. Si nouvelle session :
-1. Push image raima:latest sur Docker Hub (`docker push blipinskiaima/raima:latest`)
-2. Optionnel : nettoyer tags lightweight pollueurs (`git tag -d ...` + `git push origin --delete ...`)
-3. Optionnel : bump VERSION=V1.1.2 → V1.3.0 dans `dev/SCW/Bam2Beta.sh` (script launch SCW)
-4. Sinon, attendre la prochaine demande (intégration rapport Typst V2 dans le pipeline est la prochaine grosse étape à terme)
+1. Côté trace-platform : marquer `build_metadata_json.sh` DEPRECATED + adapter code consommateur (le pipeline V1.3.1+ génère désormais nativement)
+2. Push image `raima:latest` sur Docker Hub si distrib hors machine
+3. Sinon, attendre la prochaine demande (intégration rapport Typst V2 dans le pipeline reste la prochaine grosse étape — `bin/rapport/test/V2final/report-grail-v2.typ` prêt à intégrer via Dockerfile.rapportv4)
