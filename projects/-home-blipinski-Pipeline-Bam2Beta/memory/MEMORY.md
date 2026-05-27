@@ -2,7 +2,7 @@
 
 ## Key Facts
 
-- Current version: V1.1.2 — V1.2.0 ready to tag 2026-05-11 (raima 0.4.17 + module IV + archived SVs)
+- Current version: **V1.3.0** (tag 2026-05-27, absorbe V1.2.0 prepare 2026-05-11)
 - Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest`
 - Raima package version: **0.4.17** dans raima:latest depuis rebuild 2026-05-27 (avant: 0.4.13 par accident de build du 2026-05-09)
   - Retrocompatibilite 0.4.13 -> 0.4.17 confirmee bit-a-bit sur Healthy_826 CGFL liquid (test 2026-05-27 vs V1.1.2)
