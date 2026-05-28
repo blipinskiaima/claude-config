@@ -59,6 +59,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-05-28 — trace-prod schema v9 table dilution (suivi 480 samples)
+
+- [x] **trace-prod schema v9 — table `dilution`** — suivi du lot autonome de 480 samples Dilution (PK `sample_name`, sans FK) : 2 statuts dérivés bam/prod (1 listing S3/sample) + 13 métriques + 47 probs (16 epic v1 + 31 Loyfer). CLI `check-dilution` / `update-column-dilution` / `export-dilution` (onglet 'Dilution', 19 colonnes dont 3 dérivées du nom, probs exclues = DB only). `DilutionChecker` réutilise BaseChecker (préfixe `.merged`). 8 commits (`4ab208f`→`751fae5`). Détails : [project_schema_v9_dilution.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v9_dilution.md).
+
 ## 2026-05-27 — Dilution worker hardening + Bam2Beta V1.3.0 + V1.3.1 releases + trace-prod fix sex_predicted
 
 - [x] **Dilution worker — 3 fixes + audit complet** — fixes accumulés depuis le 22/05 : `e023058` aws s3 ls filter par basename exact (prefix match écartait .bai), `fa9ff27` seed tumor varie par healthy_id (40 réplicats tumoraux indépendants au lieu d'un set partagé), `e3c38cb` @SQ check via capture en variable + test bash pur (même bug pipefail/SIGPIPE que MM/ML). Audit complet validé : aucune commande destructive S3, 40 healthys + 3 tumors paths vérifiés, 480 OUTPUT_NAME uniques. CLAUDE.md gotcha #3 généralisé (`1c2314d`). Détails : memory `feedback_bash_pipefail_sigpipe.md` + `project_phase1_state.md`.
