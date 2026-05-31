@@ -59,6 +59,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-05-31 — Feature/ pipeline scripts/ standardisé + archive sessions Claude
+
+- [x] **Feature/ — pipeline scripts/ standardisé (01-02-03)** — portage du process exploratory-analysis-CGFL-HCL vers `scripts/` unifié : `01_prepare_cohort.py` (229L) + `02_train_combined.R` (426L, baseline mvaf seul OU XGBoost 5-fold OOF + suspects + heatmaps pseudo-log, non-régression validée vs `score_one_combo.R`, 3 bugs attrapés en séance) + `03_evaluate.R` (284L, BLOC 1 tables validé : Sens_Cancer_AI ALL 78.1% = 02 sens_95_all 0.7812 ; BLOC 2 courbes/dotplot/scatter à écrire). Branche `feat/scripts-standardises` mergée dans `main` (commit `dc732d9` → push `e15233a`). Audit `ARCHITECTURE.md` mermaid sur `exploratory-analysis-CGFL-HCL/understanding`. Session terminée brutalement sur API error 400 (thinking blocks). Détails archive : `~/Pipeline/Feature/memory/session-export-2026-05-31-pipeline-scripts-standardises.md`.
+
 ## 2026-05-28 — trace-prod schema v9 table dilution (suivi 480 samples)
 
 - [x] **trace-prod schema v9 — table `dilution`** — suivi du lot autonome de 480 samples Dilution (PK `sample_name`, sans FK) : 2 statuts dérivés bam/prod (1 listing S3/sample) + 13 métriques + 47 probs (16 epic v1 + 31 Loyfer). CLI `check-dilution` / `update-column-dilution` / `export-dilution` (onglet 'Dilution', 19 colonnes dont 3 dérivées du nom, probs exclues = DB only). `DilutionChecker` réutilise BaseChecker (préfixe `.merged`). 8 commits (`4ab208f`→`751fae5`). Détails : [project_schema_v9_dilution.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v9_dilution.md).
