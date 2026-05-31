@@ -3,3 +3,5 @@
 - [Cascade des filtres cohorte](cohort-filters-cascade.md) — 7 étapes 1309 → 454 samples, à exposer dans Aima-Tower
 - [Target specificity convention](target-specificity.md) — `Sens@95%` standard ISO, `Sens@90%` complément
 - [trace-prod schema](trace-prod-schema.md) — référence colonnes des 7 tables
+- [Convergence exploratory-analysis](convergence-exploratory-analysis.md) — 17 scripts main ; score combiné XGBoost (09) et FragDirection (17) recoupent Feature/
+- [Pipeline 3 étapes Feature](pipeline-3-etapes.md) — compute→model→eval centralisé ; refresh_cohort = portage du 01 R ; scripts/01 créé (phase 2 migration à faire)
