@@ -1,28 +1,21 @@
-# Context — Feature — 2026-05-26T14:00+02:00
+# Context — Feature — 2026-06-03
 
 **Branche** : main
-**Dernier commit** : 55c4136 — feat: étend le pool avec probes EPIC/Loyfer + features short_read (3 livrables)
-**Status** : clean (sauf `Je veux étendre ce script pour entraîner.ini` non-tracké volontaire — notes perso Boris)
+**Dernier commit** : e5d7d1e — refactor: pipeline minimal train.R + eval.R, archive ancien grid
+**Status** : clean (poussé origin/main)
 
 ## Où j'en suis
 
-Session terminée — pool Feature étendu de 7 → 11 features candidates avec ajout des **blocs probes** (EPIC 16 + Loyfer 31) et **2 features short_read** (`mvaf_v1_short_read` + `ichor_short_read_x100`). Trois livrables complets produits et committés sur `github.com/aima-dx/Feature.git` (remote nouveau, push initial). Skill `/run-new-feature` créé pour orchestrer les futurs tests.
-
-Prochaine décision en attente : adoption ou non des features short_read au pool de prod (gain démontré +4.6 pp Sens@95% Active_NoMut, couverture 99.6%).
+Pipeline Feature simplifié en production : `scripts/train.R` (trace-prod preset `lung_valtech_nosv_bladder_blood` + XGBoost OOF) → `scripts/eval.R` (5× Sens_* + PNG). Run de référence `result/combo_sc_test/` (4 features : mvaf_v1, ichor_x100, frag_mode1_sc, frag_mode2_sc). Ancien grid 01–06 sous `archives/`.
 
 ## Ce qui marche / ce qui foire
 
-- ✓ Pool étendu avec succès, support des blocs (`source_cols` pluriel) ajouté à `grid_search.py`
-- ✓ Livrable `combined_v2_probs` : adoption probes confirmée (+14.5 pp KPI clé sur n=480)
-- ✓ Livrable `combined_v4_short_read` : ajout short_read validé rigoureusement (cohortes 478 vs 480, +4.6 pp KPI clé)
-- ✓ Skill `/run-new-feature` testé 2 fois avec succès (orchestre les 9 briques du workflow)
-- ✓ Remote `origin` configuré + push initial sur `github.com/aima-dx/Feature.git`
-- ⚠ `feature_runs.duckdb` à 1392 runs — combos avec short_read invalidés/recalculés 2 fois (n=478 final)
-- ⚠ Twist_1pct ajouté en cohorte raw (734 samples) mais filtré par label NA (cohorte effective inchangée n=480/478)
+- ✓ Entonnoir cohorte documenté : 1224 liquid → 486 SQL → 475 depth → 335 labellisés eval (50 H, 285 cancer)
+- ✓ 192 healthy historique vs 50 = preset études + exclusion SpeedVac (160 HCL Val tech)
+- ✓ eval aligné : 5 facettes = 5 colonnes CSV ; définitions Sens_Active / mutés non actifs (15) clarifiées
+- ✗ Package R `duckdb` non installé — contournement python3 OK dans train.R
+- ✗ `note.txt` / prompts locaux non versionnés (gitignore)
 
 ## Prochaine étape
 
-**Décision Boris** : adopter (ou non) `mvaf_v1_short_read` + `ichor_short_read_x100` au pool de production. Si adoption recommandée :
-1. Test de robustesse via 5 seeds XGBoost différents (vérifier que +4.6 pp n'est pas du bruit)
-2. Validation sur cohorte indépendante (Alcapone ou nouveaux samples)
-3. Push de la décision dans `raima` / pipeline de production
+Option A : log effectifs par filtre dans `train.R` ; Option B : réintégrer grid search ou nouvelles features (frag v2 trace-prod) ; Option C : élargir preset cohorte si besoin de ~192 healthy.
