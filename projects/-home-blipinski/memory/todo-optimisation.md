@@ -59,6 +59,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-06-04 — trace-prod schema v10 frag_sc + nettoyage export liquid
+
+- [x] **trace-prod schema v10 — colonnes frag softclipped** — commit du code non commité (3 colonnes `frag_status_sc`/`frag_mode1_sc`/`frag_mode2_sc` dans `retd_suivis`, calque du frag v1, source `Fragmentomics/filtered_softclipped`). Commit `59dafcb`. Détails : [project_schema_v10_frag_sc.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v10_frag_sc.md).
+- [x] **trace-prod nettoyage export liquid** — retrait de 8 colonnes display-only (mVAF v1.2/v2, Score CNV, Frag Mode1/2, Sex Proba, Rarefaction, FRAG), renommage Frag Mode1/2 SC → `Mode1`/`Mode2`, arrondi 2 décimales (`format_round2_comma`). Solid inchangé. Commit `ebf738b`. Exports gsheet CGFL 753 + HCL 472 régénérés.
+
 ## 2026-05-31 — Feature/ pipeline scripts/ standardisé + archive sessions Claude
 
 - [x] **Feature/ — pipeline scripts/ standardisé (01-02-03)** — portage du process exploratory-analysis-CGFL-HCL vers `scripts/` unifié : `01_prepare_cohort.py` (229L) + `02_train_combined.R` (426L, baseline mvaf seul OU XGBoost 5-fold OOF + suspects + heatmaps pseudo-log, non-régression validée vs `score_one_combo.R`, 3 bugs attrapés en séance) + `03_evaluate.R` (284L, BLOC 1 tables validé : Sens_Cancer_AI ALL 78.1% = 02 sens_95_all 0.7812 ; BLOC 2 courbes/dotplot/scatter à écrire). Branche `feat/scripts-standardises` mergée dans `main` (commit `dc732d9` → push `e15233a`). Audit `ARCHITECTURE.md` mermaid sur `exploratory-analysis-CGFL-HCL/understanding`. Session terminée brutalement sur API error 400 (thinking blocks). Détails archive : `~/Pipeline/Feature/memory/session-export-2026-05-31-pipeline-scripts-standardises.md`.
