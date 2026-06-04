@@ -14,6 +14,7 @@ paths:
 |-------|--------|-----------------|-------|
 | `pod2bam:0.9.6` | 0.9.6+0949eb8d | V5.0.0 (simplex + 5mCG_5hmCG@v3) | Production HCL/CGFL |
 | `pod2bam:1.4.0` | 1.4.0 | V5.2.0 (simplex + 5mCG_5hmCG@v2) | Investigation multi-version |
+| `pod2bam:2.0.0` | 2.0.0+20e87c8b | V6.0.0 (simplex + 5mCG_5hmCG@v1) | Test V6.0.0 (Dorado 2.0.0) |
 
 ## Modèles de basecalling
 
@@ -23,6 +24,9 @@ paths:
 | V4.3.0 | `dna_r10.4.1_e8.2_400bps_hac@v4.3.0` | `..._5mCG_5hmCG@v1` | Host `/scratch/basecall/dorado/models/` |
 | V5.0.0 | `dna_r10.4.1_e8.2_400bps_hac@v5.0.0` | `..._5mCG_5hmCG@v3` | Dans image `pod2bam:0.9.6` `/opt/models/` |
 | V5.2.0 | `dna_r10.4.1_e8.2_400bps_hac@v5.2.0` | `..._5mCG_5hmCG@v2` | Dans image `pod2bam:1.4.0` `/opt/models/` |
+| V6.0.0 | `dna_r10.4.1_e8.2_400bps_hac@v6.0.0` | `..._5mCG_5hmCG@v1` | Dans image `pod2bam:2.0.0` `/opt/models/` |
+
+**V6.0.0 (Dorado 2.0.0)** : requiert CUDA ≥12.8. Seul `hac@v6.0.0` existe pour l'ADN (pas de sup/fast). Le suffixe modif reset à `@v1` à chaque génération majeure (v5.0.0=@v3, v5.2.0=@v2, v6.0.0=@v1). GOTCHA : `dorado download --list` en 2.0.0 écrit sur `/dev/tty` (pas stdout/stderr) → capturer via `script -qec "dorado download --list" out.txt`.
 
 ## Mapping MinKNOW ↔ Dorado
 

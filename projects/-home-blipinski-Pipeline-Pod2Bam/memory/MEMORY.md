@@ -6,6 +6,12 @@
 - **tmux pour les longs jobs** : l'utilisateur lance lui-même dans tmux
 - **POD5 index 0** : toujours utiliser `_0.pod5` pour les tests
 
+## Setup V6.0.0 + Pod2Bam.sh bi-mode (2026-06-04) — voir `setup-v6.0.0.md`
+- **`pod2bam:2.0.0`** = Dorado 2.0.0 + modèles V6.0.0 (`hac@v6.0.0` + `5mCG_5hmCG@v1`), baked `/opt/models`, entrée V6.0.0 dans nextflow.config
+- **Pod2Bam.sh = LE script unique** : variable `MODE=simplex|multiplex`, retry-loop upload S3 (en plus du download), succès=présence BAM, glob trace, upload auto GLOBAL_LOG. Les `dev/*.sh` = archives, ne plus lancer.
+- **Batch HCL simplex V6.0.0** en cours : 11 samples (10 Healthy + Lung_1), Healthy_11/12/14 OK sur S3 → V6.0.0 validé
+- Dorado 2.0.0 : CUDA ≥12.8, seul `hac@v6.0.0` ADN, `download --list` écrit sur /dev/tty (capturer via `script`)
+
 ## Décisions pipeline (mis à jour 2026-03-25, V0.2.0)
 - **Simplex** : `dorado basecaller --reference --kit-name SQK-NBD114-24 --trim all`
 - **Multiplex Pipeline B** : `basecall --trim adapters --min-qscore 9` → `demux` (trim par défaut) → `aligner --threads` (lr:hq) → `sort+index`
