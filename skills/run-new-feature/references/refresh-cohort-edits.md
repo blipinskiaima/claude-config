@@ -1,8 +1,10 @@
-# Édition de `cohort/refresh_cohort.py`
+# Édition SQL cohorte — `scripts/01_prepare_cohort.py`
+
+> **Mise à jour 2026-06** : remplace `archives/cohort/refresh_cohort.py`. Même logique SQL ; le script 01 écrit aussi `data/cohort.tsv` et les features dérivées.
 
 ## Anatomie du fichier
 
-`cohort/refresh_cohort.py` extrait la cohorte depuis `trace-prod` (DuckDB read-only) et écrit un snapshot Parquet versionné.
+`scripts/01_prepare_cohort.py` extrait la cohorte depuis `trace-prod` (read-only), écrit un snapshot Parquet versionné et `data/cohort.tsv`.
 
 Structure principale :
 ```python
@@ -43,7 +45,7 @@ TRY_CAST(q.mvaf_v1_short_read    AS DOUBLE) AS mvaf_v1_short_read,  ← nouveau
 
 **Règles** :
 - Utiliser `TRY_CAST(... AS DOUBLE)` (jamais `CAST` brut) pour gérer les NULL et les chaînes
-- L'alias `AS <nom>` doit matcher le `source_col` qu'on mettra dans `pool.yaml`
+- L'alias `AS <nom>` doit matcher le `source_col` qu'on mettra dans `feature.yaml`
 - Préserver l'indentation existante (4 espaces, alignement des `AS`)
 
 ## Pattern 2 — Plusieurs nouvelles colonnes (bloc EPIC ou Loyfer)
@@ -124,7 +126,7 @@ python3 cohort/refresh_cohort.py
 # 4. Vérifier que les nouvelles colonnes sont dans le snapshot
 python3 -c "
 import pandas as pd, glob
-latest = sorted(glob.glob('cohort/snapshot_*.parquet'))[-1]
+latest = sorted(glob.glob('data/snapshots/snapshot_*.parquet'))[-1]
 df = pd.read_parquet(latest)
 new_cols = [c for c in df.columns if 'short_read' in c]
 print(f'{len(new_cols)} nouvelles colonnes short_read :', new_cols[:5])

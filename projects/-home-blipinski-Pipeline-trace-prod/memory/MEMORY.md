@@ -1,10 +1,12 @@
 # trace-prod Memory
 
+- [Scratch workspace + BAM read-only](feedback_scratch_workspace.md) — analyses ad-hoc dans /scratch/boris/<topic>/, source BAM/POD5 strictement en lecture seule
 - [Rebasecalled POD5 — ne pas propager](feedback_rebasecalled_pod5.md) — laisser NULL après update-column stockage_pod5, ne pas copier depuis l'original
 - [Schema v6 — colonnes IV/QC](project_schema_v6_iv_qc.md) — 4 colonnes retd_suivis (read_start_time, ancestry, sex_proba, sex_predicted), path IV/ sœur de QC/
 - [Schema v7 — short_read](project_schema_v7_short_read.md) — colonne retd_suivis.short_read, vérifie 6 dossiers S3 dans bucket mirror {labo}_short_read (liquid uniquement)
 - [Schema v8 — short_read_metrics](project_schema_v8_short_read_metrics.md) — nouvelle table 28 colonnes (10 DECIMAL + 16 probs) pour métriques quantitatives short read, CLI check-short-read indépendante du check standard
 - [Schema v9 — dilution](project_schema_v9_dilution.md) — table AUTONOME 64 colonnes (PK sample_name, pas de FK), lot 480 samples Dilution, préfixe .merged → réutilise BaseChecker sans override, CLI check/update-column/export-dilution sans args type/labo
+- [Schema v10 — frag softclipped](project_schema_v10_frag_sc.md) — 3 colonnes retd_suivis (frag_status_sc/frag_mode1_sc/frag_mode2_sc), calque EXACT du frag v1, source Fragmentomics/filtered_softclipped
 - [Colonnes v2-v7 — index](project_columns_index.md) — synthèse des colonnes ajoutées + patterns transversaux (collision mapping, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
 
 ## Architecture
@@ -51,10 +53,11 @@
 - Columns extracted by `check`: dorado_model, dorado_model_version, run_id, barcode, taille_bam
 - Columns NOT extracted by `check`: reads_per_flowcell, samples_per_run (aggregate, via `update-column`)
 - Barcode extraction: from BAM filename (`barcode\d+` regex), NOT from RG header
-- **Rebasecalled samples** have no barcode in filename or RG header → barcode stays NA
-  - Workaround: extract from Pod2Bam align logs at `/mnt/aima-bam-data/processed/Pod2Bam/RetD/{run}/*/align/{sample}.log`
-  - Log line `command: dorado aligner ... {run_id}_barcode{N}.bam` contains the barcode
-  - 36 rebasecalled barcodes recovered this way (CGFL liquid, mars 2026)
+- **Rebasecalled samples** (and some non-rebasecalled, e.g. Colon_NN_rep merged BAM) have no barcode in filename or RG header → barcode stays NA
+  - Workaround: extract from Pod2Bam align logs at `/mnt/aima-bam-data/processed/Pod2Bam/RetD/{run}/{version}/align_trimmed/{sample}.log` (subdir is **align_trimmed**, NOT align ; version ex `V0.9.6_V5.0.0` ; the `{run}` dir embeds the run_id prefix, e.g. `..._962143e5_pod5_rep1`)
+  - Log line `command: dorado aligner ... {run_id}_barcode{N}.bam` contains the barcode (log has no zero-pad, DB stores `barcodeNN` zero-padded)
+  - No automated code fallback — recovery is a manual SQL UPDATE on `bam_metadata.barcode`
+  - 36 rebasecalled barcodes recovered this way (CGFL liquid, mars 2026) ; 8 Colon_17-20_rep1/rep2 recovered juin 2026 (barcode19/28/30/32, rep1+rep2 share barcode per Colon number)
   - 82 older rebasecalled (V4.3.0/V4.2.0) have no Pod2Bam logs → barcode remains NA
 
 ## POD5 Storage System (bam_metadata)

@@ -1,14 +1,16 @@
 ---
 name: run-new-feature
-description: Workflow guidé pour tester l'ajout d'une ou plusieurs nouvelles features au pool du projet ~/Pipeline/Feature/. Étend cohort/refresh_cohort.py + experiments/pool.yaml, regénère snapshot + input.tsv, lance le grid search complet, identifie le best combo et crée un livrable features/{nom}/ reproductible avec comparaison vs le best combo sans les nouvelles features. Use when the user says "/run-new-feature", "ajoute la feature X au pool", "teste de nouvelles features", "nouveau test de feature short_read", or any variation of adding/testing new candidates in the Feature/ pipeline.
+description: Workflow guidé pour tester l'ajout d'une ou plusieurs nouvelles features au pool du projet ~/Pipeline/Feature/. Étend scripts/01_prepare_cohort.py + data/feature.yaml, regénère snapshot + cohort.tsv, lance test_combo (scripts/02_test_combo.py), identifie le best combo, exécute scripts/02–04 et crée un livrable figé sous result/{slug}/. Use when the user says "/run-new-feature", "ajoute la feature X au pool", "teste de nouvelles features", "nouveau test de feature short_read", or any variation of adding/testing new candidates in the Feature/ pipeline.
 ---
 
 <objective>
-Automatiser le cycle complet de test d'une nouvelle feature dans le projet ~/Pipeline/Feature/, en suivant la procédure validée des 9 briques du workflow (cf. WORKFLOW.md à la racine). Boris donne 1+ noms de features candidates ; le skill orchestre tout : modifications de code, exécution du pipeline, archivage du livrable, comparaison.
+Automatiser le cycle complet de test d'une nouvelle feature dans `~/Pipeline/Feature/`, via le **pipeline standardisé** (`scripts/01` → `scripts/02_test_combo` → `scripts/02`–`04`). Boris donne 1+ noms de features candidates ; le skill orchestre les modifications, l'exécution et la restitution.
 
-**Scope du skill** : extension du pool actuel avec des features **déjà présentes dans trace-prod**. Pas de modification de Bam2Beta, pas de recalcul scientifique. Si la colonne n'existe pas dans trace-prod → orienter Boris vers le skill `/add-trace-prod`.
+**Scope** : features **déjà dans trace-prod** (colonnes SQL). Pas de Bam2Beta, pas de recalcul scientifique. Colonne absente → orienter vers `/add-trace-prod`.
 
-**Non-scope** : ne touche pas à `score_one_combo.R`, `grid_search.py`, `build_combined_score_flex.R` — ces fichiers sont stables et leur API supporte déjà l'ajout de candidates simples/bloc.
+**Hors scope** : ne pas modifier `scripts/02_train_combined.R` sauf bug ; le grid et le pool suffisent pour tester de nouvelles colonnes.
+
+**Archives** : l'ancien dossier `features/` (livrables v2/v3/v4, compute/model/eval dupliqués) est dans `archives/features/`. Ne plus y créer de sous-dossiers.
 </objective>
 
 <workflow>
@@ -16,214 +18,155 @@ Automatiser le cycle complet de test d'une nouvelle feature dans le projet ~/Pip
 ## Step 0 — Vérification du contexte
 
 **Actions** :
-1. Vérifier le `pwd` : on doit être dans `/home/blipinski/Pipeline/Feature/` (ou s'y placer)
-2. Vérifier que les 4 fichiers clés existent :
-   - `cohort/refresh_cohort.py`
-   - `experiments/pool.yaml`
-   - `experiments/prepare_inputs.py`
-   - `experiments/grid_search.py`
-3. Vérifier le statut git :
+1. `pwd` = `/home/blipinski/Pipeline/Feature/`
+2. Fichiers clés présents :
+   - `scripts/01_prepare_cohort.py`
+   - `data/feature.yaml`
+   - `scripts/02_test_combo.py`
+   - `scripts/03_get_best_combo.py`
+   - `scripts/02_train_combined.R`, `03_evaluate.R`, `04_plot_investigation.R`
+3. `git status --short` — demander confirmation si modifs non commitées sur ces fichiers.
+4. État cohorte / pool :
    ```bash
-   git status --short
+   ls -t data/snapshots/snapshot_*.parquet | head -1
+   python3 -c "import yaml; print(list(yaml.safe_load(open('data/feature.yaml')).keys()))"
    ```
-   Si des modifs non commitées sur ces fichiers, **demander confirmation** avant de poursuivre (risque d'écraser le travail en cours).
-4. Identifier le snapshot le plus récent et l'état actuel du pool :
-   ```bash
-   ls cohort/snapshot_*.parquet | tail -1
-   python3 -c "import yaml; p=yaml.safe_load(open('experiments/pool.yaml')); print(list(p.keys()))"
-   ```
-
-**Sortie** : confirmation que le projet est dans un état utilisable.
 
 ## Step 1 — Parsing des features à tester
 
-**Actions** :
-1. Récupérer les noms de features depuis les arguments du skill (1 ou plus).
-   - Exemples : `mvaf_v1_short_read`, `ichor_x100_short_read`, `probs_epic_short_read`
-2. Pour chaque feature, demander à Boris **interactivement** via `AskUserQuestion` (1 batch si possible) :
-   - **Source dans trace-prod** : nom de la table + nom(s) de colonne(s)
-     - Ex: `qc_metrics.mvaf_v1_short_read` (1 colonne)
-     - Ex: `probs.short_read_prop_blood_0, short_read_prop_breast_0, ...` (16 colonnes)
-   - **Type** : simple (1 colonne) ou bloc (≥ 2 colonnes regroupées en 1 candidate)
-   - **Suffixe nom logique** : déjà fourni par l'argument, mais vérifier qu'il ne collisionne pas avec un nom existant du pool
-3. Vérifier dans trace-prod que les colonnes existent :
+1. Noms depuis les arguments du skill (ex. `mvaf_v1_short_read`, `ichor_short_read_x100`).
+2. Pour chaque feature, valider avec Boris (`AskUserQuestion` si besoin) :
+   - Table + colonne(s) trace-prod
+   - Type : `source_col` (simple) ou `source_cols` (bloc) dans `feature.yaml`
+   - Pas de collision avec une clé existante du pool
+3. Vérifier les colonnes (read-only) :
    ```python
    import duckdb
-   con = duckdb.connect('/home/blipinski/Pipeline/trace-prod/database/samples_status.duckdb', read_only=True)
+   con = duckdb.connect("/home/blipinski/Pipeline/trace-prod/database/samples_status.duckdb", read_only=True)
    con.execute("DESCRIBE <table>").fetchdf()
    ```
-   Si une colonne manque → ARRÊTER, signaler à Boris, suggérer `/add-trace-prod`.
+   Colonne manquante → **ARRÊTER**, suggérer `/add-trace-prod`.
 
-**Sortie** : un mapping clair `{nom_logique → {table, cols, type}}` validé.
+## Step 2 — Plan & confirmation Boris
 
-## Step 2 — Plan de modifications & confirmation
+Présenter :
+- Modifications prévues dans `scripts/01_prepare_cohort.py` (SQL `WITH base AS`)
+- Entries `data/feature.yaml`
+- Estimation combos ajoutées (~957 total pour pool actuel ; delta selon N optionnelles)
+- Nom livrable proposé : `result/combined_v{N}_{slug}/` (pas `features/`)
+- Temps grid (~2–3 s/combo × nouvelles combos / 6 workers)
 
-**Actions** :
-1. Présenter à Boris un **résumé synthétique** des modifications prévues :
-   - Quelles lignes ajoutées à `refresh_cohort.py` (extraction trace-prod)
-   - Quelles entries ajoutées à `pool.yaml`
-   - Estimation du nombre de combos générés en plus (= `C(8+N, k-1)` pour `k=3..8`)
-   - Estimation du temps de calcul (~2-3 min par 200 combos)
-   - Nom proposé pour le livrable : `combined_v{N+1}_{slug}` (où `slug` = description courte des features ajoutées)
-2. Demander **OK explicite** à Boris avant de modifier le code.
+**OK explicite** avant d'éditer.
 
-**Si Boris refuse ou veut ajuster** : arrêter, attendre les instructions.
+## Step 3 — Édition de `scripts/01_prepare_cohort.py`
 
-## Step 3 — Édition de `cohort/refresh_cohort.py`
+1. Lire le fichier ; étendre le bloc SQL (TRY_CAST + LEFT JOIN si nouvelle table).
+2. Même patterns que l'ancien `refresh_cohort.py` — voir [references/refresh-cohort-edits.md](references/refresh-cohort-edits.md) (**remplacer mentalement** `refresh_cohort.py` par `01_prepare_cohort.py`).
 
-**Actions** :
-1. Lire `cohort/refresh_cohort.py` pour identifier la zone SQL à étendre.
-2. Pour chaque nouvelle colonne à extraire :
-   - Localiser le bloc `WITH base AS ( SELECT ... FROM samples ... LEFT JOIN <table> ... )`
-   - Ajouter une ligne `TRY_CAST(<alias>.<col> AS DOUBLE) AS <nom_export>,` au bon endroit
-3. Préserver la cohérence du nommage (ex: `loyfer_3_myeloid_granulocyte` → on garde le pattern `<source_table_short>_<col>`).
-4. Si jointure nouvelle nécessaire (ex: colonnes dans une nouvelle table de trace-prod), ajouter le `LEFT JOIN` correspondant.
+Sortie : SQL prêt ; le script écrit snapshot + `data/cohort.tsv` en une commande.
 
-Voir [references/refresh-cohort-edits.md](references/refresh-cohort-edits.md) pour les patterns d'édition validés.
+## Step 4 — Édition de `data/feature.yaml`
 
-**Sortie** : `cohort/refresh_cohort.py` modifié, prêt à régénérer un snapshot.
+Ajouter les entries (`source_col` ou `source_cols`). Voir [references/feature-yaml-edits.md](references/feature-yaml-edits.md).
 
-## Step 4 — Édition de `experiments/pool.yaml`
+## Step 5 — Régénérer snapshot + cohort.tsv
 
-**Actions** :
-1. Lire `experiments/pool.yaml` pour identifier la fin du fichier (après la dernière entry).
-2. Ajouter les nouvelles entries selon leur type :
-   - **Feature simple** : `source_col: <nom_colonne_input_tsv>`
-   - **Bloc (groupe)** : `source_cols: [col1, col2, ...]`
-3. Garder la cohérence avec la convention du fichier (description en français, suffixe sur le nom logique).
+```bash
+cd /home/blipinski/Pipeline/Feature/
+python scripts/01_prepare_cohort.py
+```
 
-Voir [references/pool-yaml-edits.md](references/pool-yaml-edits.md) pour les exemples.
+Vérifier les nouvelles colonnes dans le dernier `data/snapshots/snapshot_*.parquet` et `data/cohort.tsv`. Si tout NA → ARRÊTER (jointure / table source).
 
-**Sortie** : `experiments/pool.yaml` étendu avec les nouvelles candidates.
+## Step 6 — Grid search
 
-## Step 5 — Régénérer snapshot + input.tsv
-
-**Actions** :
-1. Lancer en séquence :
+1. Estimer le nombre de combos **non cachées** (DuckDB `runs` existantes).
+2. Si > 500 nouvelles combos → confirmation Boris.
+3. Lancer :
    ```bash
-   cd /home/blipinski/Pipeline/Feature/
-   python3 cohort/refresh_cohort.py
-   python3 experiments/prepare_inputs.py
+   python3 scripts/02_test_combo.py --workers 6
    ```
-2. Vérifier que le nouveau snapshot a bien les nouvelles colonnes :
-   ```python
-   import pandas as pd, glob
-   latest = sorted(glob.glob('cohort/snapshot_*.parquet'))[-1]
-   df = pd.read_parquet(latest)
-   # Check que les nouvelles colonnes sont là et non-NA
-   ```
-3. Si les nouvelles colonnes sont entièrement NA → ARRÊTER, signaler à Boris (possible problème de jointure ou de table source).
+   (`--smoke` pour test ; logs erreur dans `log/grid/`)
 
-**Sortie** : `cohort/snapshot_YYYY-MM-DD.parquet` et `experiments/input.tsv` à jour.
+## Step 7 — Identifier best NEW vs best OLD
 
-## Step 6 — Lancer le grid search
+```bash
+python3 scripts/03_get_best_combo.py --top 10
+```
+
+SQL complémentaire (read-only) sur `result/feature_runs.duckdb` :
+- **NEW** : meilleur combo **incluant** au moins une des nouvelles clés pool
+- **OLD** : meilleur combo **sans** ces clés (même `n_samples` si possible)
+
+Noter : features logiques du pool (ex. `mvaf_v1_short_read`) vs colonnes TSV passées à `--features` (via `expand_features()` dans test_combo).
+
+## Step 8 — Livrable `result/{slug}/` (remplace `features/{nom}/`)
+
+Structure cible — voir [references/livrable-creation.md](references/livrable-creation.md) :
+
+```
+result/combined_v{N}_{slug}/
+├── README.md              # hypothèse, combos NEW/OLD, KPIs, conclusion
+├── config.yaml            # snapshot, pool entries, target_spec, seed
+├── data/                  # copies figées snapshot + cohort.tsv
+│   ├── snapshot_*.parquet
+│   └── cohort.tsv
+├── new/                   # best combo avec nouvelles features
+│   ├── train.json         # copie KPI 02
+│   ├── scores.csv         # sortie 02
+│   ├── eval/              # sortie 03
+│   └── eval/plots/        # sortie 04
+└── old/                   # best combo sans nouvelles features (même structure)
+```
 
 **Actions** :
-1. Calculer le nombre attendu de combos :
-   - N_total = somme(C(N_optional, k-1) pour k=3..8) où N_optional = (pool actuel - mvaf) + features ajoutées
-   - Estimer le temps ≈ N_nouveaux × 2.5s / 6 workers
-2. Demander confirmation à Boris **si N_nouveaux > 500** (run long).
-3. Lancer en background :
+1. Déduire `slug` et `vN` (lister `result/combined_v*` ou `archives/features/combined_v*` pour le numéro).
+2. `mkdir -p result/{slug}/{cohort,new/eval/plots,old/eval/plots}`
+3. Copier snapshot + `cohort.tsv` dans `data/` du livrable
+4. Pour **NEW** et **OLD**, déplier les colonnes TSV depuis `feature.yaml` (`expand_features` comme dans test_combo) puis :
    ```bash
-   python3 experiments/grid_search.py --workers 6 > /tmp/grid_run.log 2>&1 &
+   Rscript scripts/02_train_combined.R --tsv data/cohort.tsv \
+     --features "<cols>" --out result/{slug}/new
+   Rscript scripts/03_evaluate.R --csv result/{slug}/new/scores.csv \
+     --out result/{slug}/new/eval --target-spec 0.95
+   Rscript scripts/04_plot_investigation.R --csv result/{slug}/new/scores.csv \
+     --out result/{slug}/new/eval --target-spec 0.95
    ```
-4. Surveiller via le PID jusqu'à completion :
-   ```bash
-   while kill -0 $PID 2>/dev/null; do sleep 5; done
-   ```
+   Répéter pour `old/` avec le combo OLD.
+5. Rédiger `README.md` + `config.yaml` ; tableau `comparison_new_vs_old.csv` (KPIs clés).
 
-**Sortie** : nouveaux combos insérés dans `experiments/feature_runs.duckdb`.
+## Step 9 — Restitution à Boris
 
-## Step 7 — Identifier le best combo
-
-**Actions** :
-1. Requête SQL sur `feature_runs.duckdb` (READ-ONLY) :
-   ```sql
-   SELECT features, n_samples, auc_all, sens_95_active_nomut, sens_90_active_nomut
-   FROM runs
-   WHERE n_samples = <n_du_nouveau_snapshot>
-   ORDER BY sens_95_active_nomut DESC, auc_all DESC
-   LIMIT 10
-   ```
-2. Identifier aussi le best combo "avant" (sans les nouvelles features) pour la comparaison :
-   ```sql
-   SELECT features, n_samples, auc_all, sens_95_active_nomut
-   FROM runs
-   WHERE n_samples = <n_du_nouveau_snapshot>
-     AND features NOT LIKE '%<nouvelle_feature_1>%'
-     AND features NOT LIKE '%<nouvelle_feature_2>%'
-     ...
-   ORDER BY sens_95_active_nomut DESC, auc_all DESC
-   LIMIT 1
-   ```
-
-**Sortie** : 2 combos identifiés (NEW = best avec nouvelles features, OLD = best sans).
-
-## Step 8 — Créer le livrable `features/{nom}/`
-
-**Actions** :
-1. Choisir le nom du dossier (proposé en Step 2) : `combined_v{N}_{slug}`
-   - Convention : incrémente `vN` (regarder les dossiers existants `features/combined_v*_*`)
-2. Créer la structure :
-   ```bash
-   mkdir -p features/{nom}/{compute,model,eval/plots}
-   ```
-3. Copier les inputs gelés dans `compute/` :
-   ```bash
-   cp cohort/snapshot_*.parquet features/{nom}/compute/
-   cp experiments/input.tsv features/{nom}/compute/
-   ```
-4. Créer `compute/compute.py` (documenter l'origine — cf. template livrable).
-5. Créer `model/train.R` à partir du template `references/livrable-creation.md` :
-   - Combo NEW = best identifié en Step 7
-   - Combo OLD = best identifié en Step 7
-   - 2 runs `build_combined_score_flex` avec mêmes folds (seed=42)
-6. Lancer `train.R` :
-   ```bash
-   cd features/{nom}/model && Rscript train.R 2>&1 | tee train.log
-   ```
-7. Créer `eval/evaluate.py` (peut être un copy-edit de `features/combined_v2_probs/eval/evaluate.py`).
-8. Lancer `evaluate.py` :
-   ```bash
-   cd /home/blipinski/Pipeline/Feature/
-   python3 features/{nom}/eval/evaluate.py 2>&1 | tee features/{nom}/eval/eval.log
-   ```
-9. Créer `README.md` + `config.yaml` (cf. template livrable).
-
-Voir [references/livrable-creation.md](references/livrable-creation.md) pour les templates complets.
-
-**Sortie** : livrable complet et reproductible dans `features/{nom}/`.
-
-## Step 9 — Restitution finale à Boris
-
-**Actions** :
-1. Présenter à Boris un résumé court :
-   - Liste des features ajoutées
-   - Best combo NEW + ses KPIs (AUC, Sens@95% Active_NoMut)
-   - Comparaison NEW vs OLD (Δ sur chaque KPI principal)
-   - Chemin du livrable créé
-   - Suggestions : si les nouvelles features sont dans le top, garder ; sinon, éventuellement retirer du pool
-2. **Ne PAS commit** automatiquement. Laisser Boris décider.
+- Features ajoutées + colonnes trace-prod
+- Best NEW vs OLD (Δ `sens_95_active_nomut`, `auc_all`, etc.)
+- Chemin `result/{slug}/`
+- Recommandation : garder au pool ou retirer
+- **Pas de commit automatique**
 
 </workflow>
 
 <references>
 
-| Fichier | Quand le charger |
+| Fichier | Usage |
 |---|---|
-| `references/refresh-cohort-edits.md` | À l'étape 3, pour étendre les jointures et les TRY_CAST dans refresh_cohort.py |
-| `references/pool-yaml-edits.md` | À l'étape 4, pour formater correctement les nouvelles entries |
-| `references/livrable-creation.md` | À l'étape 8, pour générer train.R + evaluate.py + README + config |
+| [references/refresh-cohort-edits.md](references/refresh-cohort-edits.md) | Patterns SQL — appliquer à **`scripts/01_prepare_cohort.py`** (pas `archives/cohort/refresh_cohort.py`) |
+| [references/feature-yaml-edits.md](references/feature-yaml-edits.md) | Format `data/feature.yaml` |
+| [references/livrable-creation.md](references/livrable-creation.md) | Structure **`result/{slug}/`** (mis à jour ; ignore les chemins `features/`) |
+
+| Projet | Doc |
+|---|---|
+| Pipeline | `README.md`, `CLAUDE.md`, `.claude/rules/07-feature-structure.md` |
+| Livrables historiques | `archives/features/` |
 
 </references>
 
 <rules>
 
-1. **Toujours read-only sur trace-prod** : `duckdb.connect(db, read_only=True)`. Jamais d'écriture (cf. golden rule `~/.claude/rules/duckdb.md` et CLAUDE.md du projet Feature/).
-2. **Demander confirmation avant** : édition de fichier sources, lancement du grid (si > 500 combos), création du livrable.
-3. **Pas de commit automatique** — Boris décide quand committer.
-4. **Si une colonne n'existe pas dans trace-prod** : ARRÊTER et orienter vers `/add-trace-prod`. Ne JAMAIS modifier le schéma de trace-prod depuis ce skill.
-5. **Snapshot existant : ne JAMAIS écrasé** — `refresh_cohort.py` fait déjà le versioning `_v2`, `_v3`. Respecter ce comportement.
-6. **Si erreur en cours de pipeline** : remonter l'erreur clairement à Boris, ne pas continuer aveuglément.
+1. **trace-prod read-only** toujours.
+2. **Confirmation** avant edit sources, grid massif (>500 combos), création livrable.
+3. **Pas de commit** automatique.
+4. Colonne absente → `/add-trace-prod`, pas de hack SQL.
+5. Snapshots : pas d'écrasement (`snapshot_YYYY-MM-DD_vN.parquet`).
+6. **Ne pas recréer** `features/` à la racine — livrables dans `result/{slug}/`.
 
 </rules>

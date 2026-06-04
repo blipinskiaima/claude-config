@@ -1,59 +1,77 @@
 ---
 name: explore-projet
-description: Raccourci pour relancer manuellement l'exploration standard (light, Haiku) sur le projet courant — équivaut au routing automatique du Session Start. Utile pour rafraîchir le contexte en cours de session sans rouvrir Claude. Use when the user says "/explore-projet", "explore le projet", "relance l'exploration", "refresh contexte", "recharge le projet", "explore-projet", or wants to manually trigger a lightweight project context reload during an active session.
-allowed-tools: Agent, Bash(pwd:*), Bash(basename:*)
+description: Recharge INLINE le contexte du projet courant directement dans la fenêtre principale (pas via subagent) — snapshot de tâche (get-context), MEMORY.md ET ses topic files détaillés, plus un git scan léger. Use when the user says "/explore-projet", "explore le projet", "relance l'exploration", "refresh contexte", "recharge le projet", "recharge la mémoire", "explore-projet", or wants to actually reload full project context/memory into the active session.
+allowed-tools: Bash, Read
 ---
 
 <objective>
-Lancer immédiatement le subagent `agent-explore-quick` (Haiku, ~30s, ~5-10k tokens) en background sur le projet correspondant au cwd courant. Permet de **rafraîchir le contexte standard** à tout moment de la session, sans rouvrir Claude. Aligné sur le comportement par défaut du routing Session Start (CLAUDE.md).
+Recharger **réellement** le contexte du projet courant dans la fenêtre de la session principale. Contrairement au routing Session Start (qui délègue à `agent-explore-quick` en background pour économiser des tokens), ce skill **lit lui-même** les fichiers — le contenu entre donc directement dans le contexte actif, sans compression par un subagent.
 
-**Note** : pour forcer une exploration profonde (Sonnet, deep), il faut soit invoquer un workflow qui le justifie (`/code-workflow-feature`, `/clean-skill`), soit utiliser les mots-clés feature/refactor en langage naturel.
+Charge, dans l'ordre :
+1. Le **snapshot de tâche** (`get-context`) — l'état mental de la dernière session
+2. **MEMORY.md ET ses topic files détaillés** — pas seulement l'index 200 lignes auto-chargé, mais le contenu réel des fichiers liés
+3. Un **git scan léger** pour situer l'état courant
+
+**Pourquoi inline** : un subagent lit dans SA propre fenêtre et ne renvoie qu'un résumé compressé. Les topic files détaillés (schemas, patterns) et le snapshot ne sont jamais réellement présents dans la session principale. Ce skill corrige ça en lisant directement.
 </objective>
 
 <workflow>
 
-## Step 1: Identifier le projet courant
+## Step 1: Résoudre les chemins (un seul bloc Bash)
 
-**Actions:**
-1. `pwd` — récupérer le répertoire courant
-2. `basename "$(pwd)"` — nom court du projet pour la description de l'agent
+```bash
+PROJ=$(basename "$(pwd)")
+MEMDIR="$HOME/.claude/projects/$(pwd | sed 's#/#-#g')/memory"
+CTX="$HOME/.claude/projects/-home-blipinski/memory/context/$PROJ.md"
 
-Si le cwd n'est pas dans un projet (ex: `~` directement) ou est un dossier non-code, demander confirmation à Boris avant de lancer.
+echo "=== PROJET: $PROJ ==="
+echo "=== MEMDIR: $MEMDIR ==="
 
-## Step 2: Lancer agent-explore-quick en background
+# Snapshot de tâche (get-context)
+if [ -f "$CTX" ]; then
+  AGE_DAYS=$(( ($(date +%s) - $(stat -c %Y "$CTX")) / 86400 ))
+  echo "=== SNAPSHOT: $CTX (âge ${AGE_DAYS}j) ==="
+else
+  echo "=== SNAPSHOT: aucun ==="
+fi
 
-**Actions:**
-1. Invoquer le tool `Agent` avec :
-   - `subagent_type: "agent-explore-quick"`
-   - `run_in_background: true`
-   - `description: "Quick refresh {project name}"` (≤ 5 mots)
-   - `prompt:` — instruction d'exploration light selon le workflow standard de l'agent (voir bloc ci-dessous)
+# Liste des topic files de mémoire (hors MEMORY.md)
+echo "=== TOPIC FILES ==="
+ls -1 "$MEMDIR"/*.md 2>/dev/null | grep -v '/MEMORY.md$' || echo "(aucun)"
 
-**Prompt à passer à l'agent :**
-```
-Effectue un rafraîchissement rapide du contexte projet à {cwd}.
-
-Suis ton workflow standard light en 3 étapes :
-1. Lis la documentation existante (CLAUDE.md, MEMORY.md, .claude/rules/*.md, topic files de la mémoire)
-2. Light git scan (git log --oneline -10, git status --short, git branch --show-current)
-3. Quick structure check uniquement si la doc est incomplète
-
-Retourne ton résumé concis (sous 100 lignes) avec le signal d'escalation à la fin :
-- "→ Context sufficient for this task" si la doc charge suffit
-- "→ Recommend agent-explore deep for this task" si du code-level deep est nécessaire
+# Git scan léger
+echo "=== GIT ==="
+git branch --show-current 2>/dev/null
+git log --oneline -10 2>/dev/null
+git status --short 2>/dev/null
 ```
 
-## Step 3: Confirmer à Boris
+Si cwd = `~` ou dossier non-code → demander confirmation à Boris avant de continuer.
 
-**Actions:**
-1. Une phrase courte : « Rafraîchissement du contexte lancé en background sur **{nom projet}** (Haiku, ~30s, ~$0.02). »
-2. Ne **pas** attendre la fin de l'agent — rendre la main immédiatement à Boris
+## Step 2: Charger le snapshot de tâche
 
-## Step 4: Intégration différée
+Si le snapshot existe (`$CTX`), le **lire avec Read** et l'afficher préfixé `📌 État précédent`.
+- Si âge > 7 jours → préfixer « ⚠ Snapshot daté de {N}j, possiblement obsolète » mais l'afficher quand même (Boris décide).
+- Si absent → le noter en une ligne, continuer.
 
-**Actions:**
-1. Quand l'agent termine (notification système), intégrer son résumé dans le contexte de la conversation
-2. Si l'agent retourne `→ Recommend agent-explore deep for this task`, en informer Boris brièvement (sans lancer le deep automatiquement — c'est sa décision)
+## Step 3: Charger la mémoire détaillée (cœur du skill)
+
+1. **Read `$MEMDIR/MEMORY.md`** — l'index (déjà partiellement auto-chargé, on le relit pour la fraîcheur).
+2. **Read CHAQUE topic file** listé au Step 1, intégralement. C'est le point clé : le contenu réel des schemas/patterns/feedback entre dans la fenêtre, pas seulement leurs titres dans l'index.
+   - S'il y a > 15 topic files, charger en priorité ceux dont le `name`/`description` matchent l'intent du premier message de Boris ; sinon tous.
+
+## Step 4: git scan léger
+
+Déjà récupéré au Step 1 (branch / log -10 / status --short). Ne PAS charger le diff complet sauf si Boris le demande.
+
+## Step 5: Synthèse à Boris
+
+Restituer en français, concis, structuré :
+- **Tâche en cours** (depuis le snapshot, si présent) + prochaine étape
+- **Contexte mémoire** : 3-6 points saillants tirés des topic files réellement lus (pas de paraphrase de l'index)
+- **État git** : branche, dernier commit, fichiers modifiés
+
+Pas de subagent lancé. Si une exploration **code-level profonde** est nécessaire (traces d'exécution, architecture), le signaler et proposer de lancer `agent-explore` deep — mais ne pas le lancer automatiquement (décision de Boris).
 
 </workflow>
 
@@ -63,29 +81,28 @@ Retourne ton résumé concis (sous 100 lignes) avec le signal d'escalation à la
 
 | Cas | Pourquoi |
 |---|---|
-| Reprise d'un projet après quelques heures de pause | Recharger CLAUDE.md, MEMORY.md, git status récents |
-| Tu as switché de projet et veux le contexte à jour | Skip le redémarrage de session |
-| Tu as fait des commits/modifs et veux que Claude « voie » l'état actuel | Refresh git log et status |
-| Tu sors d'une compaction et veux le contexte propre | Rebase rapide sur la doc |
+| Nouvelle session où le contexte auto-chargé ne suffit pas | Charge le snapshot + les topic files détaillés (jamais auto-chargés) |
+| Reprise d'un projet après une pause | Recharge l'état mental précédent + git récent |
+| Sortie de compaction | Rebase complet sur la mémoire documentée réelle |
+| Tu sens que Claude « a oublié » un schema/pattern documenté | Force la lecture intégrale des topic files |
 
 ## Quand NE PAS utiliser
 
-- Au tout début d'une session → le routing Session Start auto le fait déjà
-- Pour une exploration **profonde** (deep architecture, traces d'exécution) → utiliser plutôt `/code-workflow-feature` ou taper "implémente / refactor X" pour déclencher le deep via routing
+- Pour une exploration **code-level profonde** (architecture, traces) → `agent-explore` deep
+- Si tu veux juste économiser des tokens au Session Start → le routing auto (`agent-explore-quick`) suffit
 
-## Différence avec le routing automatique
+## Inline vs subagent — la distinction clé
 
-| Mécanisme | Quand | Agent lancé |
+| Mécanisme | Lit dans quelle fenêtre | Résultat |
 |---|---|---|
-| **Session Start auto** (CLAUDE.md) | 1er message Boris, intent question/brainstorm | `agent-explore-quick` |
-| **Session Start auto** (CLAUDE.md) | 1er message Boris, intent feature/refactor | `agent-explore-quick` + `agent-explore` deep |
-| **`/explore-projet`** (ce skill) | À tout moment en cours de session | `agent-explore-quick` seul |
-| **`/code-workflow-feature`** | Pour implémenter une feature | déclenche le deep via routing |
+| **Session Start auto** (`agent-explore-quick`, Haiku, background) | Fenêtre du subagent | Résumé compressé (<100 lignes) renvoyé à la session principale |
+| **`/explore-projet`** (ce skill, inline) | **Fenêtre principale directement** | Contenu réel (snapshot + topic files) présent en contexte, non compressé |
+
+Le subagent **protège** la fenêtre principale ; `/explore-projet` la **remplit**. C'est l'inverse, par dessein.
 
 ## Coût indicatif
 
-- Une invocation `/explore-projet` = **~$0.02** (Haiku, ~5-10k tokens, ~30s)
-- À comparer aux ~$0.30-0.80 d'un `agent-explore` deep
-- Pas de hausse de coût si tu invoques le skill plusieurs fois dans la même session — c'est précisément son rôle
+- Une invocation = lecture inline de ~5-20k tokens (snapshot + MEMORY.md + topic files) dans la fenêtre principale.
+- Plus cher qu'un `agent-explore-quick` délégué (~$0.02), mais c'est le prix d'avoir le contexte **réellement en tête** au lieu d'un digest.
 
 </quick_reference>

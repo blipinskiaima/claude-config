@@ -1,44 +1,35 @@
-# Création du livrable `features/{nom}/`
+# Création du livrable `result/{slug}/`
+
+> **Mise à jour 2026-06** : le dossier racine `features/` est archivé dans `archives/features/`. Les nouveaux livrables utilisent **`scripts/02`–`04`**, pas `train.R` / `evaluate.py` maison.
 
 ## Structure cible
 
-Suit la rule `.claude/rules/07-feature-structure.md` du projet Feature/.
+Suit `.claude/rules/07-feature-structure.md`.
 
 ```
-features/combined_v{N}_{slug}/
+result/combined_v{N}_{slug}/
 ├── README.md
 ├── config.yaml
-├── compute/
-│   ├── compute.py
-│   ├── snapshot_YYYY-MM-DD.parquet      (copie figée)
-│   └── input.tsv                         (copie figée)
-├── model/
-│   ├── train.R
-│   ├── predictions_new.csv
-│   ├── predictions_old.csv
-│   └── train.log
-└── eval/
-    ├── evaluate.py
-    ├── eval.log
-    ├── threshold.txt
-    ├── comparison_new_vs_old.csv
-    ├── summary_cancer_detection.csv
-    ├── summary_stratified.csv
-    ├── misclassified_{new,old}_{FN,FP}.csv
-    └── plots/
-        ├── score_dotplot_by_center_new.png
-        ├── score_dotplot_by_center_old.png
-        ├── score_vs_vaf_new.png
-        ├── score_vs_vaf_old.png
-        └── sensitivity_curve.png
+├── cohort/
+│   ├── snapshot_YYYY-MM-DD.parquet
+│   └── input.tsv
+├── new/
+│   ├── scores.csv
+│   ├── scores.json
+│   ├── eval/                    # scripts/03
+│   └── eval/plots/              # scripts/04
+└── old/
+    └── (même structure)
 ```
+
+Tableau `comparison_new_vs_old.csv` : KPIs NEW vs OLD (depuis les `.json` ou tables eval).
 
 ## Choix du nom du dossier
 
 ```python
 # 1. Lister les dossiers existants combined_v*_*
 import re, glob
-existing = glob.glob('features/combined_v*_*')
+existing = glob.glob('result/combined_v*_*') + glob.glob('archives/features/combined_v*_*')
 versions = [int(re.search(r'combined_v(\d+)_', d).group(1)) for d in existing if re.search(r'combined_v(\d+)_', d)]
 next_v = max(versions, default=1) + 1
 # next_v = 3 si on a déjà v2_probs

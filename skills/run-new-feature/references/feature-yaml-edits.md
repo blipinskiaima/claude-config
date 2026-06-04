@@ -1,8 +1,8 @@
-# Édition de `experiments/pool.yaml`
+# Édition de `data/feature.yaml`
 
 ## Anatomie du fichier
 
-Format YAML simple, 1 entrée par feature candidate. Lu par `grid_search.py:148`.
+Format YAML simple, 1 entrée par feature candidate. Lu par `02_test_combo.py:148`.
 
 ```yaml
 <nom_logique>:
@@ -13,7 +13,7 @@ Format YAML simple, 1 entrée par feature candidate. Lu par `grid_search.py:148`
 
 ## Pattern 1 — Feature simple (1 colonne)
 
-Une feature simple = 1 colonne dans `input.tsv` → 1 colonne XGBoost.
+Une feature simple = 1 colonne dans `cohort.tsv` → 1 colonne XGBoost.
 
 ```yaml
 mvaf_v1_short_read:
@@ -52,7 +52,7 @@ probs_epic_short_read:
 ```
 
 **Règles** :
-- Le `expand_features()` de `grid_search.py:71-83` détecte `source_cols` (pluriel) et déplie automatiquement
+- Le `expand_features()` de `02_test_combo.py:71-83` détecte `source_cols` (pluriel) et déplie automatiquement
 - Aucune modification de code Python/R nécessaire pour supporter un nouveau bloc
 
 ## Où ajouter dans le fichier
@@ -63,15 +63,15 @@ Toujours **à la fin du fichier**, après la dernière entrée existante. Ordre 
 
 ```bash
 # 1. Syntaxe YAML valide
-python3 -c "import yaml; yaml.safe_load(open('experiments/pool.yaml'))"
+python3 -c "import yaml; yaml.safe_load(open('data/feature.yaml'))"
 
 # 2. Compter les candidates dans le pool
-python3 -c "import yaml; p=yaml.safe_load(open('experiments/pool.yaml')); print(f'{len(p)} features, {sum(1 for v in p.values() if v.get(\"required\"))} required')"
+python3 -c "import yaml; p=yaml.safe_load(open('data/feature.yaml')); print(f'{len(p)} features, {sum(1 for v in p.values() if v.get(\"required\"))} required')"
 
 # 3. Estimer le nombre de combos
 python3 -c "
 import yaml, math
-p = yaml.safe_load(open('experiments/pool.yaml'))
+p = yaml.safe_load(open('data/feature.yaml'))
 n_opt = sum(1 for v in p.values() if not v.get('required'))
 total = sum(math.comb(n_opt, k-1) for k in range(3, 9))
 print(f'{n_opt} optionnelles → {total} combos k=3..8')
