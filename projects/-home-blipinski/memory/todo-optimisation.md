@@ -59,8 +59,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-04 — trace-prod schema v10 frag_sc + nettoyage export liquid
+## 2026-06-04 — trace-prod schema v10 frag_sc + Feature pipeline minimal
 
+- [x] **Feature/ — pipeline minimal train.R + eval.R** — remplace scripts 01–06 : lecture trace-prod (preset lung/valtech/no SpeedVac/bladder sang), XGBoost OOF → `scores.csv`, eval 5× Sens_* + PNG ; ancien code sous `archives/`. Cohorte SQL 486 → 335 labellisés (50 H). Commit `e5d7d1e` push `main`. Contexte : `memory/context/Feature.md`.
 - [x] **trace-prod schema v10 — colonnes frag softclipped** — commit du code non commité (3 colonnes `frag_status_sc`/`frag_mode1_sc`/`frag_mode2_sc` dans `retd_suivis`, calque du frag v1, source `Fragmentomics/filtered_softclipped`). Commit `59dafcb`. Détails : [project_schema_v10_frag_sc.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v10_frag_sc.md).
 - [x] **trace-prod nettoyage export liquid** — retrait de 8 colonnes display-only (mVAF v1.2/v2, Score CNV, Frag Mode1/2, Sex Proba, Rarefaction, FRAG), renommage Frag Mode1/2 SC → `Mode1`/`Mode2`, arrondi 2 décimales (`format_round2_comma`). Solid inchangé. Commit `ebf738b`. Exports gsheet CGFL 753 + HCL 472 régénérés.
 
