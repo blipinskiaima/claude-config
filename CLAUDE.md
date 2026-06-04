@@ -52,7 +52,7 @@ Auteur unique de 20 projets dans `~/Pipeline/`. Bus factor = 1 sur tout le stack
 - Intégrer les résultats des agents quand ils terminent
 - Si `agent-explore-quick` retourne `→ Recommend agent-explore deep`, escalader en lançant `agent-explore` en background
 - Ne **jamais** lancer `agent-explore` deep seul — `agent-explore-quick` charge en amont le contexte documenté (CLAUDE.md, MEMORY.md, rules), évitant que le deep le redécouvre. Le deep n'est lancé qu'**en parallèle** du quick, et uniquement pour les intents feature/refactor
-- `/explore-projet` (skill manuel) = raccourci pour relancer le quick à tout moment de la session, jamais le deep
+- `/explore-projet` (skill manuel) = rechargement **inline** du contexte (snapshot get-context + MEMORY.md + topic files détaillés + git léger) directement dans la fenêtre principale — ne lance PAS de subagent (contrairement au Session Start auto qui délègue au quick pour protéger la fenêtre). Pour le deep code-level, utiliser `agent-explore`
 
 ### Justification
 
