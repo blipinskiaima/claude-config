@@ -58,6 +58,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-06-08 — Feature pipeline CLI + benchmark 511 combos
+
+- [x] **Feature/ — select_cohort CLI + main.sh + main_bench** — filtres paramétrables (`filtres_cohorte_colonnes.tsv`), `train.R` blocs `probs_epic`/`probs_loyfer`, `./main.sh FEATURES` + bench 511 combos → `feature_runs.duckdb`. Commit `c6b3eb4` push `main`.
+
 ## 2026-06-08 — trace-prod schema v11 (mvaf_v13 + frag_score_v2_sc) + bascule props epics v1.3
 
 - [x] **trace-prod schema v11 — mvaf_v13 + frag_score_v2_sc** — 2 colonnes VARCHAR dans `retd_suivis` (liquid only) : `mvaf_v13` (calque `mvaf_v12`, source `raima_score.V1.3.tsv` col 3) + `frag_score_v2_sc` (nouveau checker, `fragmentomics_score.V2.tsv` col 1). Vérifié sur Healthy_826 (mVAF v1.3=2,581) + 26BM01841 (Frag Score v2=0,00755156001789226). Commit `251326e`. Détails : [project_schema_v11_mvaf_v13_frag_score.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v11_mvaf_v13_frag_score.md).
