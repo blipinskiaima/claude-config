@@ -46,7 +46,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [ ] **Sécurité secrets — étape 2** : installer `gitleaks` en pre-commit hook sur les projets gittés.
 - [ ] **Sécurité secrets — étape 3** : évaluer un gestionnaire de secrets (sops, age, vault).
-- [ ] **Skill save-code pour trace-prod** — automatiser la sauvegarde de session.
 - [ ] **Skills Pod2Bam** — créer test/qualif/maj analogues à Bam2Beta. Pas urgent tant que Pod2Bam n'est pas soumis à audit qualité.
 
 ---
@@ -58,6 +57,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-06-08 — trace-prod schema v11 (mvaf_v13 + frag_score_v2_sc) + bascule props epics v1.3
+
+- [x] **trace-prod schema v11 — mvaf_v13 + frag_score_v2_sc** — 2 colonnes VARCHAR dans `retd_suivis` (liquid only) : `mvaf_v13` (calque `mvaf_v12`, source `raima_score.V1.3.tsv` col 3) + `frag_score_v2_sc` (nouveau checker, `fragmentomics_score.V2.tsv` col 1). Vérifié sur Healthy_826 (mVAF v1.3=2,581) + 26BM01841 (Frag Score v2=0,00755156001789226). Commit `251326e`. Détails : [project_schema_v11_mvaf_v13_frag_score.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v11_mvaf_v13_frag_score.md).
+- [x] **trace-prod bascule source props epics → props_v1.3.tsv** — `check_props_epic` + extraction `probs_cmd` lisent `props_v1.3.tsv` (avant `props_v1.tsv`). Recalcul liquid CGFL+HCL (Healthy_826 blood_0 : 0,945857 → 0,8239526) + re-export gsheet (753 + 481). Non répercuté sur short_read/dilution (pipelines séparés). Commit `251326e`.
+- [x] **Skill save-code pour trace-prod** — workflow `/save-code` + `/end-session` validé de bout en bout sur trace-prod (analyse → README → CLAUDE.md/mémoire → commit/push → snapshot → todo).
 
 ## 2026-06-04 — trace-prod schema v10 frag_sc + Feature pipeline minimal + Pod2Bam V6.0.0
 
