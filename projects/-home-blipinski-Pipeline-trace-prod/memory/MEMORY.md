@@ -7,6 +7,7 @@
 - [Schema v8 — short_read_metrics](project_schema_v8_short_read_metrics.md) — nouvelle table 28 colonnes (10 DECIMAL + 16 probs) pour métriques quantitatives short read, CLI check-short-read indépendante du check standard
 - [Schema v9 — dilution](project_schema_v9_dilution.md) — table AUTONOME 64 colonnes (PK sample_name, pas de FK), lot 480 samples Dilution, préfixe .merged → réutilise BaseChecker sans override, CLI check/update-column/export-dilution sans args type/labo
 - [Schema v10 — frag softclipped](project_schema_v10_frag_sc.md) — 3 colonnes retd_suivis (frag_status_sc/frag_mode1_sc/frag_mode2_sc), calque EXACT du frag v1, source Fragmentomics/filtered_softclipped
+- [Schema v11 — mvaf_v13 + frag_score_v2_sc](project_schema_v11_mvaf_v13_frag_score.md) — 2 colonnes retd_suivis VARCHAR, liquid only, mvaf_v13 calque mvaf_v12 (raima V1.3) + frag_score_v2_sc (nouveau, fragmentomics_score.V2.tsv softclipped)
 - [Colonnes v2-v7 — index](project_columns_index.md) — synthèse des colonnes ajoutées + patterns transversaux (collision mapping, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
 
 ## Architecture

@@ -2,6 +2,7 @@
 
 > Pas de dossier `~/Pipeline/Feature/memory/` dans le repo (archivé dans `archives/memory/`). Contexte opérationnel : `CLAUDE.md` + `.claude/rules/` + fichiers ci-dessous.
 
+- [Feedback design pipeline](feedback-feature-pipeline-design.md) — scripts sélection = très simples ; args explicites, pas d'état caché
 - [Pipeline scripts 01–04](pipeline-3-etapes.md) — **source de vérité** architecture juin 2026
 - [Livrables et décisions pool](livrables-actuels.md) — v2_probs / v4_short_read ; chemins `runs/` + `archives/features/`
 - [Convergence exploratory-analysis](convergence-exploratory-analysis.md) — scripts Michael (référence)

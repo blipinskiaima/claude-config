@@ -2,13 +2,14 @@
 
 ## Key Facts
 
-- Current version: **V1.3.1** (tag 2026-05-27, ajout metadata.json natif dans Raima_report)
+- Current version: **V1.3.2** (2026-06-05, score mVAF v1.3 + fragmentomics v2 softclip-removed + raima 0.5.0)
 - Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest`
-- Raima package version: **0.4.17** dans raima:latest depuis rebuild 2026-05-27 (avant: 0.4.13 par accident de build du 2026-05-09)
+- Raima package version: **0.5.0** dans raima:latest depuis 2026-06-05 (requis par mVAF v1.3 + fragmento v2). Avant: 0.4.17 (2026-05-27)
   - Retrocompatibilite 0.4.13 -> 0.4.17 confirmee bit-a-bit sur Healthy_826 CGFL liquid (test 2026-05-27 vs V1.1.2)
   - Image `raima:0.4.17` (tag dedie) existait deja depuis 2026-05-07 mais `raima:latest` etait reste sur 0.4.13
   - Gotcha : verifier la version effective avec `docker run --rm raima:latest R -e 'packageVersion("raima")'` apres tout bump
-- Pipeline modules: MERGE, BETA (EPIC), BETA_28M (Loyfer), FRAG, CNV, ICHORCNA, IV, QC (SCORE block removed 2026-05-26)
+- Pipeline modules: MERGE, BETA (EPIC), BETA_28M (Loyfer + score mVAF v1.3), FRAG (v2 softclip-removed), CNV, ICHORCNA, IV, MVAF1_3 (retrospectif), QC
+- `--MVAF1_3`: mode retrospectif score v1.3 (collecte 22 bedMethyl_28M deja sur S3, aucun recalcul). Process `Raima_score_v1_3` importe de beta_28M.nf dans main.nf. Voir [mvaf-v1.3-frag-v2.md](mvaf-v1.3-frag-v2.md)
 - Prod profile enables: MERGE + BETA + FRAG + CNV + IV
 - Retry strategy: doublement CPU/RAM par tentative, max 10, plafond cpus_max/memory_max
 

@@ -1,22 +1,18 @@
-# Context — trace-prod — 2026-06-04 14:40 UTC
+# Context — trace-prod — 2026-06-08
 
 **Branche** : main
-**Dernier commit** : ebf738b — refactor: export liquid — retrait 8 colonnes + Mode1/Mode2 arrondis 2 déc
-**Status** : clean côté code (untracked = backup DB/CSV/rapports, hors scope)
+**Dernier commit** : 251326e — feat: schema v11 — mvaf_v13 + frag_score_v2_sc + bascule props epics v1.3
+**Status** : clean (untracked non commités : backups .duckdb, csv dev/, html rapport/, .claude/)
 
 ## Où j'en suis
-Session de nettoyage de l'export gsheet liquid TERMINÉE et pushée. Deux features
-distinctes commitées séparément : (A) schema v10 frag softclipped — code qui était
-non commité en début de session, (B) nettoyage export liquid de cette session.
+Session terminée — 2 features livrées, committées, pushées sur main. (1) Schema v11 : colonnes `mvaf_v13` + `frag_score_v2_sc` dans retd_suivis (liquid only). (2) Bascule source props epics `props_v1.tsv` → `props_v1.3.tsv`. Les deux exécutées en base + exportées vers gsheet.
 
 ## Ce qui marche / ce qui foire
-- ✓ Lot A (59dafcb) : schema v10 frag_sc committé (code + CLAUDE.md + README 3 lignes)
-- ✓ Lot B (ebf738b) : export liquid — 8 colonnes retirées (mVAF v1.2/v2, Score CNV, Frag Mode1/2, Sex Proba, Rarefaction, FRAG), Frag Mode1/2 SC → Mode1/Mode2, arrondi 2 décimales
-- ✓ Découpage 2 commits via reconstruction d'état intermédiaire (revert Lot B → commit A → restore Lot B → commit B), les 2 lots s'entrecroisaient dans utils.py/duckdb.py
-- ✓ Export gsheet poussé en cours de session : CGFL 753 + HCL 472 (onglets liquid à jour)
-- ✓ `format_round2_comma()` (lib/utils.py) : arrondi virgule française, KO/NA inchangés
-- ✗ Solid volontairement inchangé (décision Boris : nettoyage liquid only)
+- ✓ Schema v11 vérifié : Healthy_826 mVAF v1.3=2,581, Frag Score v2=-0,0682464198886691 ; 26BM01841 Frag Score v2=0,00755156001789226 (= exemple Boris)
+- ✓ Props epics recalculées liquid CGFL+HCL (Healthy_826 blood_0 : 0,945857 → 0,8239526 avec v1.3)
+- ✓ update-column props_epic_status CGFL+HCL OK (481 HCL) ; export gsheet CGFL (753) + HCL (481) pushés
+- ✓ README + CLAUDE.md à jour (bloc v11 + note props_v1.3) ; mémoire v11 déjà à jour
+- ✗ Bascule props_v1.3 NON répercutée sur short_read/dilution (pipelines séparés, choix assumé)
 
 ## Prochaine étape
-Rien en attente. Au besoin : étendre le nettoyage/renommage à l'export solid si décidé,
-ou peupler frag_sc via `check`/`update-column frag_status_sc liquid {labo}`.
+Rien en attente. Si Boris veut basculer aussi short_read (checkers_short_read.py:85) et dilution (checkers_dilution.py:105) sur props_v1.3.tsv, c'est un chantier séparé à valider.
