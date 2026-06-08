@@ -1,6 +1,9 @@
 ---
 name: livrables-actuels-du-projet-feature
 description: Décisions features + emplacement livrables — juin 2026
+metadata: 
+  node_type: memory
+  originSessionId: b3ac9798-fbc1-465e-a927-aad831034f9b
 ---
 
 # Livrables Feature (juin 2026)
@@ -14,13 +17,13 @@ description: Décisions features + emplacement livrables — juin 2026
 
 Détail artefacts : **`~/Pipeline/Feature/archives/features/combined_v*/`**
 
-## Où vivent les livrables maintenant
+## Où vivent les livrables maintenant (post-refactor juin 2026)
 
-- **Nouveau test** : `runs/combined_v{N}_{slug}/` (pas `features/`)
-- **Comparaison grid** : `experiments/feature_runs.duckdb` + `scripts/bin/analyze.py`
-- **Run détaillé** : `scripts/02` → `03` → `04` sous `runs/<nom>/`
+- **Run détaillé** : `result/{std_N}/{combo}/` (scores.csv, stratified_sensitivity.csv, PNG) — via `launch.sh`
+- **Comparaison inter-runs** : `feature_runs.duckdb` (racine) via `scripts/feature_db.py`
+- **Cohorte figée** : `data/cohorts/{std_N}/` (manifest.json + samples.tsv) ; pipeline cf. [[pipeline-3-etapes]]
 
-## Ne plus utiliser
+## Ne plus utiliser (archivés)
 
-- `features/` à la racine du repo (archivé)
-- `memory/` à la racine du repo (archivé → `archives/memory/`)
+- `runs/`, `experiments/`, `scripts/bin/`, `scripts/0[1-6]_*` (ancien grid → `archives/`)
+- `features/` et `memory/` à la racine (→ `archives/`)

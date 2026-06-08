@@ -1,21 +1,22 @@
-# Context — Feature — 2026-06-03
+# Context — Feature — 2026-06-08
 
 **Branche** : main
-**Dernier commit** : e5d7d1e — refactor: pipeline minimal train.R + eval.R, archive ancien grid
-**Status** : clean (poussé origin/main)
+**Dernier commit** : (en cours — end-session)
+**Status** : commit session select_cohort CLI + train blocs probs + main/main_bench
 
 ## Où j'en suis
 
-Pipeline Feature simplifié en production : `scripts/train.R` (trace-prod preset `lung_valtech_nosv_bladder_blood` + XGBoost OOF) → `scripts/eval.R` (5× Sens_* + PNG). Run de référence `result/combo_sc_test/` (4 features : mvaf_v1, ichor_x100, frag_mode1_sc, frag_mode2_sc). Ancien grid 01–06 sous `archives/`.
+Pipeline Feature opérationnel bout-en-bout : `select_cohort.py` (args CLI par champ `filtres_cohorte_colonnes.tsv`) → `main.sh FEATURES` → train/eval/publish → `feature_runs.duckdb`. `train.R` expand `probs_epic` (16) et `probs_loyfer` (31). `main_bench.sh` lance 511 combos sur pool 9 features (~30 min).
 
 ## Ce qui marche / ce qui foire
 
-- ✓ Entonnoir cohorte documenté : 1224 liquid → 486 SQL → 475 depth → 335 labellisés eval (50 H, 285 cancer)
-- ✓ 192 healthy historique vs 50 = preset études + exclusion SpeedVac (160 HCL Val tech)
-- ✓ eval aligné : 5 facettes = 5 colonnes CSV ; définitions Sens_Active / mutés non actifs (15) clarifiées
-- ✗ Package R `duckdb` non installé — contournement python3 OK dans train.R
-- ✗ `note.txt` / prompts locaux non versionnés (gitignore)
+- ✓ Cohorte std_359 : 359 scorés, 50 H + 285 C labellisés
+- ✓ Référentiels : `filtres_cohorte_colonnes.tsv`, `features_disponibles.tsv`
+- ✓ trace-prod schema mémoire à jour (268 cols, 9 tables)
+- ✓ publish DB : baseline `mvaf_v1` unique, combos avec deltas
+- ✗ `eval.R` n'accepte pas `--cohort`/`--features` (lit `run.env`)
+- ✗ `main_bench.sh` relance train même si combo déjà en DB
 
 ## Prochaine étape
 
-Option A : log effectifs par filtre dans `train.R` ; Option B : réintégrer grid search ou nouvelles features (frag v2 trace-prod) ; Option C : élargir preset cohorte si besoin de ~192 healthy.
+Lancer `./main_bench.sh` (ou combos ciblés via `./main.sh "..."`) puis requête SQL sur `feature_runs.duckdb` pour identifier le best combo (tri `delta_sens_active_nomut`).

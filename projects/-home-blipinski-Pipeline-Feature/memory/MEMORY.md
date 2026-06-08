@@ -3,8 +3,8 @@
 > Pas de dossier `~/Pipeline/Feature/memory/` dans le repo (archivé dans `archives/memory/`). Contexte opérationnel : `CLAUDE.md` + `.claude/rules/` + fichiers ci-dessous.
 
 - [Feedback design pipeline](feedback-feature-pipeline-design.md) — scripts sélection = très simples ; args explicites, pas d'état caché
-- [Pipeline scripts 01–04](pipeline-3-etapes.md) — **source de vérité** architecture juin 2026
-- [Livrables et décisions pool](livrables-actuels.md) — v2_probs / v4_short_read ; chemins `runs/` + `archives/features/`
+- [Pipeline select_cohort→train→eval](pipeline-3-etapes.md) — **source de vérité** architecture juin 2026 (post-extraction)
+- [Livrables et décisions pool](livrables-actuels.md) — v2_probs / v4_short_read ; livrables sous `result/`, DB `feature_runs.duckdb`
 - [Convergence exploratory-analysis](convergence-exploratory-analysis.md) — scripts Michael (référence)
 - [Target specificity](target-specificity.md) — Sens@95% KPI standard, Sens@90% complément
 - [Cascade filtres cohorte](cohort-filters-cascade.md) — historique 1309→454 (pré-pipeline scripts)

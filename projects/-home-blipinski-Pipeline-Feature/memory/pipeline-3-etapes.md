@@ -1,44 +1,49 @@
 ---
 name: pipeline-3-etapes
-description: Pipeline Feature standardisé scripts/01-04 + scripts/bin grid — juin 2026
+description: "Pipeline Feature scripts/ — select_cohort → train → eval → publish (état juin 2026, post-extraction)"
+metadata: 
+  node_type: memory
+  originSessionId: b3ac9798-fbc1-465e-a927-aad831034f9b
 ---
 
-# Pipeline Feature (état juin 2026)
+# Pipeline Feature (juin 2026, post-extraction select_cohort)
 
-**Pas de dossier `memory/` dans le repo** — doc projet : `README.md`, `.claude/rules/`, `archives/`.
+**Pas de dossier `memory/` dans le repo** — doc projet : `CLAUDE.md`, `.claude/rules/`, `archives/`, `docs/superpowers/`.
 
-## Flux opérationnel
+## Flux opérationnel (orchestré par launch.sh, 4 étapes)
 
 ```
-scripts/01_prepare_cohort.py     → cohort/snapshot_*.parquet + experiments/input.tsv
-scripts/02_train_combined.R    → runs/<prefix>.{csv,json}
-scripts/03_evaluate.R            → runs/<run>/eval/*.csv (tables)
-scripts/04_plot_investigation.R  → runs/<run>/eval/plots/
-scripts/bin/grid_search.py       → experiments/feature_runs.duckdb
-scripts/bin/analyze.py           → top-K depuis DuckDB
+scripts/select_cohort.py  → data/cohorts/{std_N}/cohort.csv  (+ gel manifest.json/samples.tsv si inédit)
+scripts/train.R --cohort  → result/{std_N}/{combo}/scores.csv  (+ run.env OUT/COHORT_REF)
+scripts/eval.R            → result/{std_N}/{combo}/stratified_sensitivity.csv + PNG
+scripts/feature_db.py     → feature_runs.duckdb  (cohorts + results KPIs)
 ```
 
-Helpers R : `scripts/bin/R/eval_helpers.R` (sourcés par 03 et 04).
+`./main.sh "mvaf_v1,ichor_x100"` ou `./scripts/launch.sh` enchaînent select → train → eval → publish.
+`./main_bench.sh` : 511 combos (pool 9 features), `COHORT` exporté une fois.
+
+## Séparation des responsabilités (décision design 2026-06-08)
+
+- **select_cohort.py = quelles LIGNES** (filtres+dedup+labels ; pilotable dashboard à terme). Très simple : 1 SQL paramétré. `ORDER BY unique_id` → folds/KPIs **déterministes** (l'ancien combo était non-reproductible ~±2pp).
+- **train.R = quelles COLONNES** (`--cohort` lit le CSV, charge `--features` par `sample_id`, XGBoost OOF ou baseline `mvaf_only`).
+- Lien **explicite `--cohort`** (pas via run.env). Voir [[feedback-feature-pipeline-design]].
+- Spec/plan : `docs/superpowers/specs|plans/2026-06-08-select-cohort*`.
 
 ## Règles clés
 
-- trace-prod **read_only** ; filtres techniques en 01 ; filtres analytiques (rep/TNE/Bladder_Blood, depth≥0.25) en 02
-- Seuil eval : `quantile(healthy, target_spec, type=1)` — aligné 02/03/04
-- Label : healthy=0 ; muté ou actif sans mut=1
-- Cohorte eval typique post-02 : ~480 labellisés (288 cancer, 192 healthy) — ≠ 307 exploratory (filtres bladder)
+- trace-prod **read_only** ; cohorte = preset `lung_valtech_nosv_bladder_blood` (`DEFAULT_SPEC` dans select_cohort.py, sérialisée au manifest).
+- Seuil eval : `quantile(healthy, target_spec=0.95, type=1)`.
+- Label : healthy=0 ; muté (vaf>0) OU actif sans mut=1 ; reste exclu (imagerie suspecte → inférence modèle).
+- Cohorte **std_359** : 359 scorés (335 labellisés = 50 H + 285 cancer ; +24 imagerie suspecte).
 
-## Grid
+## Identité cohorte + gel
 
-- `experiments/pool.yaml` : mvaf obligatoire, combos taille 3–8
-- Cache `combo_id` dans `feature_runs.duckdb`
-- `grid_search` appelle `scripts/02` (plus `score_one_combo.R`)
+`COHORT_REF = std_{nrow}` (lignes label∨suspect). Gel figé `data/cohorts/{ref}/` (manifest.json + samples.tsv, versionnés) ; `cohort.csv` = working file **gitignoré**. `feature_db.py` insère en DB via `COHORT_REF` (run.env) et **ne réécrit pas** le manifest de select_cohort.
 
-## Livrables
+## Filtres cohorte CLI (juin 2026)
 
-- **Nouveau** : `runs/combined_v{N}_{slug}/` (README, cohort figé, `new/` + `old/` avec 02–04)
-- **Historique** : `archives/features/combined_v2_probs`, v3/v4, validations Michael
-- Skill : `/run-new-feature`
+`select_cohort.py` : 1 arg par ligne de `filtres_cohorte_colonnes.tsv` (défaut = preset std_359). Référentiel features : `features_disponibles.tsv`. Blocs `probs_epic`/`probs_loyfer` expandus dans `train.R` (16+31 cols XGBoost).
 
 ## Archives repo
 
-`archives/` : ancien code (refresh_cohort, prepare_inputs, score_one_combo, build_combined_score_flex, dossier `features/`), ancien `memory/` (projects-knowledge-base, session-exports).
+`archives/` : ancien grid 01–06, refresh_cohort, score_one_combo, dossier `features/`, `data/snapshots/` (+ `archives/data/`), ancien `memory/`.
