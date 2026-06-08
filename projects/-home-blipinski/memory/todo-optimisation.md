@@ -61,6 +61,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## 2026-06-08 — Feature pipeline CLI + benchmark 511 combos
 
 - [x] **Feature/ — select_cohort CLI + main.sh + main_bench** — filtres paramétrables (`filtres_cohorte_colonnes.tsv`), `train.R` blocs `probs_epic`/`probs_loyfer`, `./main.sh FEATURES` + bench 511 combos → `feature_runs.duckdb`. Commit `c6b3eb4` push `main`.
+- [x] **Feature/ — main.sh --features** — argument explicite `--features` (fini l'argument positionnel), `main_bench.sh` + README/CLAUDE alignés. Commit `f39b7ba`.
 
 ## 2026-06-08 — trace-prod schema v11 (mvaf_v13 + frag_score_v2_sc) + bascule props epics v1.3
 
