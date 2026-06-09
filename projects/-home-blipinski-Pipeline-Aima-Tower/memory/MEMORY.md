@@ -1,5 +1,8 @@
 # Aima Tower — Auto Memory
 
+## Page `/exploration-beta` — connexion pipeline Feature (2026-06-09)
+Tower lit (read-only) les résultats du pipeline `~/Pipeline/Feature` : sélection de features → CSV sensibilité stratifiée (ligne Combined colorée vert/rouge vs baseline mVAF) + PNG + best combos top 5 + état cohorte figée `std_359`. **Affichage seul** : aucune exécution depuis le conteneur (pas de R, mount `/pipeline:ro`) ; même `feature_db.py best_combo` répliqué en SQL read-only (son `connect()` ouvre la DB en write → KO sur `:ro`). Clé canonique `normalize_features` copiée du pipeline (ordre de sélection indifférent). 4 endpoints `/api/exploration-beta/{result,png,best-combos,cohort-info}`. MAJ DB → pas de restart (bind-mount live). Rollback tag `pre-exploration-beta`. Détails : [feature_pipeline_integration.md](feature_pipeline_integration.md)
+
 ## Feature `/samples` + `/sample/:id` — Tower v4.2.0 (2026-05-13)
 Deux nouvelles pages : liste tous les samples R&D + détail enrichi 1-sample reproduisant le mockup `aima-tower-sample-detail.html`. Backend `DatabaseService.get_sample_detail()` JOIN 5 tables. Animation `aima-rise` cascade appliquée sur toutes les pages via `key={location.pathname}`. Décisions clés : TF=mvaf_v1, NEGATIVE/POSITIVE strict (==0/>0), depth threshold 0.25×, paths trace-prod `s3://aima-bam-data/processed/MRD/RetD/{type}/{labo}/{sample}/{REPORT|LOG}/`. Détails : [feature_sample_detail.md](feature_sample_detail.md)
 
