@@ -58,9 +58,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-09 — trace-prod fix probs loyfer HCL
+## 2026-06-09 — trace-prod fix probs loyfer + Feature select_cohort
 
 - [x] **Fix probs loyfer manquantes (HCL V6.0.0)** — 9 samples rebasecalled sans loyfer (décalage temporel d'extraction, pas un bug : fichier `props_loyfer` généré après dernière passe) ré-extraits en `-P` → HCL loyfer 481/481 + export gsheet. Diagnostic : [feedback_probs_loyfer_lag.md](../-home-blipinski-Pipeline-trace-prod/memory/feedback_probs_loyfer_lag.md).
+- [x] **Feature/ — extraction select_cohort + fix déterminisme** — sélection cohorte sortie de `train.R` vers `scripts/select_cohort.py` (lignes+labels, gel `data/cohorts/{ref}`, `train.R --cohort`). **Fix repro clé** : `ORDER BY unique_id` rend le combo OOF déterministe (l'ancien code variait ~±2pp sur Sens_Active_NoMut selon l'ordre DuckDB) ; baseline bit-identique. Commits b225ad6..88a12b3, spec/plan `docs/superpowers/{specs,plans}/2026-06-08-select-cohort*`.
 
 ## 2026-06-08 — Feature pipeline CLI + benchmark 511 combos
 
