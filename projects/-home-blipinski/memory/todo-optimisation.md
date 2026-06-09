@@ -58,6 +58,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-06-09 — trace-prod fix probs loyfer HCL
+
+- [x] **Fix probs loyfer manquantes (HCL V6.0.0)** — 9 samples rebasecalled sans loyfer (décalage temporel d'extraction, pas un bug : fichier `props_loyfer` généré après dernière passe) ré-extraits en `-P` → HCL loyfer 481/481 + export gsheet. Diagnostic : [feedback_probs_loyfer_lag.md](../-home-blipinski-Pipeline-trace-prod/memory/feedback_probs_loyfer_lag.md).
+
 ## 2026-06-08 — Feature pipeline CLI + benchmark 511 combos
 
 - [x] **Feature/ — select_cohort CLI + main.sh + main_bench** — filtres paramétrables (`filtres_cohorte_colonnes.tsv`), `train.R` blocs `probs_epic`/`probs_loyfer`, `./main.sh FEATURES` + bench 511 combos → `feature_runs.duckdb`. Commit `c6b3eb4` push `main`.
