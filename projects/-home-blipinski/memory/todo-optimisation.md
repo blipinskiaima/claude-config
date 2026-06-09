@@ -58,8 +58,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-09 — trace-prod fix probs loyfer + Feature select_cohort + Tower /exploration-beta
+## 2026-06-09 — Feature feature_db + select_cohort + trace-prod loyfer + Tower /exploration-beta
 
+- [x] **Feature/ — feature_db best_combo + chemins PNG/CSV** — `publish` enregistre `png_path`/`csv_path` absolus ; `python3 scripts/feature_db.py best_combo` classe par `delta_sens_active_nomut`. Leader provisoire `mvaf_v1,probs_loyfer` (+21.8 pp). Commit `6188844`.
 - [x] **Fix probs loyfer manquantes (HCL V6.0.0)** — 9 samples rebasecalled sans loyfer (décalage temporel d'extraction, pas un bug : fichier `props_loyfer` généré après dernière passe) ré-extraits en `-P` → HCL loyfer 481/481 + export gsheet. Diagnostic : [feedback_probs_loyfer_lag.md](../-home-blipinski-Pipeline-trace-prod/memory/feedback_probs_loyfer_lag.md).
 - [x] **Feature/ — extraction select_cohort + fix déterminisme** — sélection cohorte sortie de `train.R` vers `scripts/select_cohort.py` (lignes+labels, gel `data/cohorts/{ref}`, `train.R --cohort`). **Fix repro clé** : `ORDER BY unique_id` rend le combo OOF déterministe (l'ancien code variait ~±2pp sur Sens_Active_NoMut selon l'ordre DuckDB) ; baseline bit-identique. Commits b225ad6..88a12b3, spec/plan `docs/superpowers/{specs,plans}/2026-06-08-select-cohort*`.
 - [x] **Aima-Tower /exploration-beta — connexion pipeline Feature** — nouvelle page lecture seule : sélection de features → CSV sensibilité stratifiée (Combined coloré vert/rouge vs baseline mVAF) + PNG + best combos top 5 (réplique read-only `feature_db.py best_combo`) + état cohorte std_359. Aucune exécution conteneur (pas de R, mount `/pipeline:ro`). Commit `b18c572` (v4.3.0). Détails : [feature_pipeline_integration.md](../-home-blipinski-Pipeline-Aima-Tower/memory/feature_pipeline_integration.md).
