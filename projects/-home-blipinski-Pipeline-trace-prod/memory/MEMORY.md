@@ -9,6 +9,7 @@
 - [Schema v10 — frag softclipped](project_schema_v10_frag_sc.md) — 3 colonnes retd_suivis (frag_status_sc/frag_mode1_sc/frag_mode2_sc), calque EXACT du frag v1, source Fragmentomics/filtered_softclipped
 - [Schema v11 — mvaf_v13 + frag_score_v2_sc](project_schema_v11_mvaf_v13_frag_score.md) — 2 colonnes retd_suivis VARCHAR, liquid only, mvaf_v13 calque mvaf_v12 (raima V1.3) + frag_score_v2_sc (nouveau, fragmentomics_score.V2.tsv softclipped)
 - [Colonnes v2-v7 — index](project_columns_index.md) — synthèse des colonnes ajoutées + patterns transversaux (collision mapping, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
+- [Probs loyfer manquantes = décalage extraction](feedback_probs_loyfer_lag.md) — loyfer NULL + epic OK → fichier props_loyfer généré après dernière passe loyfer (pas un bug). upsert_probs préserve loyfer en mode v1 seul. Fix `probs -P`. `-s` mono-sample → boucler
 
 ## Architecture
 - CLI entry: `database/check_samples.py` (Click)
