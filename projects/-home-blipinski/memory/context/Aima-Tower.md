@@ -1,24 +1,22 @@
-# Context — Aima-Tower — 2026-06-09T08:16:09+00:00
+# Context — Aima-Tower — 2026-06-10T08:56:21+00:00
 
 **Branche** : main
-**Dernier commit** : b18c572 — feat(v4.3.0): page /exploration-beta — connexion pipeline Feature (lecture seule)
-**Status** : clean (seul `.claude/worktrees/` untracked, exclu volontairement)
+**Dernier commit** : 3de8681 — feat(exploration-beta): top N configurable + filtres présence/absence des best combos
+**Status** : README.md modifié (v4.4.0, working tree) ; sinon main == origin/main
 
 ## Où j'en suis
-Feature `/exploration-beta` terminée, committée (v4.3.0) et déployée en conteneur (live).
-Connexion Tower → pipeline `~/Pipeline/Feature` en **lecture seule** : sélection de features →
-affichage CSV (Combined coloré vs baseline mVAF) + PNG + best combos top 5 + état cohorte std_359.
-Dev itératif validé par Boris à chaque étape. Session clôturée via /end-session.
+Page `/exploration-beta` complète et en prod. Tout poussé sur main :
+- Base v4.3.0 (b18c572) : features → CSV (Combined coloré vs mVAF) + PNG + best combos top 5 + état cohorte std_359, lecture seule de `feature_runs.duckdb`
+- Fix cache refetch (eac709f, cette session) : reclic Exécuter sur même sélection force un `refetch()`
+- Raffinements (session parallèle) : diagramme Venn composition cohorte, top-N configurable (5/10/20/50) + filtres présence/absence des best combos, clic sur un combo coche ses features + charge son résultat, colonnes nb_healthy/nb_cancer masquées du CSV
 
 ## Ce qui marche / ce qui foire
-- ✓ 4 endpoints `/api/exploration-beta/{result,png,best-combos,cohort-info}` testés en conteneur
-- ✓ Lecture read-only `feature_runs.duckdb` via mount `/pipeline:ro` + réécriture path `/home/blipinski/Pipeline`→`/pipeline`
-- ✓ `best_combo` répliqué en SQL read-only (subprocess impossible : `connect()` ouvre en write → KO sur `:ro`)
-- ✓ `normalize_features` == benchmark pipeline (ordre de sélection indifférent), prouvé empiriquement
-- ✓ typecheck + build verts, conteneur healthy, MAJ DB sans restart (bind-mount live)
-- ✗ Rendu visuel non vérifié par moi (pas de navigateur) → à confirmer par Boris (couleurs Combined, tables, PNG)
+- ✓ Lecture read-only `feature_runs.duckdb` via mount `/pipeline:ro`, MAJ DB sans restart
+- ✓ Fix refetch validé (combo `mvaf_v1,frag_score_v2_sc` trouvé après recalcul)
+- ✓ `best_combo` répliqué read-only, `normalize_features` == benchmark pipeline
+- ✓ README bumpé **v4.4.0** documentant les 4 raffinements (modif working tree à committer)
+- ⚠ CLAUDE.md table Pages décrit la version de base de `/exploration-beta` (raffinements pas encore reflétés — optionnel)
 - ⚠ Exécution réelle du pipeline depuis Tower NON faite (par design : Tower = reader)
 
 ## Prochaine étape
-Boris valide le rendu visuel de `/exploration-beta`. Évolution possible (écartée cette session) :
-daemon hôte pour une vraie exécution one-click du pipeline (Option B).
+Committer la modif README v4.4.0. Évolution possible : daemon hôte pour vraie exécution one-click (Option B, écartée).
