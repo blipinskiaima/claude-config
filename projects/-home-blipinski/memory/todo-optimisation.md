@@ -58,6 +58,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-06-10 — Feature train/eval découplé + Alc + bench 1023×2 specs
+
+- [x] **Feature/ — cohorte eval Alc + DB runs/eval_kpis** — train std_335 fixe, inférence Alc (`EVAL_ALC=1`), 6 unités d'éval (`eval_kpis.csv`), DB `runs`+`eval_kpis`, `main_bench.sh` 1023 combos × Alc × spec 0.90/0.95. Bench lancé en tmux.
+
 ## 2026-06-09 — Feature feature_db + select_cohort + trace-prod loyfer + Tower /exploration-beta
 
 - [x] **Feature/ — feature_db best_combo + chemins PNG/CSV** — `publish` enregistre `png_path`/`csv_path` absolus ; `python3 scripts/feature_db.py best_combo` classe par `delta_sens_active_nomut`. Leader provisoire `mvaf_v1,probs_loyfer` (+21.8 pp). Commit `6188844`.
