@@ -1,7 +1,7 @@
 # Context — Feature — 2026-06-10
 
 **Branche** : main
-**Dernier commit** : (en cours — end-session)
+**Dernier commit** : a22a12c — feat: cohorte eval Alc, eval_kpis et bench 1023×dual-spec
 **Status** : bench `./main_bench.sh` lancé en tmux (BL2)
 
 ## Où j'en suis
