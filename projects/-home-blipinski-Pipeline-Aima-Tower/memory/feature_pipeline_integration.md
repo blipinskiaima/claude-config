@@ -78,6 +78,14 @@ Le bind-mount est live + connexion read-only fraîche par requête → quand Bor
 COUNT que l'hôte sans restart). Seul le cache front TanStack (`staleTime` best-combos 60s,
 cohort-info 5min) → un F5 rafraîchit tout de suite.
 
+## Contrôles « Meilleurs combos » + Venn (2026-06-09)
+
+- **Venn composition** dans « État de la cohorte » : positifs (`nb_cancer`) / négatifs (`nb_healthy`) / suspects (`n_other`), groupes **exclusifs** (le recouvrement central = convention visuelle, pas une vraie intersection). Pur frontend (consomme `CohortInfo`), aucun backend. Layout 50/50 Venn | conditions.
+- **Best combos cliquables** : clic sur une ligne → `setSelectedFeatures(features.split(","))` + `setSubmitted(features)` → le Résultat s'affiche. Combo issu du benchmark donc `found=true` garanti ; `submitted === featureStr` donc pas de warning « sélection modifiée ».
+- **Top N (5/10/20/50) + filtres présence/absence** : `best_combos(cohort_ref, top, kpi, include, exclude)`, `include`/`exclude` en CSV. Filtre **AVANT** `ORDER BY ... LIMIT` → le Top N porte sur les combos filtrés. Présence = **ET** (toutes présentes), absence = **aucune** ; sélecteurs mutuellement exclusifs côté UI.
+- **Gotcha token-safe (réutilisable)** : pour tester la présence d'une feature dans la clé canonique `"a,b,c"`, utiliser `list_contains(string_split(features, ','), ?)` en **paramètre lié** — JAMAIS `LIKE '%mvaf_v1%'` qui matcherait aussi `mvaf_v12`/`mvaf_v13`. Vérifié contre la DB (0 fuite substring).
+- CSV Résultat : colonnes `nb_healthy`/`nb_cancer` masquées dans `KpiTable` (compo déjà donnée par le Venn).
+
 ## Rollback
 
 Tag git `pre-exploration-beta` (avant toute la feature).

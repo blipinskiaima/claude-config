@@ -33,7 +33,7 @@ scripts/feature_db.py     → feature_runs.duckdb  (cohorts + results KPIs)
 
 - trace-prod **read_only** ; cohorte = preset `lung_valtech_nosv_bladder_blood` (`DEFAULT_SPEC` dans select_cohort.py, sérialisée au manifest).
 - Seuil eval : `quantile(healthy, target_spec=0.95, type=1)`.
-- Label : healthy=0 ; muté (vaf>0) OU actif sans mut=1 ; reste exclu (imagerie suspecte → inférence modèle).
+- Labels : voir [[label-definitions]] (canon juin 2026).
 - Cohorte **std_359** : 359 scorés (335 labellisés = 50 H + 285 cancer ; +24 imagerie suspecte).
 
 ## Identité cohorte + gel

@@ -1,22 +1,22 @@
-# Context — Aima-Tower — 2026-06-10T08:56:21+00:00
+# Context — Aima-Tower — 2026-06-10T12:26:03+00:00
 
 **Branche** : main
-**Dernier commit** : 3de8681 — feat(exploration-beta): top N configurable + filtres présence/absence des best combos
-**Status** : README.md modifié (v4.4.0, working tree) ; sinon main == origin/main
+**Dernier commit** : bbeccca — docs(v4.4.0): Venn cohorte + best combos cliquables + Top N & filtres présence/absence
+**Status** : clean (origin/main synchronisé ; .claude/worktrees/ untracked exclu)
 
 ## Où j'en suis
-Page `/exploration-beta` complète et en prod. Tout poussé sur main :
-- Base v4.3.0 (b18c572) : features → CSV (Combined coloré vs mVAF) + PNG + best combos top 5 + état cohorte std_359, lecture seule de `feature_runs.duckdb`
-- Fix cache refetch (eac709f, cette session) : reclic Exécuter sur même sélection force un `refetch()`
-- Raffinements (session parallèle) : diagramme Venn composition cohorte, top-N configurable (5/10/20/50) + filtres présence/absence des best combos, clic sur un combo coche ses features + charge son résultat, colonnes nb_healthy/nb_cancer masquées du CSV
+Session de polissage de la page /exploration-beta (Tower v4.4.0) : 6 features livrées, committées,
+déployées (conteneur healthy) et poussées sur origin/main. En parallèle, étude de faisabilité du
+redessin natif du PNG d'eval.R — verdict rendu, mise de côté à la demande de Boris.
 
 ## Ce qui marche / ce qui foire
-- ✓ Lecture read-only `feature_runs.duckdb` via mount `/pipeline:ro`, MAJ DB sans restart
-- ✓ Fix refetch validé (combo `mvaf_v1,frag_score_v2_sc` trouvé après recalcul)
-- ✓ `best_combo` répliqué read-only, `normalize_features` == benchmark pipeline
-- ✓ README bumpé **v4.4.0** documentant les 4 raffinements (modif working tree à committer)
-- ⚠ CLAUDE.md table Pages décrit la version de base de `/exploration-beta` (raffinements pas encore reflétés — optionnel)
-- ⚠ Exécution réelle du pipeline depuis Tower NON faite (par design : Tower = reader)
+- ✓ Venn composition cohorte (positifs 285 / négatifs 50 / suspects 24) + Total scoré dans la carte, 50/50 avec les conditions
+- ✓ Best combos cliquables → charge le résultat ; Top N (5/10/20/50) + filtres présence/absence (backend token-safe `list_contains`, vérifié contre la DB : 0 fuite substring)
+- ✓ CSV Résultat masque nb_healthy/nb_cancer
+- ✓ Tout déployé (conteneur healthy) + poussé (bbeccca)
+- ✗ Rendu visuel non vérifié par moi (aucun navigateur connecté au MCP Chrome, serveur headless) → à confirmer par F5 de Boris
+- ⚠ Faisabilité redessin PNG : OUI via `scores.csv` (par-sample, déjà accessible mount RO), NON via `feature_runs.duckdb` seul (agrégats à 1 seuil only)
 
 ## Prochaine étape
-Committer la modif README v4.4.0. Évolution possible : daemon hôte pour vraie exécution one-click (Option B, écartée).
+Reprendre la faisabilité validée du **redessin natif du PNG** sensibilité/spécificité en Plotly : lire `scores.csv`,
+répliquer `curve_for` (quantile type=1 ⟺ np `inverted_cdf`, grille 0.80–1.00, 5 strates × 2 modèles). Optionnel : auto-scroll vers Résultat au clic d'un combo.

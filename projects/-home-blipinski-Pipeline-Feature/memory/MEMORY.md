@@ -2,6 +2,7 @@
 
 > Pas de dossier `~/Pipeline/Feature/memory/` dans le repo (archivé dans `archives/memory/`). Contexte opérationnel : `CLAUDE.md` + `.claude/rules/` + fichiers ci-dessous.
 
+- [Truth labels](label-definitions.md) — **canon** positif/négatif/NA + imagerie suspecte (select_cohort.py)
 - [Feedback design pipeline](feedback-feature-pipeline-design.md) — scripts sélection = très simples ; args explicites, pas d'état caché
 - [Pipeline select_cohort→train→eval](pipeline-3-etapes.md) — **source de vérité** architecture juin 2026 (post-extraction)
 - [Livrables et décisions pool](livrables-actuels.md) — v2_probs / v4_short_read ; livrables sous `result/`, DB `feature_runs.duckdb`
