@@ -1,21 +1,20 @@
-# Context — Feature — 2026-06-10
+# Context — Feature — 2026-06-11
 
 **Branche** : main
 **Dernier commit** : a22a12c — feat: cohorte eval Alc, eval_kpis et bench 1023×dual-spec
-**Status** : bench `./main_bench.sh` lancé en tmux (BL2)
+**Status** : clean (untracked : eval_v2.r, data/cohorts/std_{0,145,335}, unlabeled.csv)
 
 ## Où j'en suis
 
-Architecture train/eval découplée implémentée : cohorte train std_335 fixe, cohorte eval Alc optionnelle (`EVAL_ALC=1`), 6 unités d'éval (5 strates + alc), DB `runs` + `eval_kpis`, bench 1023 combos × 2 specs (0.90/0.95).
+Session pédagogique sur le pipeline eval : effectifs std_359 (359 scorés = 335 labellisés + 24 imagerie suspecte), canon labels documenté (`label-definitions.md`), déroulé train.R / eval.R et logique sens-spé (seuil = quantile healthy @ target-spec, sensibilité par strate cancer). Repo déjà sur archi train/eval découplée (std_335 train, Alc optionnel, dual-spec 0.90/0.95) — commit a22a12c.
 
 ## Ce qui marche / ce qui foire
 
-- ✓ `./main.sh` sans Alc (5 strates) + avec `EVAL_ALC=1` (6 strates, 480 scores)
-- ✓ `eval_kpis.csv` format long + publish DB + migration anciens `results`
-- ✓ `main_bench.sh` : Alc par défaut, dual spec, `--no-train` sur 2ᵉ spec, `--skip-done`
-- ✓ fix `read_run_env()` eval.R (liste vs vecteur)
-- ✗ `data/cohorts/std_0/` artefact vide (select Alc avant fix filtres) — ne pas utiliser
+- ✓ Canon labels : muté (vaf>0) + active_no_mut ; healthy %Health% ; NA + is_suspicious inférence seule
+- ✓ eval.R : inputs = scores.csv (label, is_healthy, is_mutated, vaf, active_cancer, mvaf_v1, combined_score)
+- ✓ eval.R restauré intact (pas de modif parasite) ; eval_v2.r abandonné (untracked, hors pipeline)
+- ✗ data/cohorts/std_0/ artefact vide — ne pas utiliser
 
 ## Prochaine étape
 
-Laisser tourner `./main_bench.sh` (ou `--skip-done` si reprise). Puis `best_combo --cohort-train std_335 --cohort-eval alc` une fois combos en DB.
+Bench `./main_bench.sh` si en cours (tmux). Puis `best_combo --cohort-train std_335 --cohort-eval alc` quand DB remplie.
