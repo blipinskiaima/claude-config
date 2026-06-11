@@ -61,6 +61,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## 2026-06-11 — Feature canon labels + eval sens-spé
 
 - [x] **Feature/ — canon labels + logique eval sens-spé** — effectifs std_359 (359 scorés = 335 labellisés + 24 imagerie suspecte), définitions label dans `label-definitions.md`, inputs et calcul sens/spé `eval.R` clarifiés en session.
+- [x] **Feature/ + Tower — pipeline script/ multi-combos × speedvac × 7 unités** — refonte `script/` (select_cohort_train/eval, train.R 1023 combos OOF + inférence eval en mémoire, eval.R baseline vs combiné), cohortes train std_335/std_522 (`--speedvac`), 7e strate `lung_di` (Lung-DI précoce). Tower `/exploration-beta` branchée direct sur `result/speedvac_{no,yes}/` (sélecteur speedvac + spec 98% + best combos par unité + export CSV scores + 7e facette/colonne). Commits Feature `52aa974` / Aima-Tower `0960bbd`.
 
 ## 2026-06-10 — Feature train/eval découplé + Alc + Tower Plotly
 
