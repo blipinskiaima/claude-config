@@ -1,22 +1,21 @@
-# Context — Aima-Tower — 2026-06-10T12:26:03+00:00
+# Context — Aima-Tower — 2026-06-10T18:00:00+02:00
 
 **Branche** : main
-**Dernier commit** : bbeccca — docs(v4.4.0): Venn cohorte + best combos cliquables + Top N & filtres présence/absence
-**Status** : clean (origin/main synchronisé ; .claude/worktrees/ untracked exclu)
+**Dernier commit** : 6048729 — feat(exploration-beta): courbes Plotly 6 facettes + CSV legacy reconstruit
+**Status** : clean (origin/main synchronisé)
 
 ## Où j'en suis
-Session de polissage de la page /exploration-beta (Tower v4.4.0) : 6 features livrées, committées,
-déployées (conteneur healthy) et poussées sur origin/main. En parallèle, étude de faisabilité du
-redessin natif du PNG d'eval.R — verdict rendu, mise de côté à la demande de Boris.
+Intégration Feature → Tower `/exploration-beta` **terminée** : courbes Plotly 6 facettes (5 strates train + Alc),
+CSV legacy reconstruit, schéma DB `runs`+`eval_kpis`, cohorte `std_335`. UI polie (grille cartes, légende HTML,
+sans barre Plotly, axes Y 0–100 % / X 80–100 %). Conteneur rebuild + redéployé.
 
 ## Ce qui marche / ce qui foire
-- ✓ Venn composition cohorte (positifs 285 / négatifs 50 / suspects 24) + Total scoré dans la carte, 50/50 avec les conditions
-- ✓ Best combos cliquables → charge le résultat ; Top N (5/10/20/50) + filtres présence/absence (backend token-safe `list_contains`, vérifié contre la DB : 0 fuite substring)
-- ✓ CSV Résultat masque nb_healthy/nb_cancer
-- ✓ Tout déployé (conteneur healthy) + poussé (bbeccca)
-- ✗ Rendu visuel non vérifié par moi (aucun navigateur connecté au MCP Chrome, serveur headless) → à confirmer par F5 de Boris
-- ⚠ Faisabilité redessin PNG : OUI via `scores.csv` (par-sample, déjà accessible mount RO), NON via `feature_runs.duckdb` seul (agrégats à 1 seuil only)
+- ✓ `feature_curves.py` : parité `eval_v2.r` (quantile type=1, grille spec, 6 strates dont Alc)
+- ✓ `feature_service.py` : lit `runs`+`eval_kpis`, fallback `results`, reconstruit CSV + courbes JSON
+- ✓ Frontend `FeatureSensitivityChart.tsx` : 6 mini-panneaux, labels hors Plotly, tooltips sens/spec
+- ✓ API smoke test OK (mvaf_v1 : 2 csv_rows, 252 points courbe)
+- ✓ Tower redéployé (docker compose build + up)
+- ⚠ Bench Feature `main_bench.sh` tourne en tmux (BL2) — pas bloquant Tower
 
 ## Prochaine étape
-Reprendre la faisabilité validée du **redessin natif du PNG** sensibilité/spécificité en Plotly : lire `scores.csv`,
-répliquer `curve_for` (quantile type=1 ⟺ np `inverted_cdf`, grille 0.80–1.00, 5 strates × 2 modèles). Optionnel : auto-scroll vers Résultat au clic d'un combo.
+Vérifier visuellement `/exploration-beta` sur quelques combos bench (pas seulement mvaf_v1). Commit Aima-Tower poussé.
