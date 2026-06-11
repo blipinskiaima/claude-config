@@ -1,20 +1,18 @@
-# Context — Feature — 2026-06-11
+# Context — Feature — 2026-06-11T17:42
 
 **Branche** : main
-**Dernier commit** : a22a12c — feat: cohorte eval Alc, eval_kpis et bench 1023×dual-spec
-**Status** : clean (untracked : eval_v2.r, data/cohorts/std_{0,145,335}, unlabeled.csv)
+**Dernier commit** : 52aa974 — refactor(pipeline): nouveau pipeline script/ (combos × speedvac × 7 unités)
+**Status** : clean (result/, archives/, result_no_lung/ gitignored)
 
 ## Où j'en suis
-
-Session pédagogique sur le pipeline eval : effectifs std_359 (359 scorés = 335 labellisés + 24 imagerie suspecte), canon labels documenté (`label-definitions.md`), déroulé train.R / eval.R et logique sens-spé (seuil = quantile healthy @ target-spec, sensibilité par strate cancer). Repo déjà sur archi train/eval découplée (std_335 train, Alc optionnel, dual-spec 0.90/0.95) — commit a22a12c.
+Pipeline Feature entièrement réécrit dans `script/` (combos par feature, variantes speedvac, 7 unités dont lung_di) et branché dans Aima-Tower `/exploration-beta`. Session close : tout committé/poussé (Feature 52aa974 + Aima-Tower 0960bbd), Tower rebuild/redéployée.
 
 ## Ce qui marche / ce qui foire
-
-- ✓ Canon labels : muté (vaf>0) + active_no_mut ; healthy %Health% ; NA + is_suspicious inférence seule
-- ✓ eval.R : inputs = scores.csv (label, is_healthy, is_mutated, vaf, active_cancer, mvaf_v1, combined_score)
-- ✓ eval.R restauré intact (pas de modif parasite) ; eval_v2.r abandonné (untracked, hors pipeline)
-- ✗ data/cohorts/std_0/ artefact vide — ne pas utiliser
+- ✓ `script/` : select_cohort_train/eval, train.R multi-combos (1023), eval.R baseline vs combiné, 7 unités
+- ✓ `result/speedvac_{no,yes}/` régénérés (480 / 667 samples)
+- ✓ Tower : sélecteur speedvac + spec 98% + best combos par unité + export CSV + 7e facette/colonne (vérifié live)
+- ✓ Lung-DI précoce = 28 cancers du train
+- ✗ Rien en suspens identifié
 
 ## Prochaine étape
-
-Bench `./main_bench.sh` si en cours (tmux). Puis `best_combo --cohort-train std_335 --cohort-eval alc` quand DB remplie.
+Au besoin : analyser les meilleurs combos par unité (notamment lung_di et alc) pour décider des features à retenir.
