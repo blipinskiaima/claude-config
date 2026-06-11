@@ -58,9 +58,14 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-10 — Feature train/eval découplé + Alc + bench 1023×2 specs
+## 2026-06-11 — Feature canon labels + eval sens-spé
+
+- [x] **Feature/ — canon labels + logique eval sens-spé** — effectifs std_359 (359 scorés = 335 labellisés + 24 imagerie suspecte), définitions label dans `label-definitions.md`, inputs et calcul sens/spé `eval.R` clarifiés en session.
+
+## 2026-06-10 — Feature train/eval découplé + Alc + Tower Plotly
 
 - [x] **Feature/ — cohorte eval Alc + DB runs/eval_kpis** — train std_335 fixe, inférence Alc (`EVAL_ALC=1`), 6 unités d'éval (`eval_kpis.csv`), DB `runs`+`eval_kpis`, `main_bench.sh` 1023 combos × Alc × spec 0.90/0.95. Bench lancé en tmux.
+- [x] **Aima-Tower /exploration-beta — Plotly 6 facettes** — PNG remplacé par courbes sens/spec (5 strates + Alc), CSV legacy reconstruit depuis `scores.csv`/`eval_kpis.csv`, `feature_curves.py` + schéma `runs`/`eval_kpis`, cohorte std_335. Commit `6048729`.
 
 ## 2026-06-09 — Feature feature_db + select_cohort + trace-prod loyfer + Tower /exploration-beta
 
