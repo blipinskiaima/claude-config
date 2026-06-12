@@ -1,21 +1,25 @@
-# Context — Aima-Tower — 2026-06-10T18:00:00+02:00
+# Context — Aima-Tower — 2026-06-12T14:02:07+00:00
 
 **Branche** : main
-**Dernier commit** : 6048729 — feat(exploration-beta): courbes Plotly 6 facettes + CSV legacy reconstruit
-**Status** : clean (origin/main synchronisé)
+**Dernier commit** : 5744647 — feat(scaleway): désactive les liens cliquables vers la console Scaleway
+**Status** : 6 fichiers modifiés non commités (WIP exploration-beta, session précédente)
 
 ## Où j'en suis
-Intégration Feature → Tower `/exploration-beta` **terminée** : courbes Plotly 6 facettes (5 strates train + Alc),
-CSV legacy reconstruit, schéma DB `runs`+`eval_kpis`, cohorte `std_335`. UI polie (grille cartes, légende HTML,
-sans barre Plotly, axes Y 0–100 % / X 80–100 %). Conteneur rebuild + redéployé.
+Feature **« désactivation des liens cliquables Scaleway »** terminée, commitée (5744647) et déployée
+(container `aima-tower-dashboard` rebuildé + healthy). Les chemins S3 restent affichés en texte mais
+ne sont plus cliquables. Le travail **exploration-beta** (6 fichiers, courbes Plotly / cohortes speedvac)
+reste **non commité** — c'est le WIP de la session précédente, à reprendre/finir.
 
 ## Ce qui marche / ce qui foire
-- ✓ `feature_curves.py` : parité `eval_v2.r` (quantile type=1, grille spec, 6 strates dont Alc)
-- ✓ `feature_service.py` : lit `runs`+`eval_kpis`, fallback `results`, reconstruit CSV + courbes JSON
-- ✓ Frontend `FeatureSensitivityChart.tsx` : 6 mini-panneaux, labels hors Plotly, tooltips sens/spec
-- ✓ API smoke test OK (mvaf_v1 : 2 csv_rows, 252 points courbe)
-- ✓ Tower redéployé (docker compose build + up)
-- ⚠ Bench Feature `main_bench.sh` tourne en tmux (BL2) — pas bloquant Tower
+- ✓ `/database›Platform` + `/monitoring` : liens `<a>` → `<code>` texte non cliquable (chemin S3 brut)
+- ✓ `/sample/:id` : bouton « Exporter rapport » retiré (« Trace prod » Google Sheets conservé)
+- ✓ Dash legacy `callbacks.py` neutralisé par cohérence (html.A Scaleway → html.Span path S3)
+- ✓ Helpers `s3ToScaleway` / `_s3_to_scaleway` supprimés ; icône « Chemins » Monitoring → `Folder`
+- ✓ Build front OK + docker rebuild + redéploiement healthy ; doc CLAUDE.md/README MAJ
+- ✓ Commit 5744647 ciblé (7 fichiers), exploration-beta préservé ; tag rollback `pre-disable-scaleway`
+- ⚠ Commit 5744647 **non poussé** (push non demandé) — à `git push` si voulu
+- ⚠ 6 fichiers exploration-beta toujours non commités (WIP)
 
 ## Prochaine étape
-Vérifier visuellement `/exploration-beta` sur quelques combos bench (pas seulement mvaf_v1). Commit Aima-Tower poussé.
+Pousser 5744647 si validé, puis reprendre le WIP exploration-beta (vérif visuelle des courbes sur
+quelques combos bench, puis commit).
