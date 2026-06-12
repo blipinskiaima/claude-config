@@ -58,6 +58,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-06-12 — Aima-Tower désactivation liens Scaleway
+
+- [x] **Liens Scaleway désactivés (Aima-Tower)** — tous les liens cliquables vers la console Scaleway retirés (`/database›Platform`, `/monitoring`, `/sample` bouton « Exporter rapport ») ; chemins S3 conservés en texte non cliquable ; Dash legacy `callbacks.py` neutralisé + helpers `s3ToScaleway`/`_s3_to_scaleway` supprimés. Commit `5744647` poussé + déployé, tag rollback `pre-disable-scaleway`.
+
 ## 2026-06-11 — Feature canon labels + eval sens-spé
 
 - [x] **Feature/ — canon labels + logique eval sens-spé** — effectifs std_359 (359 scorés = 335 labellisés + 24 imagerie suspecte), définitions label dans `label-definitions.md`, inputs et calcul sens/spé `eval.R` clarifiés en session.
