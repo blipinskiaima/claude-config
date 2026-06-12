@@ -21,6 +21,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [ ] **Intégrer rapport Typst V2 dans Bam2Beta** — créer `Dockerfile.rapportv4` (Typst + cetz + IBM Plex) + remplacer `rmarkdown::render` dans `workflow/beta.nf:309` par `typst compile` + switcher `conf/{base,prod}.config` vers `rapportv4:latest`. Source : `bin/rapport/test/V2final/report-grail-v2.typ` (centralisé V1.3.0).
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
+- [ ] **Lancer run loyfer short-read — lundi 15/06** — script validé bit-à-bit (`diff=0`) `/scratch/boris/loyfer_short_read/loyfer_methylseq.sh` → `prop_loyfer_methylseq.csv` (16 samples × 9 variantes rastair, déconvolution cellulaire Loyfer). ~40 min tmux.
 
 ## Moyenne priorité
 
