@@ -58,10 +58,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-12 — Feature Lung-DI stades + Aima-Tower Scaleway
+## 2026-06-12 — Feature Lung-DI stades + Aima-Tower Scaleway + Bam2Beta bootstrap mVAF v1
 
 - [x] **Feature/ — 5 unités Lung-DI par stade** — `stage` propagée trace-prod → eval ; 5 strates `lung_I_III`…`lung_NR` dans `eval.R` + section dédiée Tower `/exploration-beta` (best combos étendu). Commit Feature `4ac2adb`. +9/+10 nouveaux cancers trace-prod identifiés (Bladder sang CGFL + HCL_Colon_2).
 - [x] **Liens Scaleway désactivés (Aima-Tower)** — tous les liens cliquables vers la console Scaleway retirés (`/database›Platform`, `/monitoring`, `/sample` bouton « Exporter rapport ») ; chemins S3 conservés en texte non cliquable ; Dash legacy `callbacks.py` neutralisé + helpers `s3ToScaleway`/`_s3_to_scaleway` supprimés. Commit `5744647` poussé + déployé, tag rollback `pre-disable-scaleway`.
+- [x] **Bam2Beta — feature bootstrap mVAF v1** — process `bootstrap_model` (`raima::bootstrap_model_v1`, 200 scores) câblé en from-scratch (Beta_28M) + rétrospectif (`--bootstrap`), image `raima:0.5.1` (future+withr ; `latest` 0.5.0 intacte). Validé bit-à-bit vs réf Florian (Breast_10). Commit `57b4deb`. Détails : [bootstrap-model-v1.md](../-home-blipinski-Pipeline-Bam2Beta/memory/bootstrap-model-v1.md).
 
 ## 2026-06-11 — Feature canon labels + eval sens-spé
 
