@@ -30,10 +30,9 @@ conn.execute(f"ATTACH '{db2}' AS wf (READ_ONLY)")
 Voir `PlatformService.get_samples_overview()` pour l'implementation complete.
 Details : [duckdb-patterns.md](duckdb-patterns.md)
 
-## Scaleway S3 URL Mapping
+## Liens Scaleway désactivés (2026-06-12)
 
-`s3://aima-platform/` → `https://console.scaleway.com/object-storage/buckets/fr-par/aima-platform/files/`
-Helper : `_s3_to_scaleway_url()` dans `callbacks.py:_build_platform_table()`
+Tous les liens cliquables vers la console Scaleway ont été retirés (commit `5744647`, tag rollback `pre-disable-scaleway`). Les chemins S3 restent affichés en **texte non cliquable** (`<code>`) sur `/database›Platform`, `/monitoring`, `/sample/:id` (bouton « Exporter rapport » supprimé). Helpers `s3ToScaleway` (front) et `_s3_to_scaleway` (Dash legacy `callbacks.py`) **supprimés** — ne plus s'y référer. Décision Boris : garder le chemin, retirer la navigation web Scaleway.
 
 ## Platform Detail Panel (Database > Platform)
 
