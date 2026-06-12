@@ -1,27 +1,22 @@
-# Context — Bam2Beta — 2026-05-27T16:30:00+02:00
+# Context — Bam2Beta — 2026-06-12
 
 **Branche** : main
-**Dernier commit** : 98ff63f — chore(dev): backfill scripts (Bladder/Twist samples START_TIME + IV)
-**Status** : clean
+**Dernier commit** : 57b4deb — feat(bootstrap): bootstrap du score mVAF v1 (raima::bootstrap_model_v1)
+**Status** : clean (seul dev/SCW/bacasable.sh untracked, sandbox exclu volontairement)
 
 ## Où j'en suis
-V1.3.1 release + qualif officielle terminées. Patch qui ajoute la génération native
-d'un metadata.json (10 champs schema trace-platform) dans Raima_report, remplaçant
-le script externe `trace-platform/scripts/build_metadata_json.sh`. Tag V1.3.1 +
-release GitHub publiés, QUALIF officielle promue `s3://...QUALIF/V1.3.1/`. Aucune
-tâche en cours.
+Feature `bootstrap_model_v1` implémentée, validée bit-à-bit (Breast_10), commitée + pushée (57b4deb).
+Vérification de non-régression S3 sur Colon_2 (HCL liquid) en cours : snapshot AVANT capturé,
+reste à lancer le run rétrospectif puis l'inventaire APRÈS pour prouver que seul le CSV bootstrap est ajouté.
 
 ## Ce qui marche / ce qui foire
-- ✓ V1.3.1 release : 2 commits feat + docs, pushés sur main + tag V1.3.1 + release GitHub
-- ✓ /qualif_bam2beta : QUALIF OK (RUN + QUALIF CONFORME bit-à-bit vs V1.3.0)
-- ✓ metadata.json natif testé : 10 champs valides en QUALIF (patient_name="QUALIF")
-- ✓ Pattern Nextflow appris : `.combine(by:0)` pour broadcast 1 file/sample sur N entries
-- ⚠ `~/Pipeline/trace-platform/scripts/build_metadata_json.sh` à marquer DEPRECATED (le pipeline le génère désormais nativement). Adapter le code trace-platform qui l'invoque.
-- ⚠ Image `raima:latest` (raima 0.4.17) toujours pas pushée sur Docker Hub
-- ⚠ 3 tags lightweight pollueurs git : `bam2beta-pre-qc-refactor`, `checkpoint-pre-cleanup`, `pre-raima-refactor` (cleanup optionnel)
+- ✓ bootstrap : 200 scores bit-à-bit identiques à la réf Florian (Breast_10), `max|Δ|=0`
+- ✓ Image `raima:0.5.1` buildée (raima 0.5.1 + future + withr) ; `raima:latest` 0.5.0 intacte (id c69bfa42ec1a)
+- ✓ Commit 57b4deb pushé ; MEMORY.md compactée 216→115 ; topic file bootstrap-model-v1.md
+- ✓ Inventaire AVANT Colon_2 : 323 objets, 25,54 Go, digest `36c1e792…06ed33d4`, BOOTSTRAP/ absent (`processed/MRD/RetD/liquid/HCL/Colon_2/`)
+- ⏳ Run rétrospectif Colon_2 + inventaire APRÈS : NON faits (à terminer)
+- ⏳ Image 0.5.1 NON pushée sur Docker Hub (OK mono-nœud SCW ; push requis si multi-nœuds)
 
 ## Prochaine étape
-Aucune tâche bloquée. Si nouvelle session :
-1. Côté trace-platform : marquer `build_metadata_json.sh` DEPRECATED + adapter code consommateur (le pipeline V1.3.1+ génère désormais nativement)
-2. Push image `raima:latest` sur Docker Hub si distrib hors machine
-3. Sinon, attendre la prochaine demande (intégration rapport Typst V2 dans le pipeline reste la prochaine grosse étape — `bin/rapport/test/V2final/report-grail-v2.typ` prêt à intégrer via Dockerfile.rapportv4)
+Lancer le run rétrospectif Colon_2 (`--bootstrap true`, `grep -xE` pour cibler exact), puis régénérer
+l'inventaire (`/tmp/inv_colon2.sh`) et `diff` vs AVANT → confirmer +1 objet (BOOTSTRAP/*.bootstrap_v1.tsv), 0 modifié, 0 supprimé.

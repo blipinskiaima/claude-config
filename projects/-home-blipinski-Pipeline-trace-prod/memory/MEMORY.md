@@ -11,6 +11,7 @@
 - [Colonnes v2-v7 — index](project_columns_index.md) — synthèse des colonnes ajoutées + patterns transversaux (collision mapping, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
 - [Frag softclip vs trim barcode](project_frag_softclip_trim.md) — AlCapone re-basecallé offline hétérogène (trim ON/OFF). frag_mode v1 gonflé jusqu'à +148bp sur ~81 samples ; seul frag_mode_sc fiable. Delta filtered−sc = détecteur du trim manquant
 - [Probs loyfer manquantes = décalage extraction](feedback_probs_loyfer_lag.md) — loyfer NULL + epic OK → fichier props_loyfer généré après dernière passe loyfer (pas un bug). upsert_probs préserve loyfer en mode v1 seul. Fix `probs -P`. `-s` mono-sample → boucler
+- [Samples Twist](project_twist_samples.md) — « twist » = 11 samples liquid CGFL (titration validation enrichissement Twist, blanc Twist_Diluant_RB), pas un type/cohorte/commande → check via `-s` sur liquid CGFL puis export liquid CGFL --gsheet
 
 ## Architecture
 - CLI entry: `database/check_samples.py` (Click)
