@@ -1,18 +1,19 @@
-# Context — Feature — 2026-06-11T17:42
+# Context — Feature — 2026-06-12T12:00
 
 **Branche** : main
-**Dernier commit** : 52aa974 — refactor(pipeline): nouveau pipeline script/ (combos × speedvac × 7 unités)
-**Status** : clean (result/, archives/, result_no_lung/ gitignored)
+**Dernier commit** : 4ac2adb — feat(pipeline): unités Lung-DI par stade + propagation stage
+**Status** : clean
 
 ## Où j'en suis
-Pipeline Feature entièrement réécrit dans `script/` (combos par feature, variantes speedvac, 7 unités dont lung_di) et branché dans Aima-Tower `/exploration-beta`. Session close : tout committé/poussé (Feature 52aa974 + Aima-Tower 0960bbd), Tower rebuild/redéployée.
+Pipeline Feature : 12 unités d'éval (7 principales + 5 stades Lung-DI précoce actif). Colonne `stage` propagée select → train → scores → eval. Tower `/exploration-beta` branchée (section stades + best combos). Session close : Feature commit `4ac2adb` poussé.
 
 ## Ce qui marche / ce qui foire
-- ✓ `script/` : select_cohort_train/eval, train.R multi-combos (1023), eval.R baseline vs combiné, 7 unités
-- ✓ `result/speedvac_{no,yes}/` régénérés (480 / 667 samples)
-- ✓ Tower : sélecteur speedvac + spec 98% + best combos par unité + export CSV + 7e facette/colonne (vérifié live)
-- ✓ Lung-DI précoce = 28 cancers du train
+- ✓ `script/eval.R` : 5 unités `lung_I_III`…`lung_NR` (Lung-DI précoce + active_cancer=Yes + stage)
+- ✓ `select_cohort_*.py` + `train.R` : colonne `stage` depuis trace-prod
+- ✓ `result/speedvac_{no,yes}/` régénérés (344 / 532 samples train)
+- ✓ Tower : section stades Lung-DI + sélecteur best combos étendu (commits Aima-Tower session précédente)
+- ✓ +9/+10 nouveaux cancers trace-prod identifiés (9 Bladder sang CGFL communs + HCL_Colon_2 speedvac yes)
 - ✗ Rien en suspens identifié
 
 ## Prochaine étape
-Au besoin : analyser les meilleurs combos par unité (notamment lung_di et alc) pour décider des features à retenir.
+Au besoin : analyser KPIs par stade Lung-DI (meilleurs combos `lung_I`…`lung_NR`) ou décider exclusion des nouveaux Bladder sang.

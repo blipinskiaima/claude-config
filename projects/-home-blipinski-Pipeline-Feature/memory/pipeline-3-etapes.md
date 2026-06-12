@@ -11,27 +11,19 @@ metadata:
 ## Flux opérationnel
 
 ```
-select_cohort (train)  → data/cohorts/std_335/cohort.csv
-select_cohort (eval)   → alc (~145 v5) si EVAL_ALC=1
-train.R                → OOF train + inférence Alc → scores.csv (col eval_cohort)
-eval.R                 → spec_XX/eval_kpis.csv (format long)
-feature_db.py publish  → runs + eval_kpis dans feature_runs.duckdb
+select_cohort_train.py  → cohort_train.csv (--speedvac no|yes)
+select_cohort_eval.py   → cohort_eval.csv (Alc ~145)
+train.R                 → scores.csv (2^N-1 combos, eval_cohort train|eval, col stage)
+eval.R                  → eval_kpis.csv (baseline mvaf_v1 vs combiné, format long)
 ```
 
-`./main.sh --features "..."` ; `EVAL_ALC=1` pour strate Alc.
-`./main_bench.sh` : **1023 combos** (10 features) × **Alc** × **spec 0.90+0.95** ; train 1×/combo, 2ᵉ spec via `--no-train`.
+`./script/main.sh` → `result/speedvac_{no,yes}/`. Tower lit directement ces dossiers (plus de `feature_runs.duckdb`).
 
 ## Séparation train / eval
 
-- **Train fixe** : std_335 (50 H + 285 C)
-- **Unités d'éval** : 5 strates (filtres sur train) + **alc** (cohorte externe, label=1 forcé, hors fit)
-- Seuil : healthy du **train** uniquement
-
-## DB (`feature_runs.duckdb`)
-
-- `runs` : clé `(cohort_train_ref, features, target_spec)`
-- `eval_kpis` : clé `(run_id, cohort_eval, model)` — mut, active_nomut, alc, …
-- `best_combo` : `--cohort-train`, `--cohort-eval`, `--kpi`
+- **Train** : std_335 (speedvac_no, 50 H + ~294 C) / std_522 (speedvac_yes, 192 H + ~340 C)
+- **Unités d'éval** : 7 principales + 5 stades Lung-DI précoce actif (`lung_I_III`…`lung_NR`) + **alc** (cohorte externe)
+- Seuil : healthy du **train** uniquement ; `stage` depuis trace-prod (`metadata.stage`)
 
 ## Règles clés
 
