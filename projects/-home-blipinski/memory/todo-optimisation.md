@@ -58,8 +58,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-12 — Aima-Tower désactivation liens Scaleway
+## 2026-06-12 — Feature Lung-DI stades + Aima-Tower Scaleway
 
+- [x] **Feature/ — 5 unités Lung-DI par stade** — `stage` propagée trace-prod → eval ; 5 strates `lung_I_III`…`lung_NR` dans `eval.R` + section dédiée Tower `/exploration-beta` (best combos étendu). Commit Feature `4ac2adb`. +9/+10 nouveaux cancers trace-prod identifiés (Bladder sang CGFL + HCL_Colon_2).
 - [x] **Liens Scaleway désactivés (Aima-Tower)** — tous les liens cliquables vers la console Scaleway retirés (`/database›Platform`, `/monitoring`, `/sample` bouton « Exporter rapport ») ; chemins S3 conservés en texte non cliquable ; Dash legacy `callbacks.py` neutralisé + helpers `s3ToScaleway`/`_s3_to_scaleway` supprimés. Commit `5744647` poussé + déployé, tag rollback `pre-disable-scaleway`.
 
 ## 2026-06-11 — Feature canon labels + eval sens-spé
