@@ -62,6 +62,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [x] **Loyfer prop sur short-read (2/4 pipelines)** — déconvolution cellulaire (31 types) calculée sur NF_Watchmaker_Methylseq (16×9 rastair) + BP_5base (8, DRAGEN), versionnés `short-read/loyfer_short_read/` (eb235e7+92be8f7). Décrochage high-TF reproductible (Breast_18/Lung_8 → Erythroid_Progenitor, signal TF pas artefact) ; reste NF_Aima/BP_Watchmaker/ONT.
 - [x] **Bam2Beta — image bootstrap raima:0.5.2** — bump de l'image dédiée `bootstrap_model` 0.5.1→0.5.2 (Dockerfile + base.config), rebuild + validé bit-à-bit (200/200) sur Lung_138 HCL liquid vs réf Florian (après Breast_10 en 0.5.1). `raima:latest` 0.5.0 intacte. Commit `b36adba`.
+- [x] **trace-prod schema v12 — colonne `bootstrap`** — `retd_suivis.bootstrap` OK/KO (liquid only) trackant la présence S3 de `BOOTSTRAP/{sample}.merged.all.bootstrap_v1.tsv` (module Bootstrap Bam2Beta). Pattern preserve via `_s3_exists`. Ajout via skill `/add-trace-prod` (A→E). Backfill CGFL 247 OK/542 KO, HCL 2 OK/511 KO. Commit `ac7f0f5`. Détails : [project_schema_v12_bootstrap.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v12_bootstrap.md).
+- [x] **trace-prod — refresh probs + metadata/ONT** — recalcul probs epic v1.3 + Loyfer liquid CGFL (771/772) + HCL (513/513) ; import metadata CGFL+HCL + export ONT Sample (834 lignes) ; 17 nouveaux samples CGFL (Bladder_Urine/Twist) intégrés. Exports gsheet régénérés.
 
 ## 2026-06-12 — Feature Lung-DI stades + Aima-Tower Scaleway + Bam2Beta bootstrap mVAF v1
 
