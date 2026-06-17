@@ -21,7 +21,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [ ] **Intégrer rapport Typst V2 dans Bam2Beta** — créer `Dockerfile.rapportv4` (Typst + cetz + IBM Plex) + remplacer `rmarkdown::render` dans `workflow/beta.nf:309` par `typst compile` + switcher `conf/{base,prod}.config` vers `rapportv4:latest`. Source : `bin/rapport/test/V2final/report-grail-v2.typ` (centralisé V1.3.0).
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
-- [ ] **Lancer run loyfer short-read — lundi 15/06** — script validé bit-à-bit (`diff=0`) `/scratch/boris/loyfer_short_read/loyfer_methylseq.sh` → `prop_loyfer_methylseq.csv` (16 samples × 9 variantes rastair, déconvolution cellulaire Loyfer). ~40 min tmux.
 
 ## Moyenne priorité
 
@@ -58,6 +57,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-06-17 — Loyfer déconvolution short-read
+
+- [x] **Loyfer prop sur short-read (2/4 pipelines)** — déconvolution cellulaire (31 types) calculée sur NF_Watchmaker_Methylseq (16×9 rastair) + BP_5base (8, DRAGEN), versionnés `short-read/loyfer_short_read/` (eb235e7+92be8f7). Décrochage high-TF reproductible (Breast_18/Lung_8 → Erythroid_Progenitor, signal TF pas artefact) ; reste NF_Aima/BP_Watchmaker/ONT.
 
 ## 2026-06-12 — Feature Lung-DI stades + Aima-Tower Scaleway + Bam2Beta bootstrap mVAF v1
 
