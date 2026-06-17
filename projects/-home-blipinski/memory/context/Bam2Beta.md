@@ -1,22 +1,21 @@
-# Context — Bam2Beta — 2026-06-12
+# Context — Bam2Beta — 2026-06-17
 
 **Branche** : main
-**Dernier commit** : 57b4deb — feat(bootstrap): bootstrap du score mVAF v1 (raima::bootstrap_model_v1)
-**Status** : clean (seul dev/SCW/bacasable.sh untracked, sandbox exclu volontairement)
+**Dernier commit** : b36adba — chore(raima): bump image bootstrap raima:0.5.1 -> 0.5.2
+**Status** : clean (seul dev/SCW/bacasable.sh untracked, sandbox exclu)
 
 ## Où j'en suis
-Feature `bootstrap_model_v1` implémentée, validée bit-à-bit (Breast_10), commitée + pushée (57b4deb).
-Vérification de non-régression S3 sur Colon_2 (HCL liquid) en cours : snapshot AVANT capturé,
-reste à lancer le run rétrospectif puis l'inventaire APRÈS pour prouver que seul le CSV bootstrap est ajouté.
+Feature bootstrap mVAF v1 complète, image bumpée sur raima:0.5.2 (sortie Florian), commitée + pushée (b36adba).
+Validée bit-à-bit (200/200) sur 2 samples : Breast_10 (CGFL, image 0.5.1) et Lung_138 (HCL, image 0.5.2).
+Aucune tâche en cours.
 
 ## Ce qui marche / ce qui foire
-- ✓ bootstrap : 200 scores bit-à-bit identiques à la réf Florian (Breast_10), `max|Δ|=0`
-- ✓ Image `raima:0.5.1` buildée (raima 0.5.1 + future + withr) ; `raima:latest` 0.5.0 intacte (id c69bfa42ec1a)
-- ✓ Commit 57b4deb pushé ; MEMORY.md compactée 216→115 ; topic file bootstrap-model-v1.md
-- ✓ Inventaire AVANT Colon_2 : 323 objets, 25,54 Go, digest `36c1e792…06ed33d4`, BOOTSTRAP/ absent (`processed/MRD/RetD/liquid/HCL/Colon_2/`)
-- ⏳ Run rétrospectif Colon_2 + inventaire APRÈS : NON faits (à terminer)
-- ⏳ Image 0.5.1 NON pushée sur Docker Hub (OK mono-nœud SCW ; push requis si multi-nœuds)
+- ✓ raima:0.5.2 buildée (future+withr, bootstrap_model_v1 exporté) ; latest 0.5.0 + 0.5.1 intactes
+- ✓ Lung_138 HCL liquid : 200/200 scores bit-à-bit identiques réf Florian (image 0.5.2)
+- ✓ Breast_10 CGFL liquid : 200/200 identiques (image 0.5.1)
+- ✓ Commit b36adba pushé ; CLAUDE.md + MEMORY + topic file à jour 0.5.2
+- ⏳ Images 0.5.1/0.5.2 NON pushées sur Docker Hub (OK mono-nœud SCW ; push si multi-nœuds)
+- ⏳ Preuve non-régression S3 Colon_2 (inventaire avant/après) jamais finalisée — optionnel, feature déjà validée sur 2 samples
 
 ## Prochaine étape
-Lancer le run rétrospectif Colon_2 (`--bootstrap true`, `grep -xE` pour cibler exact), puis régénérer
-l'inventaire (`/tmp/inv_colon2.sh`) et `diff` vs AVANT → confirmer +1 objet (BOOTSTRAP/*.bootstrap_v1.tsv), 0 modifié, 0 supprimé.
+Rien de bloqué. Pour un rollout bootstrap large : adapter le grep de dev/SCW/launch_SCW.sh et lancer sur la cohorte. Push Docker Hub si run hors mono-nœud.
