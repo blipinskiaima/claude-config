@@ -48,3 +48,4 @@ remote/
 
 # Runtime session data (PID/sessionId/cwd, ephemeral)
 sessions/
+teams/

@@ -4,6 +4,7 @@
 
 - [Truth labels](label-definitions.md) — **canon** positif/négatif/NA + imagerie suspecte (select_cohort.py)
 - [Feedback design pipeline](feedback-feature-pipeline-design.md) — scripts sélection = très simples ; args explicites, pas d'état caché
+- [Feedback vérifier avant redesign](feedback-verifier-avant-redesign.md) — prouver ce que le code fait (subset sample_id) avant de proposer une refonte / question multi-options
 - [Pipeline select_cohort→train→eval](pipeline-3-etapes.md) — **source de vérité** architecture juin 2026 (post-extraction)
 - [Livrables et décisions pool](livrables-actuels.md) — v2_probs / v4_short_read ; livrables sous `result/`, DB `feature_runs.duckdb`
 - [Convergence exploratory-analysis](convergence-exploratory-analysis.md) — scripts Michael (référence)

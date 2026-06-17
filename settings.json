@@ -148,6 +148,5 @@
   },
   "autoUpdatesChannel": "latest",
   "agentPushNotifEnabled": true,
-  "effortLevel": "xhigh",
-  "model": "claude-fable-5[1m]"
+  "effortLevel": "xhigh"
 }

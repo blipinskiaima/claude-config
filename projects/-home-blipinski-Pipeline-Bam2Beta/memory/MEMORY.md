@@ -3,14 +3,14 @@
 ## Key Facts
 
 - Current version: **V1.3.2** (2026-06-05, score mVAF v1.3 + fragmentomics v2 softclip-removed + raima 0.5.0)
-- Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest` (0.5.0) + `blipinskiaima/raima:0.5.1` (bootstrap only, latest reste intacte)
+- Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest` (0.5.0) + `blipinskiaima/raima:0.5.2` (bootstrap only, latest reste intacte)
 - Raima package version: **0.5.0** dans raima:latest depuis 2026-06-05 (requis par mVAF v1.3 + fragmento v2). Avant: 0.4.17 (2026-05-27)
   - Retrocompatibilite 0.4.13 -> 0.4.17 confirmee bit-a-bit sur Healthy_826 CGFL liquid (test 2026-05-27 vs V1.1.2)
   - Image `raima:0.4.17` (tag dedie) existait deja depuis 2026-05-07 mais `raima:latest` etait reste sur 0.4.13
   - Gotcha : verifier la version effective avec `docker run --rm raima:latest R -e 'packageVersion("raima")'` apres tout bump
-- Pipeline modules: MERGE, BETA (EPIC), BETA_28M (Loyfer + score mVAF v1.3), FRAG (v2 softclip-removed), CNV, ICHORCNA, IV, MVAF1_3 (retrospectif), bootstrap (R&D, raima:0.5.1), QC
+- Pipeline modules: MERGE, BETA (EPIC), BETA_28M (Loyfer + score mVAF v1.3), FRAG (v2 softclip-removed), CNV, ICHORCNA, IV, MVAF1_3 (retrospectif), bootstrap (R&D, raima:0.5.2), QC
 - `--MVAF1_3`: mode retrospectif score v1.3 (collecte 22 bedMethyl_28M deja sur S3, aucun recalcul). Process `Raima_score_v1_3` importe de beta_28M.nf dans main.nf. Voir [mvaf-v1.3-frag-v2.md](mvaf-v1.3-frag-v2.md)
-- `--bootstrap`: bootstrap du score mVAF v1 (raima::bootstrap_model_v1, 200 scores) sur les 22 extract_full_table.bgzf. From-scratch (Beta_28M) + retrospectif (lit EXTRACT_FULL_28M/*.bgzf sur S3, miroir MVAF1_3). Container `raima:0.5.1`. Validé bit-à-bit Breast_10. Voir [bootstrap-model-v1.md](bootstrap-model-v1.md)
+- `--bootstrap`: bootstrap du score mVAF v1 (raima::bootstrap_model_v1, 200 scores) sur les 22 extract_full_table.bgzf. From-scratch (Beta_28M) + retrospectif (lit EXTRACT_FULL_28M/*.bgzf sur S3, miroir MVAF1_3). Container `raima:0.5.2` (bump 0.5.1→0.5.2 le 2026-06-17). Validé bit-à-bit Breast_10 (0.5.1) + Lung_138 (0.5.2). Voir [bootstrap-model-v1.md](bootstrap-model-v1.md)
 - Prod profile enables: MERGE + BETA + FRAG + CNV + IV
 - Retry strategy: doublement CPU/RAM par tentative, max 10, plafond cpus_max/memory_max
 
@@ -43,7 +43,7 @@
 - **raima 0.4.5 casse Raima_process_CNV** : `depth_per_region` n'est pas exportee dans 0.4.5. Fix: utiliser raima 0.4.3 dans le Dockerfile.
 - **Container raima:latest doit etre rebuild** apres modification du Dockerfile — sinon Docker utilise l'ancienne image cachee.
 - Le test GRCh38 a fonctionne avec l'ancien cache Docker (raima 0.3.2 dans le container) car `Raima_process_CNV` n'appelle pas `depth_per_region` dans cette version.
-- **Container assigne par `withName:` dans conf/base.config, PAS dans le process** : tout nouveau process raima doit avoir son entree withName sinon il herite du default `bam2beta:latest`. Ex : Raima_score_all, bootstrap_model (→ raima:0.5.1).
+- **Container assigne par `withName:` dans conf/base.config, PAS dans le process** : tout nouveau process raima doit avoir son entree withName sinon il herite du default `bam2beta:latest`. Ex : Raima_score_all, bootstrap_model (→ raima:0.5.2).
 
 ## Architecture Notes
 
