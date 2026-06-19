@@ -58,9 +58,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-19 — Aima-Tower page /dilution (séries Twist + sélecteur stat)
+## 2026-06-19 — Aima-Tower /dilution + Feature/Tower dimension depth à l'éval
 
 - [x] **Aima-Tower page `/dilution`** — nouvelle page : séries de dilution Twist (principale/Rep2) en 2 panneaux, sélecteur stat mVAF / mVAF v1.3 + toggle spécificité 95/98/99 % (seuil `quantile_type1` healthy speedvac_yes du pipeline Feature, recalculé par stat). Livrée en TDD (17 tests), déployée en prod, documentée. Détails : `feature_dilution_page.md`.
+- [x] **Feature/ + Tower — dimension depth à l'éval** — décline sens/spéci à `depth ≥ 0.25/0.5/1/2×` (en plus de target_spec) : `eval.R --depths` + colonne `depth` (scores.csv/eval_kpis.csv), `<select>` Profondeur dans `/exploration-beta` (tables depth==, courbes depth>=). Scores XGBoost bit-identiques (passthrough). Commits Feature `1a90cac` + Tower `5255ac9`, déployé. Détails : [depth-dimension.md](../-home-blipinski-Pipeline-Feature/memory/depth-dimension.md).
 
 ## 2026-06-17 — Loyfer déconvolution short-read + Bam2Beta bootstrap raima:0.5.2
 
