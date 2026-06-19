@@ -58,8 +58,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-19 — Aima-Tower /dilution + Feature/Tower dimension depth à l'éval
+## 2026-06-19 — Aima-Tower /dilution + Feature/Tower dimension depth + Bam2Beta couverture mosdepth
 
+- [x] **Bam2Beta — analyse couverture mosdepth CGFL vs HCL** — outil `dev/coverage_analysis/` (binning per-base→100kb, lecture NFS streaming, parallèle idempotent) + figures cumulative/positionnelle. Finding : couverture autosomale équivalente entre labos, trous = régions non-mappables hg38 (pas d'effet labo, contrairement aux scores). 1 per-base corrompu détecté (Healthy_780). Commit `e1362a1`. Détails : [coverage-analysis-cgfl-hcl.md](../-home-blipinski-Pipeline-Bam2Beta/memory/coverage-analysis-cgfl-hcl.md).
 - [x] **Aima-Tower page `/dilution`** — nouvelle page : séries de dilution Twist (principale/Rep2) en 2 panneaux, sélecteur stat mVAF / mVAF v1.3 + toggle spécificité 95/98/99 % (seuil `quantile_type1` healthy speedvac_yes du pipeline Feature, recalculé par stat). Livrée en TDD (17 tests), déployée en prod, documentée. Détails : `feature_dilution_page.md`.
 - [x] **Feature/ + Tower — dimension depth à l'éval** — décline sens/spéci à `depth ≥ 0.25/0.5/1/2×` (en plus de target_spec) : `eval.R --depths` + colonne `depth` (scores.csv/eval_kpis.csv), `<select>` Profondeur dans `/exploration-beta` (tables depth==, courbes depth>=). Scores XGBoost bit-identiques (passthrough). Commits Feature `1a90cac` + Tower `5255ac9`, déployé. Détails : [depth-dimension.md](../-home-blipinski-Pipeline-Feature/memory/depth-dimension.md).
 
