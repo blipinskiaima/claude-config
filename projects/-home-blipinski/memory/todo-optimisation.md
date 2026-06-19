@@ -58,6 +58,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-06-19 — Aima-Tower page /dilution (séries Twist + sélecteur stat)
+
+- [x] **Aima-Tower page `/dilution`** — nouvelle page : séries de dilution Twist (principale/Rep2) en 2 panneaux, sélecteur stat mVAF / mVAF v1.3 + toggle spécificité 95/98/99 % (seuil `quantile_type1` healthy speedvac_yes du pipeline Feature, recalculé par stat). Livrée en TDD (17 tests), déployée en prod, documentée. Détails : `feature_dilution_page.md`.
+
 ## 2026-06-17 — Loyfer déconvolution short-read + Bam2Beta bootstrap raima:0.5.2
 
 - [x] **Loyfer prop sur short-read (2/4 pipelines)** — déconvolution cellulaire (31 types) calculée sur NF_Watchmaker_Methylseq (16×9 rastair) + BP_5base (8, DRAGEN), versionnés `short-read/loyfer_short_read/` (eb235e7+92be8f7). Décrochage high-TF reproductible (Breast_18/Lung_8 → Erythroid_Progenitor, signal TF pas artefact) ; reste NF_Aima/BP_Watchmaker/ONT.
