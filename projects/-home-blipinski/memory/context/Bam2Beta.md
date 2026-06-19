@@ -1,21 +1,18 @@
-# Context — Bam2Beta — 2026-06-17
+# Context — Bam2Beta — 2026-06-19T16:27:57+0000
 
 **Branche** : main
-**Dernier commit** : b36adba — chore(raima): bump image bootstrap raima:0.5.1 -> 0.5.2
-**Status** : clean (seul dev/SCW/bacasable.sh untracked, sandbox exclu)
+**Dernier commit** : e1362a1 — feat(dev): outils analyse couverture mosdepth (per-base -> bins 100kb)
+**Status** : 6 fichiers modifiés (tous PRÉ-EXISTANTS, hors session : conf/base.config, workflow/beta.nf, workflow/merge.nf, dev/PLT/*, dev/SCW/launch_SCW.sh, bacasable.sh)
 
 ## Où j'en suis
-Feature bootstrap mVAF v1 complète, image bumpée sur raima:0.5.2 (sortie Florian), commitée + pushée (b36adba).
-Validée bit-à-bit (200/200) sur 2 samples : Breast_10 (CGFL, image 0.5.1) et Lung_138 (HCL, image 0.5.2).
-Aucune tâche en cours.
+Session "analyse de couverture mosdepth" terminée. Outil `dev/coverage_analysis/` créé et commité (scripts seuls, outputs gitignorés). Figures produites pour 3 analyses : (1) 20 samples mixtes merged+epic, (2) Healthy CGFL vs HCL (231 samples, all + matched 0.6-1.5x). Conclusion : couverture autosomale équivalente entre labos, trous = régions non-mappables hg38, pas d'effet labo.
 
 ## Ce qui marche / ce qui foire
-- ✓ raima:0.5.2 buildée (future+withr, bootstrap_model_v1 exporté) ; latest 0.5.0 + 0.5.1 intactes
-- ✓ Lung_138 HCL liquid : 200/200 scores bit-à-bit identiques réf Florian (image 0.5.2)
-- ✓ Breast_10 CGFL liquid : 200/200 identiques (image 0.5.1)
-- ✓ Commit b36adba pushé ; CLAUDE.md + MEMORY + topic file à jour 0.5.2
-- ⏳ Images 0.5.1/0.5.2 NON pushées sur Docker Hub (OK mono-nœud SCW ; push si multi-nœuds)
-- ⏳ Preuve non-régression S3 Colon_2 (inventaire avant/après) jamais finalisée — optionnel, feature déjà validée sur 2 samples
+- ✓ Binning per-base→100kb en streaming NFS (aucune copie des 145 GB sources), parallèle idempotent, relançable en tmux
+- ✓ Figures PNG (VSCode ne lit pas les PDF) : cumulative + positionnelle médiane/IQR par labo
+- ✓ Finding : batch effect CGFL/HCL absent sur la couverture (présent uniquement sur les scores)
+- ✗ `Healthy_780.merged.per-base.bed.gz` CORROMPU (CRC error) → exclu (231/232). Fichier non touché
+- ✗ epic non comparable entre labos (Healthy CGFL sans fichier epic) ; epic dilué en bins 100kb (peu lisible)
 
 ## Prochaine étape
-Rien de bloqué. Pour un rollout bootstrap large : adapter le grep de dev/SCW/launch_SCW.sh et lancer sur la cohorte. Push Docker Hub si run hors mono-nœud.
+2 points en suspens proposés à Boris, non tranchés : (1) scan intégrité `gzip -t` des autres per-base QC pour voir si la corruption Healthy_780 est isolée ou systémique (lecture seule) ; (2) intersection des trous merged avec blacklist ENCODE pour confirmation. Sinon, analyse close.

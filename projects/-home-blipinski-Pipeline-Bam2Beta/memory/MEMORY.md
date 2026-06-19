@@ -37,6 +37,7 @@
 
 - [Batch effect investigation](batch-effect-investigation.md) — Investigation complète CGFL vs HCL : 17% FP Healthy HCL (V1), CNV biaisé, pas d'effet taille fragments
 - [Soft clipping & longueur FRAG](softclip-fragmentomics-length.md) — FRAG = length(SEQ), soft clips inclus ; vérifié Lung_115/95, ne pas migrer vers span réf
+- [Coverage analysis CGFL vs HCL](coverage-analysis-cgfl-hcl.md) — outil dev/coverage_analysis (binning per-base mosdepth 100kb) ; couverture autosomale équivalente CGFL/HCL, trous = non-mappable, pas d'effet labo ; Healthy_780 per-base corrompu
 
 ## Debugging Insights
 
