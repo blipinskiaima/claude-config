@@ -1,5 +1,8 @@
 # Aima Tower — Auto Memory
 
+## Page `/dilution` — séries de dilution Twist (2026-06-19)
+Nouvelle page V1 : courbes mVAF v1 des samples Twist (trace-prod) en 2 panneaux côte à côte (série principale + Rep2), axe X d1..d8+Diluant (parsé depuis `sample_name`, points à 2 réplicats), ligne de seuil de spécificité (toggle 95/98/99 %, défaut 98 % = 0.9916) calculé via `quantile_type1` sur la cohorte healthy `speedvac_yes` du pipeline Feature. `mvaf_threshold` est dans `dilution_service.py` (pas feature_service.py = WIP). Commits `7d7069c`→`23855f5`. Détails : [feature_dilution_page.md](feature_dilution_page.md)
+
 ## Page `/exploration-beta` — connexion pipeline Feature (2026-06-09)
 Tower lit (read-only) les résultats du pipeline `~/Pipeline/Feature` : sélection de features → CSV sensibilité stratifiée (ligne Combined colorée vert/rouge vs baseline mVAF) + PNG + best combos top 5 + état cohorte figée `std_359`. **Affichage seul** : aucune exécution depuis le conteneur (pas de R, mount `/pipeline:ro`) ; même `feature_db.py best_combo` répliqué en SQL read-only (son `connect()` ouvre la DB en write → KO sur `:ro`). Clé canonique `normalize_features` copiée du pipeline (ordre de sélection indifférent). 4 endpoints `/api/exploration-beta/{result,png,best-combos,cohort-info}`. MAJ DB → pas de restart (bind-mount live). Rollback tag `pre-exploration-beta`. Détails : [feature_pipeline_integration.md](feature_pipeline_integration.md)
 
