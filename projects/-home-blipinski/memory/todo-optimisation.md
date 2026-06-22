@@ -58,6 +58,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-06-22 — Feature/ unité d'éval dilution (Twist)
+
+- [x] **Feature/ — unité d'éval "dilution" (Twist)** — mécanisme `unit` empilant les 22 Twist valides (reps inclus, `Twist_10_8` KO exclu) dans `cohort_eval.csv` aux côtés d'Alc, scorés par les modèles entraînés sur 1023 combos × 2 variantes speedvac → `scores.csv` (`unit='dilution'`, lu par Tower). Additif prouvé : train+Alc + eval_kpis.csv byte-identiques au baseline ; train_combined/infer_eval intacts. Commit `029021f`. Détails : [dilution-eval-unit.md](../-home-blipinski-Pipeline-Feature/memory/dilution-eval-unit.md).
+
 ## 2026-06-19 — Aima-Tower /dilution + Feature/Tower dimension depth + Bam2Beta couverture mosdepth
 
 - [x] **Bam2Beta — analyse couverture mosdepth CGFL vs HCL** — outil `dev/coverage_analysis/` (binning per-base→100kb, lecture NFS streaming, parallèle idempotent) + figures cumulative/positionnelle. Finding : couverture autosomale équivalente entre labos, trous = régions non-mappables hg38 (pas d'effet labo, contrairement aux scores). 1 per-base corrompu détecté (Healthy_780). Commit `e1362a1`. Détails : [coverage-analysis-cgfl-hcl.md](../-home-blipinski-Pipeline-Bam2Beta/memory/coverage-analysis-cgfl-hcl.md).
