@@ -7,6 +7,7 @@
 - [Feedback vérifier avant redesign](feedback-verifier-avant-redesign.md) — prouver ce que le code fait (subset sample_id) avant de proposer une refonte / question multi-options
 - [Pipeline select_cohort→train→eval](pipeline-3-etapes.md) — **source de vérité** architecture juin 2026 (post-extraction)
 - [Dimension depth](depth-dimension.md) — depth 0.25/0.5/1/2X live à l'éval (Feature + Tower) ; sémantique Option-1 + gotchas (scores.csv par-sample, result/ gitignoré)
+- [Dilution eval unit](dilution-eval-unit.md) — mécanisme `unit` pour empiler cohortes éval hors-train (Twist) dans cohort_eval/scores.csv
 - [Livrables et décisions pool](livrables-actuels.md) — v2_probs / v4_short_read ; livrables sous `result/`, DB `feature_runs.duckdb`
 - [Convergence exploratory-analysis](convergence-exploratory-analysis.md) — scripts Michael (référence)
 - [Target specificity](target-specificity.md) — Sens@95% KPI standard, Sens@90% complément
