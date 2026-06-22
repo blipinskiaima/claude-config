@@ -58,9 +58,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-22 — Feature/ unité d'éval dilution (Twist)
+## 2026-06-22 — Feature/ dilution (Twist) + Bam2Beta covdepth Étape 1
 
 - [x] **Feature/ — unité d'éval "dilution" (Twist)** — mécanisme `unit` empilant les 22 Twist valides (reps inclus, `Twist_10_8` KO exclu) dans `cohort_eval.csv` aux côtés d'Alc, scorés par les modèles entraînés sur 1023 combos × 2 variantes speedvac → `scores.csv` (`unit='dilution'`, lu par Tower). Additif prouvé : train+Alc + eval_kpis.csv byte-identiques au baseline ; train_combined/infer_eval intacts. Commit `029021f`. Détails : [dilution-eval-unit.md](../-home-blipinski-Pipeline-Feature/memory/dilution-eval-unit.md).
+- [x] **Bam2Beta — covdepth Étape 1 (figures QC depth/coverage)** — Fig.1 cumulative depth-vs-breadth (merged vs epic) + Fig.2 positionnelle multi-échelle avec bandes de déplétion systématique, sur 4 samples. Finding : 067 pathologique (34 M reads alignés mais depth=0), concordance parfaite mosdepth↔trace-prod. Scripts versionnés `dev/coverage_analysis/fig{1,2}_*.R`, commit `f1d75be`. Détails : [covdepth-qc-valorization.md](../-home-blipinski-Pipeline-Bam2Beta/memory/covdepth-qc-valorization.md).
 
 ## 2026-06-19 — Aima-Tower /dilution + Feature/Tower dimension depth + Bam2Beta couverture mosdepth
 
