@@ -38,7 +38,7 @@
 - [Batch effect investigation](batch-effect-investigation.md) — Investigation complète CGFL vs HCL : 17% FP Healthy HCL (V1), CNV biaisé, pas d'effet taille fragments
 - [Soft clipping & longueur FRAG](softclip-fragmentomics-length.md) — FRAG = length(SEQ), soft clips inclus ; vérifié Lung_115/95, ne pas migrer vers span réf
 - [Coverage analysis CGFL vs HCL](coverage-analysis-cgfl-hcl.md) — outil dev/coverage_analysis (binning per-base mosdepth 100kb) ; couverture autosomale équivalente CGFL/HCL, trous = non-mappable, pas d'effet labo ; Healthy_780 per-base corrompu
-- [covdepth QC valorization](covdepth-qc-valorization.md) — chantier R&D valorisation QC depth/coverage (Étape 1 = figures merged+epic sur Bladder_Urine_02_064) ; roadmap détection anomalies multi-échelle
+- [covdepth QC valorization](covdepth-qc-valorization.md) — chantier R&D QC depth/coverage ; **Étape 1 livrée** (Fig.1 cumulative depth-vs-breadth + Fig.2 positionnelle multi-échelle/bandes déplétion, 4 samples) ; finding 067 vide (34M reads alignés, depth=0) + concordance mosdepth↔trace-prod ; roadmap multi-échelle
 
 ## Debugging Insights
 

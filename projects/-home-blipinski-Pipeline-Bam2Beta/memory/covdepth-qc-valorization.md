@@ -1,21 +1,28 @@
 ---
 name: covdepth-qc-valorization
-description: Chantier R&D covdepth — valorisation analyse QC depth/coverage par sample + détection anomalies multi-échelle (roadmap) ; Étape 1 = figure(s) merged+epic sur Bladder_Urine_02_064
+description: Chantier R&D covdepth — valorisation analyse QC depth/coverage par sample + détection anomalies multi-échelle (roadmap) ; Étape 1 LIVRÉE (Fig.1 cumulative + Fig.2 positionnelle multi-échelle, 4 samples)
 metadata: 
   node_type: memory
   type: project
   originSessionId: baa0c749-9109-466e-8649-b1ef4f18abb5
 ---
 
-Chantier démarré le 2026-06-22 (dev model Opus 4.8 1M MAX thinking). Workspace local `/scratch/boris/covdepth/{data,result,script}` ; livrables (figures finales UNIQUEMENT) copiés dans `/home/blipinski/Pipeline/Bam2Beta/dev/coverage_analysis/test/`. S'appuie sur l'outil existant [[coverage-analysis-cgfl-hcl]] (binning per-base mosdepth 100kb, helper `save_png()`, exclusion chrX/Y + `total` + alt/random) — ne pas le réinventer.
+Chantier démarré le 2026-06-22 (dev Opus 4.8 1M). Workspace local `/scratch/boris/covdepth/{data,result,script}` ; figures finales copiées dans `dev/coverage_analysis/test/` (gitignoré). S'appuie sur l'outil existant [[coverage-analysis-cgfl-hcl]] (binning per-base mosdepth via `bin_one.sh`, helper `save_png()`, exclusion chrX/Y + `total` + alt/random) — ne pas le réinventer.
 
-Sample test : `Bladder_Urine_02_064` (CGFL liquid urine, ~1x). QC sur S3/NFS `.../RetD/liquid/CGFL/Bladder_Urine_02_064/QC/` (Cramino/, Mosdepth/merged/, Samtools/). **Deux jeux mosdepth** à ne pas confondre : `*.merged.*` (génome WGS, per-base ~260MB) et `*.merged.epic.*` (empreinte EPIC ciblée, per-base ~27MB). Source canonique depth/coverage = courbe cumulative `*.mosdepth.global.dist.txt` (piège : `depth_threshold` monte à ~1176, pas 144 ; exclure ligne `total` + contigs alt/random).
+**Code versionné (décision Boris, option B, 2026-06-22)** : scripts `dev/coverage_analysis/fig1_depth_coverage.R` + `fig2_positional_multiscale.R` (le code, pas les PNG régénérables ; `test/` gitignoré). Limitation : chemins `/scratch` hardcodés dans les scripts (cleanup futur si réutilisation hors machine Boris).
 
-**Objectif global (ROADMAP — prévu dans les prochaines étapes, à ne PAS coder en spéculatif maintenant)** :
-- Valoriser l'analyse QC pour les samples.
-- Détecter des anomalies QC à l'échelle du sample.
-- Détecter des anomalies de tendance à plusieurs échelles : sample → cohorte → indication → labo → multi-labo → tous samples réunis.
+**ROADMAP (prévu, PAS spéculatif maintenant)** : valoriser QC par sample → détecter anomalies sample → détecter tendances multi-échelle (sample → cohorte → indication → labo → multi-labo → tous).
 
-**Étape 1 (en cours)** : figure(s) R basique(s) depth/coverage pour les DEUX jeux (merged + epic), claires et lisibles biologiste + bioinfo — jusqu'à 2 figures, ou 1 figure comparative à 2 courbes (à challenger). Étapes suivantes non encore définies.
+## Étape 1 — LIVRÉE (2026-06-22)
 
-Process imposé : Karpathy Guidelines + gates d'approbation par phase (brainstorm → contexte → plan → impl → vérif), arrêt/validation après chaque modif. Prompt de lancement rédigé via prompt-creator le 2026-06-22 (cible Opus 4.8 1M MAX). Git du dossier `test/` : ignoré pour l'instant (décision Boris).
+**Fig.1 — cumulative depth-vs-breadth, comparative merged vs epic** (`fig1_depth_coverage.R`). Source = `*.mosdepth.global.dist.txt` (per-base exact, seuils ENTIERS ; pas les bins lissés). Agrégat autosomal pondéré par `length` (summary.txt). Axe X dynamique ~0–6x (sample ~1x), ligne 1x + annotation breadth@1x. **Finding sémantique clé** : mosdepth epic rapporte la proportion à la **longueur du chromosome entier**, PAS à l'empreinte EPIC → même dénominateur que merged, superposition légitime ; epic apparaît basse (~8% @1x vs 58% merged) car l'empreinte = petite fraction du génome.
+
+**Fig.2 — positionnelle multi-échelles** (`fig2_positional_multiscale.R`, args `<sample> <merged|epic>`). Binning de base 100kb (`bin_one.sh`, réutilisé sans modif) agrégé en R par moyenne pondérée vers plusieurs fenêtres (merged 100k/500k/1M ; **epic 500k/1M/5M** car bruit Poisson à ~0.1x — le 100kb epic est un mur illisible, seul le 5Mb est net). Facettes empilées, norm /médiane, pics plafonnés à 2x (sur-couverture = peu utile). **Bandes rouges = déplétion systématique** (fenêtres 1Mb < 0.6× médiane, reportées sur tous les panneaux) — capte les zones non couvertes ; un vrai creux persiste à toutes les échelles, le bruit se lisse.
+
+**Extension (4 samples)** : Fig.2 merged+epic sur 064, 073, 067 + 831 merged. Healthy CGFL liquid (642, 831) n'ont PAS de per-base epic.
+
+**Finding QC majeur — Bladder_Urine_02_067 pathologique** : profondeur ~0.003x (autosomes tous 0.00x). trace-prod `qc_metrics` (DB `trace-prod/database/samples_status.duckdb`, join `qc_metrics.sample_id = samples.id`) : depth=0, coverage_percent=0, MAIS **34.45M reads alignés** (loi d'échelle des autres ~13M reads/x → aurait dû donner ~2.3x). → reads présents mais inexploitables (ultra-courts / dup / QC-fail exclus par mosdepth). **Concordance parfaite mosdepth ↔ trace-prod** sur depth (064:0.99, 073:9.39, 067:0.00, 831:0.71) → validation croisée de la mesure. La comparaison reads-vs-depth est le bon révélateur d'anomalie (un depth=0 seul cache les 34M reads derrière).
+
+Profondeurs samples : 064~1.0x (57% cov), 073~9.5x (excellent, 94% cov), 067~0x (échec), 831~0.7x (46% cov).
+
+Process : Karpathy + gates par phase, validation après chaque modif. Étapes suivantes (cohorte/labo/multi-échelle/détection auto) non encore définies.
