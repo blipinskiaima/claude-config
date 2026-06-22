@@ -58,10 +58,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-22 — Feature/ dilution (Twist) + Bam2Beta covdepth Étape 1
+## 2026-06-22 — Feature/ dilution (Twist) + Tower /combined refonte+Dilution + Bam2Beta covdepth Étape 1
 
 - [x] **Feature/ — unité d'éval "dilution" (Twist)** — mécanisme `unit` empilant les 22 Twist valides (reps inclus, `Twist_10_8` KO exclu) dans `cohort_eval.csv` aux côtés d'Alc, scorés par les modèles entraînés sur 1023 combos × 2 variantes speedvac → `scores.csv` (`unit='dilution'`, lu par Tower). Additif prouvé : train+Alc + eval_kpis.csv byte-identiques au baseline ; train_combined/infer_eval intacts. Commit `029021f`. Détails : [dilution-eval-unit.md](../-home-blipinski-Pipeline-Feature/memory/dilution-eval-unit.md).
 - [x] **Bam2Beta — covdepth Étape 1 (figures QC depth/coverage)** — Fig.1 cumulative depth-vs-breadth (merged vs epic) + Fig.2 positionnelle multi-échelle avec bandes de déplétion systématique, sur 4 samples. Finding : 067 pathologique (34 M reads alignés mais depth=0), concordance parfaite mosdepth↔trace-prod. Scripts versionnés `dev/coverage_analysis/fig{1,2}_*.R`, commit `f1d75be`. Détails : [covdepth-qc-valorization.md](../-home-blipinski-Pipeline-Bam2Beta/memory/covdepth-qc-valorization.md).
+- [x] **Aima-Tower — refonte page Combined (ex-/exploration-beta)** — renommage complet (fichiers/route/endpoints) + Résultat en 3 onglets (Initial/Lung-DI/Dilution), suppression panneaux Cohorte/État + orphelins back, défaut SpeedVac, sélecteurs d'éval regroupés à gauche. Commit `0fb9357`, déployé.
+- [x] **Aima-Tower — onglet Dilution piloté par le combo** — courbes Twist du combo sélectionné via source unique `scores.csv` (unité `dilution`, archi α : pipeline Feature score les Twist, Tower reste reader) ; lookup colonne `features.replace(',','+')` ; mono ET multi-features XGBoost ; page `/dilution` autonome retirée. Commit `80f6330`, déployé. Détails : [combined_dilution_tab.md](../-home-blipinski-Pipeline-Aima-Tower/memory/combined_dilution_tab.md).
 
 ## 2026-06-19 — Aima-Tower /dilution + Feature/Tower dimension depth + Bam2Beta couverture mosdepth
 
