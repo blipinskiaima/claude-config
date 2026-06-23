@@ -2,7 +2,7 @@
 
 ## Key Facts
 
-- Current version: **V1.3.2** (2026-06-05, score mVAF v1.3 + fragmentomics v2 softclip-removed + raima 0.5.0)
+- Current version: **V1.3.3** (2026-06-23, Check_Input QC gate amont du merge + bootstrap mVAF v1 + retrait rapport PDF ; score mVAF prod toujours raima 0.5.0). Voir [check-input-qc.md](check-input-qc.md)
 - Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest` (0.5.0) + `blipinskiaima/raima:0.5.2` (bootstrap only, latest reste intacte)
 - Raima package version: **0.5.0** dans raima:latest depuis 2026-06-05 (requis par mVAF v1.3 + fragmento v2). Avant: 0.4.17 (2026-05-27)
   - Retrocompatibilite 0.4.13 -> 0.4.17 confirmee bit-a-bit sur Healthy_826 CGFL liquid (test 2026-05-27 vs V1.1.2)
@@ -11,6 +11,8 @@
 - Pipeline modules: MERGE, BETA (EPIC), BETA_28M (Loyfer + score mVAF v1.3), FRAG (v2 softclip-removed), CNV, ICHORCNA, IV, MVAF1_3 (retrospectif), bootstrap (R&D, raima:0.5.2), QC
 - `--MVAF1_3`: mode retrospectif score v1.3 (collecte 22 bedMethyl_28M deja sur S3, aucun recalcul). Process `Raima_score_v1_3` importe de beta_28M.nf dans main.nf. Voir [mvaf-v1.3-frag-v2.md](mvaf-v1.3-frag-v2.md)
 - `--bootstrap`: bootstrap du score mVAF v1 (raima::bootstrap_model_v1, 200 scores) sur les 22 extract_full_table.bgzf. From-scratch (Beta_28M) + retrospectif (lit EXTRACT_FULL_28M/*.bgzf sur S3, miroir MVAF1_3). Container `raima:0.5.2` (bump 0.5.1→0.5.2 le 2026-06-17). Validé bit-à-bit Breast_10 (0.5.1) + Lung_138 (0.5.2). Voir [bootstrap-model-v1.md](bootstrap-model-v1.md)
+- **Check_Input** (workflow Merge, en amont du merge, 2026-06-23) : QC des fichiers d'entree. Input non conforme (BAM corrompu/0 read, fichier non whiteliste, 0 .bam) -> run **SUCCESS**, seul Check_Input, publie `REPORT/metadata.json` (status=FAILED_QC_INPUT + reason). Input OK -> pipeline normal ; autre erreur -> crash normal. Gate via `.branch` sur `env('QC_STATUS')`. Voir [check-input-qc.md](check-input-qc.md)
+- **Rapport PDF retire** (2026-06-23) : generation desactivee (output `rapport` + `rmarkdown::render` commentes dans beta.nf), PDF retire de la conformite (check-run-output/check-conformity) + doc. `Raima_report` ne produit plus que les JSON (raima_score.V2.json + metadata.json). Container rapportv2 conserve. Voir [check-input-qc.md](check-input-qc.md)
 - Prod profile enables: MERGE + BETA + FRAG + CNV + IV
 - Retry strategy: doublement CPU/RAM par tentative, max 10, plafond cpus_max/memory_max
 
@@ -46,6 +48,7 @@
 - **Container raima:latest doit etre rebuild** apres modification du Dockerfile — sinon Docker utilise l'ancienne image cachee.
 - Le test GRCh38 a fonctionne avec l'ancien cache Docker (raima 0.3.2 dans le container) car `Raima_process_CNV` n'appelle pas `depth_per_region` dans cette version.
 - **Container assigne par `withName:` dans conf/base.config, PAS dans le process** : tout nouveau process raima doit avoir son entree withName sinon il herite du default `bam2beta:latest`. Ex : Raima_score_all, bootstrap_model (→ raima:0.5.2).
+- **Channel vide → emit de sous-workflow qui plante** (gotcha NF 25.04, 2026-06-23) : couper l'aval via un channel vide fait planter a la CONSTRUCTION si le sous-workflow a un `emit:` referencant un process aval (`No such property: X for DataflowBroadcast`). Fix : retirer les emits inutilises (Beta_epic/Frag/IV n'avaient aucun consommateur). Voir [check-input-qc.md](check-input-qc.md).
 
 ## Architecture Notes
 

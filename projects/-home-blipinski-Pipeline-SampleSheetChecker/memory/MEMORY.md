@@ -86,6 +86,7 @@ Reçus le 20-21/03/2026 (uploads retardataires) puis synchronisés via `ss5.tsv`
 - `ss7.tsv`: 16 samples (Healthy_143-150 + Lung_81-88, NANO20+21)
 - `ss8.tsv` / `ss8bis.tsv` / `ss8done.tsv`: drafts pour Lung_89+ avec différents découpages variants/originaux
 - `ss9_final.tsv` / `ss9_final_final.tsv`: 60 samples (Lung_89-144 + Nuclear_13-16) — version finale après consolidation variants→originaux
+- `ss10.tsv`: 32 samples (Healthy_151-182, NANO26 N1-N4 + NANO27 N1-N4, runs du 08/06/2026)
 
 ## Renommage NANO sur S3 (effectué 2026-05-04)
 - ex-`NANO24_26_N4b` → renommé **NANO24_26_N4** (vrai N4)
@@ -110,6 +111,12 @@ Pour les runs avec re-séquences (variants `Nxb`, `Nxc`), les données ont été
 - N23 : N1b-N4b → N1-N4 (run dirs : `dc2aaea3`/`583553ad`/`e29ab570`/`4c7ea746` → `f1e2d309`/`2bde5754`/`bf422774`/`0d1e87ca`)
 
 **Vérification cohérence variant/original** : pour les 9 paires, mêmes barcodes remplis (4 barcodes consécutifs identiques), juste yields différents (variants = re-runs faible yield).
+
+## NANO26/27 — 08/06/2026 (ss10, Healthy_151-182)
+- 8 runs reçus le 08/06 : NANO26 N1-N4 + NANO27 N1-N4 (4 barcodes consécutifs chacun).
+- Run dirs : N26 = `30863ffb`/`1e19a3fc`/`0d032a16`/`47edb312` ; N27 = `05fac215`/`37c1e9c1`/`beb00a99`/`7d9499b8`.
+- Rapports HTML MinKNOW copiés dans `rapport/` (préfixe `NANO{}__report_*.html`).
+- **Raw purgé par Boris lui-même** (2026-06-23, hors session Claude) : suppression raw + création des 8 `upload.done`. Ce sont les seuls runs sans `upload.done` au 23/06 avant sa purge ; tout NANO01→NANO25 en avait déjà un.
 
 ## Upload Speed Monitoring
 - R/ggplot2 graph: `upload_speed.png`, data in `/tmp/upload_speed_week.csv`
