@@ -1,18 +1,18 @@
-# Context — trace-prod — 2026-06-17T13:53:16+0000
+# Context — trace-prod — 2026-06-23T15:58:02+0000
 
 **Branche** : main
 **Dernier commit** : ac7f0f5 — feat: schema v12 — colonne bootstrap (retd_suivis)
-**Status** : clean côté tracké (untracked préexistants : backups .duckdb, csv dev/, html rapport/, .claude/)
+**Status** : clean côté tracké (aucun code modifié cette session — uniquement données DB + gsheets)
 
 ## Où j'en suis
-Session terminée, tout committé/poussé. 3 blocs : (1) recalcul probs epic+Loyfer liquid CGFL+HCL, (2) import metadata + export ONT Sample, (3) ajout feature bootstrap (schema v12) via /add-trace-prod + backfill rétrospectif.
+Session = remplissage ad-hoc de colonnes trace-prod (zéro code). Backfill bootstrap terminé (plateau), intégration metadata HCL (+32 nouveaux), + colonnes BAM/POD5/frag/dorado/extract pour samples HCL/CGFL ciblés. Tout exporté, rien en attente.
 
 ## Ce qui marche / ce qui foire
-- ✓ Feature bootstrap v12 : `retd_suivis.bootstrap` OK/KO, liquid only, pattern preserve (`_s3_exists`), câblée check + update-column + export (entre Short Read et BAM). Committée ac7f0f5.
-- ✓ Backfill bootstrap : CGFL 247 OK / 542 KO, HCL 2 OK / 511 KO. Exports gsheet poussés.
-- ✓ Probs epic+Loyfer recalculées : CGFL 771/772, HCL 513/513 → gsheet.
-- ✓ Metadata import CGFL+HCL + export ONT Sample (834 lignes). 17 nouveaux samples CGFL intégrés (probs re-run).
-- ✗ Trous résiduels : `Bladder_Urine_02_090` (props absents S3), `Twist_10_8` (ni metadata ni probs, blanc probable), `Bladder_Urine_02_091/092/093` (sur S3, pas en base).
+- ✓ Bootstrap : backfill complet CGFL 788/790, HCL 513/513 (2 KO CGFL structurels = Bladder_Urine_02_090 + Twist_10_8, props absents)
+- ✓ import-metadata HCL : 422 importés (+32 = Healthy_151-182 passés de gsheet-only → base), export ONT Sample 834 lignes
+- ✓ 32 Healthy_151-182 : colonnes BAM/POD5 remplies ; + frag_status_sc 37 HCL, modes_sc Colon_53 + 4 Bladder CGFL, dorado/date/pipeline/extract_full Healthy_171/176
+- ✗ 11 Twist titration : stockage_pod5=SCW mais pas d'adresse/taille POD5 individuelle (POD5 partagés, structure atypique)
+- ⚠ FRAG SC (frag_status_sc) ≠ Mod1/Mod2 (frag_mode*_sc) : colonnes distinctes, lancer séparément
 
 ## Prochaine étape
-Rien d'engagé. Optionnel : `check liquid CGFL --new_samples` pour intégrer `Bladder_Urine_02_091/092/093`. La colonne bootstrap se remplira au fil de Bam2Beta via `update-column bootstrap liquid {labo}`.
+Rien d'engagé. Optionnel : investiguer les POD5 des 11 Twist titration (taille/complétude) ; scheduled task refresh bootstrap proposé (non retenu).
