@@ -57,10 +57,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-23 — Bam2Beta Check_Input + retrait rapport PDF V1.3.3
+## 2026-06-23 — Bam2Beta Check_Input + retrait rapport PDF V1.3.3 + trace-prod bootstrap/data HCL-CGFL
 
 - [x] **Bam2Beta V1.3.3 — Check_Input + retrait rapport PDF** — process QC des fichiers d'entrée en amont du merge (input KO → run SUCCESS + REPORT/metadata.json status=FAILED_QC_INPUT, seul Check_Input ; input OK → pipeline normal ; autre erreur → crash) + désactivation du rapport PDF (Raima_report → JSON only). Gotcha NF (channel vide → emit sous-workflow qui plante) fixé par retrait des emits inutilisés (Beta_epic/Frag/IV). TEST OK 3/3 + QUALIF OK 3/3 bit-à-bit vs V1.3.2, release publiée. Détails : [check-input-qc.md](../-home-blipinski-Pipeline-Bam2Beta/memory/check-input-qc.md).
 - [x] **Rapport Typst V2 — abandonné** — la migration `rmarkdown → Typst` (Dockerfile.rapportv4) est sans objet : le rapport PDF a été retiré du pipeline en V1.3.3, `Raima_report` ne produit plus que les JSON.
+- [x] **trace-prod — bootstrap backfill complet + data HCL/CGFL** — colonne `bootstrap` au plateau (CGFL 788/790, HCL 513/513, 2 KO structurels = Bladder_Urine_02_090 + Twist_10_8) ; +32 HCL Healthy_151-182 intégrés (import-metadata + BAM/POD5) ; remplissages ciblés frag_sc/modes_sc/dorado/extract_full. Routine update-column + exports, zéro code.
 
 ## 2026-06-22 — Feature/ dilution (Twist) + Tower /combined refonte+Dilution + Bam2Beta covdepth Étape 1
 
