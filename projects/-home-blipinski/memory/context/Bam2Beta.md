@@ -1,19 +1,22 @@
-# Context — Bam2Beta — 2026-06-22T17:45:16+00:00
+# Context — Bam2Beta — 2026-06-23T14:12:06+0000
 
 **Branche** : main
-**Dernier commit** : f1d75be — feat(dev): figures covdepth depth/coverage (Fig.1 cumulative + Fig.2 multi-échelle)
-**Status** : 5 fichiers modifiés pré-existants (conf/base.config, dev/PLT, dev/SCW, workflow/beta.nf, workflow/merge.nf) + bacasable.sh — HORS session covdepth, non touchés
+**Dernier commit** : 918ddb0 — docs: update CHANGELOG and README for V1.3.3
+**Status** : clean (seul dev/SCW/bacasable.sh untracked, sandbox ignoré)
 
 ## Où j'en suis
-Chantier R&D covdepth — Étape 1 LIVRÉE et commitée. Scripts versionnés (`dev/coverage_analysis/fig1_depth_coverage.R`, `fig2_positional_multiscale.R`), figures dans `test/` (gitignoré), workspace `/scratch/boris/covdepth/`. 2 questions ouvertes restées en suspens avant /end-session.
+Session terminée : feature **Check_Input** (QC des fichiers d'entrée en amont du merge)
+implémentée + **retrait du rapport PDF**, version **V1.3.3 publiée ET qualifiée en
+production** (QUALIF OK 3/3). Aucune tâche en cours.
 
 ## Ce qui marche / ce qui foire
-- ✓ Fig.1 cumulative depth-vs-breadth comparative merged vs epic (global.dist, dénominateur natif = génome)
-- ✓ Fig.2 positionnelle multi-échelle + bandes de déplétion systématique (merged propres ; 073 ~9.5x très net)
-- ✓ Concordance parfaite mosdepth ↔ trace-prod (qc_metrics) ; finding 067 pathologique (34M reads alignés, depth=0/cov=0%)
-- ✗ epic positionnel : 500kb encore bruité (~0.1x), seul le 5Mb est net — choix 1M/5M/10M non tranché
-- ✗ Paradoxe 067 (34M reads → 0 couverture) non élucidé (cause exacte : reads courts/dup/QC-fail ?)
-- ✗ Healthy CGFL liquid sans per-base epic (642, 831) — epic impossible pour ces samples
+- ✓ Check_Input : input KO → run SUCCESS + REPORT/metadata.json (status=FAILED_QC_INPUT + reason), seul Check_Input ; input OK → pipeline normal ; autre erreur → crash standard
+- ✓ Retrait PDF : génération rmarkdown désactivée, conformité (2 scripts) + doc nettoyées ; Raima_report → JSON uniquement
+- ✓ Gotcha NF documenté : channel vide → emit de sous-workflow qui plante (No such property DataflowBroadcast) → fix = retrait emits inutilisés (Beta_epic/Frag/IV). Voir [[check-input-qc]]
+- ✓ V1.3.3 : /test_bam2beta TEST OK 3/3 + /qualif-bam2beta QUALIF OK 3/3 (bit-à-bit vs V1.3.2), tag + release GitHub publiés
+- ✓ Score mVAF prod = raima:latest **0.5.0** (vérifié : 0.5.2 = bootstrap R&D `--bootstrap` uniquement, inactif en prod/qualif)
+- ⏳ Cas "input absent" (dossier inexistant) : pas de json possible dans NF (checkIfExists plante à l'init) ; dossier vide existant → json OK. Garde-fou amont (bash) si besoin, non implémenté
 
 ## Prochaine étape
-Trancher les 2 questions ouvertes : (1) échelles epic 1M/5M/10M (retirer 500k bruité) ? (2) creuser 067 via flagstat + distribution longueur des reads. Puis définir l'Étape 2 du chantier (cohorte/labo/multi-échelle).
+Rien de bloqué. Optionnel si le cas se présente en prod : garde-fou bash (input absent → json
+d'échec) dans launch_SCW.sh. Sinon, prochaine feature.
