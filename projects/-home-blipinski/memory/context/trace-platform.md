@@ -1,20 +1,24 @@
-# Context — trace-platform — 2026-06-23T15:58:50+0000
+# Context — trace-platform — 2026-06-24T14:35:00+0000
 
 **Branche** : main
-**Dernier commit** : c878c33 — feat: JSON devient le livrable rapport (PDF non requis)
-**Status** : clean (tout commité + pushé)
+**Dernier commit** : 8a5c75d — feat(case): compte non déclaré → PROD par défaut
+**Status** : clean (tout commité/poussé ; untracked = logs/backups/copie DB seulement)
 
 ## Où j'en suis
-Refonte complète du modèle de statuts trace-platform + pont Aima-Tower : TERMINÉE et déployée.
-5 features livrées, commitées/pushées sur les 2 repos, tower rebuildée, DB migrée v11, gsheet exporté. Rien en cours.
+Grosse session terminée et déployée. trace-platform : scan migré 100% S3 (plus de
+/mnt), nouvelles commandes delete/prune/daemon, colonne creation_date (v12), nouveau
+compte → PROD. Aima-Tower aligné (PROD défaut) + rebuild OK. Rien en cours.
 
 ## Ce qui marche / ce qui foire
-- ✓ run_status : WAITING (état 0, pas de .dl-complete) → RUNNING → SUCCESSED/WARNING/FAILED + ARCHIVED. 281 réconcilient.
-- ✓ Granularité PROD sample-level (`samples.case` v10, `PROD_CUTOFFS`). Compte 1 Romain Boidot (16342fc9) PROD depuis upload ≥ 2026-06-15 (26BM + futurs). Vérifié end-to-end (assignation/tower/export).
-- ✓ ARCHIVED : commande `check_platform.py archive` (DEV >2 mois, base upload_date, sticky). 88 samples archivés.
-- ✓ report_date supprimé (schema v11). JSON = livrable rapport (PDF non requis) → 4 Breast_Demo récupérés (FAILED→SUCCESSED).
-- ✓ Tower : case effectif COALESCE, totals par (client,case) → bug 15≠17 fixé, WARNING séparé de SUCCESSED, badges WAITING/ARCHIVED, cartes Warning. Validé via API.
-- ⚠ Colonne `clinical_report_pdf` conservée (info historique) — droppable en v12 si cleanup complet voulu.
+- ✓ Scan 100% S3 : découverte (list_objects_v2) + staging tmpdir (petits TSV, mtime préservé) + BAM via URL présignée (samtools header, pas les 8Go). Testé bout-en-bout (~3s/sample).
+- ✓ Schema v12 : creation_date (1er objet S3 LastModified), tri export par creation_date DESC. Backfill S3 fait (252/252).
+- ✓ Commandes : delete (unitaire), prune (purge samples absents S3, backup auto), daemon (check --new + re-scan 3j + export). Daemon ARRÊTÉ (Boris teste via cron).
+- ✓ Occultation gsheet : 168 Bladder blood/urine figés (data/export_hidden_samples.tsv), futurs visibles.
+- ✓ Fix bioit : rapport_pdf plus requis (v11) → faux FAILED corrigés.
+- ✓ Nouveau compte non déclaré → PROD (COALESCE ..., 'PROD') dans trace-platform ET Aima-Tower (services.py), tower rebuildé healthy.
+- ✓ Cron actif : check (full) + export --gsheet toutes les 30 min.
+- ⚠ data/export_hidden_samples.tsv + export_labs_users.tsv gitignorés (*.tsv) → locaux, non versionnés.
 
 ## Prochaine étape
-Aucune tâche en attente. Option ouverte : drop colonne `clinical_report_pdf` (v12) si Boris confirme le retrait total du PDF.
+Aucune tâche en attente. Surveiller le cron 30 min (cron_check.log / cron_export.log).
+Option : déclarer les nouveaux comptes dans data/export_labs_users.tsv au fil de l'eau.
