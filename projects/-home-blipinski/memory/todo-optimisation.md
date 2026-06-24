@@ -57,6 +57,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-06-24 — Aima-Tower scission /database + ID sample monitoring
+
+- [x] **Scission page /database en 2 pages** — onglets R&D/Platform éclatés en 2 pages sidebar autonomes : R&D (`/database`) + Plateforme (`/database-platform`, `DatabasePlatform.tsx`). 0 backend. Commit `519348e`.
+- [x] **ID sample sur Monitoring › Récents** — `--patient_id` parsé depuis `wf.command_line` affiché à droite de `CompletedRow` (`—` si absent). Commit `519348e`.
+
 ## 2026-06-23 — Bam2Beta Check_Input + retrait rapport PDF V1.3.3 + trace-prod bootstrap/data HCL-CGFL
 
 - [x] **Bam2Beta V1.3.3 — Check_Input + retrait rapport PDF** — process QC des fichiers d'entrée en amont du merge (input KO → run SUCCESS + REPORT/metadata.json status=FAILED_QC_INPUT, seul Check_Input ; input OK → pipeline normal ; autre erreur → crash) + désactivation du rapport PDF (Raima_report → JSON only). Gotcha NF (channel vide → emit sous-workflow qui plante) fixé par retrait des emits inutilisés (Beta_epic/Frag/IV). TEST OK 3/3 + QUALIF OK 3/3 bit-à-bit vs V1.3.2, release publiée. Détails : [check-input-qc.md](../-home-blipinski-Pipeline-Bam2Beta/memory/check-input-qc.md).
