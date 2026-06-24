@@ -57,10 +57,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-24 — Aima-Tower scission /database + ID sample monitoring
+## 2026-06-24 — Aima-Tower scission /database + ID sample monitoring + trace-workflow catch-up
 
 - [x] **Scission page /database en 2 pages** — onglets R&D/Platform éclatés en 2 pages sidebar autonomes : R&D (`/database`) + Plateforme (`/database-platform`, `DatabasePlatform.tsx`). 0 backend. Commit `519348e`.
 - [x] **ID sample sur Monitoring › Récents** — `--patient_id` parsé depuis `wf.command_line` affiché à droite de `CompletedRow` (`—` si absent). Commit `519348e`.
+- [x] **trace-workflow — rattrapage 11→24 juin** — base passée de 152 à 1525 workflows (user + pipeline-prod) via pagination `offset` ; 4 zombies RUNNING du 17 juin (non annulables par Tower car runs non orchestrés) marqués UNKNOWN en base.
+- [x] **trace-workflow — catch-up daemon** — `sync --catchup` + rattrapage auto au démarrage du daemon (pagine jusqu'à recouper la base, arrêt à 2 pages stériles) ; testé (trou de 250 comblé en 7,5 s). 3 commits poussés sur `main`.
 
 ## 2026-06-23 — Bam2Beta Check_Input + retrait rapport PDF V1.3.3 + trace-prod bootstrap/data HCL-CGFL
 
