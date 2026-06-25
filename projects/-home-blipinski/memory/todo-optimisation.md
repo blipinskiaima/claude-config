@@ -57,6 +57,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-06-25 — Aima-Tower mvaf_v14 sélecteur /combined
+
+- [x] **Aima-Tower — mvaf_v14 dans sélecteur /combined** — feature mVAF 1.4 ajoutée à `FEATURE_NAMES` (combined-data.ts), buildé + déployé (conteneur healthy). Gotcha gravé : liste figée à synchroniser à la main avec `Feature/script/main.sh` (combos lus dynamiquement). Commit `9a87362`.
+
 ## 2026-06-24 — Aima-Tower scission /database + ID sample monitoring + trace-workflow catch-up
 
 - [x] **Scission page /database en 2 pages** — onglets R&D/Platform éclatés en 2 pages sidebar autonomes : R&D (`/database`) + Plateforme (`/database-platform`, `DatabasePlatform.tsx`). 0 backend. Commit `519348e`.
