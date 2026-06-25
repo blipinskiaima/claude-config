@@ -1,6 +1,6 @@
 ---
 name: bootstrap-model-v1
-description: "Feature bootstrap du score mVAF v1 (raima::bootstrap_model_v1) - process NF, image raima:0.5.2, mode retrospectif --bootstrap, validation bit-a-bit Breast_10 + Lung_138"
+description: "Feature bootstrap du score mVAF v1 (raima::bootstrap_model_v1) - process NF, image raima:0.5.3, mode retrospectif --bootstrap, validation bit-a-bit Breast_10 + Lung_138. Extension mVAF v1.4 (--MVAF1_4, mean(sqrt(scores))^2, file 1 bootstrap_model_v1.1.R 3 sorties + file 2 bootstrap_trasnfo.R) + gotcha BAM_FILE inconditionnel / needs_bam reverte par Boris"
 metadata: 
   node_type: memory
   type: project
