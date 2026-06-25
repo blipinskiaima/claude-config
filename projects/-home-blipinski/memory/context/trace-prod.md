@@ -1,18 +1,23 @@
-# Context — trace-prod — 2026-06-23T15:58:02+0000
+# Context — trace-prod — 2026-06-25T13:05:19+0000
 
 **Branche** : main
-**Dernier commit** : ac7f0f5 — feat: schema v12 — colonne bootstrap (retd_suivis)
-**Status** : clean côté tracké (aucun code modifié cette session — uniquement données DB + gsheets)
+**Dernier commit** : cd72c61 — feat: schema v13 — colonne mvaf_v14 (retd_suivis)
+**Status** : clean (tracké)
 
 ## Où j'en suis
-Session = remplissage ad-hoc de colonnes trace-prod (zéro code). Backfill bootstrap terminé (plateau), intégration metadata HCL (+32 nouveaux), + colonnes BAM/POD5/frag/dorado/extract pour samples HCL/CGFL ciblés. Tout exporté, rien en attente.
+Schema v13 (colonne mvaf_v14) implémenté de bout en bout via le skill add-trace-prod
+et committé (cd72c61). Calque de mvaf_v13 sauf extraction cols[1] (colonne mvaf du
+fichier V1.4 à 3 colonnes) + formatage format_mvaf4. Code poussé, doc à jour.
 
 ## Ce qui marche / ce qui foire
-- ✓ Bootstrap : backfill complet CGFL 788/790, HCL 513/513 (2 KO CGFL structurels = Bladder_Urine_02_090 + Twist_10_8, props absents)
-- ✓ import-metadata HCL : 422 importés (+32 = Healthy_151-182 passés de gsheet-only → base), export ONT Sample 834 lignes
-- ✓ 32 Healthy_151-182 : colonnes BAM/POD5 remplies ; + frag_status_sc 37 HCL, modes_sc Colon_53 + 4 Bladder CGFL, dorado/date/pipeline/extract_full Healthy_171/176
-- ✗ 11 Twist titration : stockage_pod5=SCW mais pas d'adresse/taille POD5 individuelle (POD5 partagés, structure atypique)
-- ⚠ FRAG SC (frag_status_sc) ≠ Mod1/Mod2 (frag_mode*_sc) : colonnes distinctes, lancer séparément
+- ✓ Colonne mvaf_v14 créée (schema v13), migration idempotente OK, version DB = 13
+- ✓ check_mvaf_v14 testé : 26BM01841 → 0,0121 ; valeur scientifique → 0,00005074 ; absent → NA
+- ✓ format_mvaf4() : 4 décimales, ou 4 chiffres signif. si <1e-4, jamais de e-05
+- ✓ Export _LIQUID_QC : mVAF v1.4 après mVAF v1.3, bout-en-bout validé
+- ✓ Doc complète : README (table + section), CLAUDE.md (v13), mémoire (topic + MEMORY.md)
+- ⚠ Seuls 2 samples passés en test (26BM01841 + Bladder_Blood_01_001) — backfill complet non lancé
 
 ## Prochaine étape
-Rien d'engagé. Optionnel : investiguer les POD5 des 11 Twist titration (taille/complétude) ; scheduled task refresh bootstrap proposé (non retenu).
+Rétrospectif PAR BORIS (single writer lock, séquentiel) :
+update-column mvaf_v14 liquid CGFL → liquid HCL → export --gsheet CGFL → HCL.
+Checkpoint rollback dispo : tag checkpoint-pre-mvaf-v14.

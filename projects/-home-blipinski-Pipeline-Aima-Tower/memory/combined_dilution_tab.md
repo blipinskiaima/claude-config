@@ -35,6 +35,15 @@ metadata:
 - **Page `/dilution` autonome supprimée** (route, Sidebar item + icône Droplets, `Dilution.tsx`, `useDilutionSeries`/`DILUTION_STATS`, router `/api/dilution`). `DilutionChart` + type `DilutionPoint` conservés (réutilisés par l'onglet).
 - Seuil dilution hérité de Combined : `targetSpec` (90/95/98) + `speedvac`.
 
+## Sélecteur Features — liste figée à synchroniser à la main (2026-06-25)
+Les options du multi-select Features (`FEATURE_NAMES` dans `frontend/src/lib/combined-data.ts`)
+sont une liste **hardcodée maintenue à la main**, PAS lue dynamiquement depuis le pipeline Feature.
+`features_disponibles.tsv` (ancienne source) **n'existe plus**. → Toute feature ajoutée côté Feature
+(`script/main.sh` array `FEATURES`) doit être ajoutée **manuellement** dans `combined-data.ts` pour
+apparaître dans le sélecteur. À l'inverse, les **données combos** (`scores.csv` / `feature_runs.duckdb`)
+sont lues dynamiquement → dès la sélection le lookup colonne (`features.replace(",","+")`) les trouve.
+Ajout `mvaf_v14` (mVAF 1.4) le 2026-06-25.
+
 ## Validé
 Smoke test conteneur : mono `mvaf_v1` (seuil 0.6906, % bruts) + multi `mvaf_v1,ichor_x100` (seuil 0.7627, proba décroissante 0.987→0.18) ; ancien `/api/dilution` → 404.
 
