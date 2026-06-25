@@ -57,10 +57,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-06-25 — Aima-Tower mvaf_v14 sélecteur /combined + trace-prod schema v13
+## 2026-06-25 — Aima-Tower mvaf_v14 sélecteur /combined + trace-prod schema v13 + Bam2Beta score mVAF v1.4
 
 - [x] **Aima-Tower — mvaf_v14 dans sélecteur /combined** — feature mVAF 1.4 ajoutée à `FEATURE_NAMES` (combined-data.ts), buildé + déployé (conteneur healthy). Gotcha gravé : liste figée à synchroniser à la main avec `Feature/script/main.sh` (combos lus dynamiquement). Commit `9a87362`.
 - [x] **trace-prod — colonne mVAF v1.4 (schema v13)** — calque de mvaf_v13 (extraction `cols[1]`, colonne mvaf du fichier V1.4 à 3 colonnes `name·mvaf·model`) + helper `format_mvaf4` (4 décimales, ou 4 chiffres significatifs si <1e-4, jamais de notation scientifique). Câblé check + update-column + export `_LIQUID_QC` après mVAF v1.3. Commit `cd72c61`. Backfill rétrospectif à lancer par Boris. Détails : [project_schema_v13_mvaf_v14.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v13_mvaf_v14.md).
+- [x] **Bam2Beta — score mVAF v1.4 (R&D)** — `mean(sqrt(scores))²` sur les 200 scores bootstrap. file 1 `bootstrap_model_v1.1.R` (3 sorties scores+props+V1.4) + file 2 `bootstrap_trasnfo.R` (transfo seule, `--MVAF1_4` rétrospectif). Renommage `--MVAF1_3`→`--MVAF1_4`. Commit `5d6e1b0`. ⚠️ Gate bit-à-bit SORTIE 1 + qualif restant. Détails : [bootstrap-model-v1.md](../-home-blipinski-Pipeline-Bam2Beta/memory/bootstrap-model-v1.md).
 
 ## 2026-06-24 — Aima-Tower scission /database + ID sample monitoring + trace-workflow catch-up
 
