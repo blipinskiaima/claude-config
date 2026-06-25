@@ -1,22 +1,20 @@
-# Context — Bam2Beta — 2026-06-23T14:12:06+0000
+# Context — Bam2Beta — 2026-06-25T13:07:44+0000
 
 **Branche** : main
-**Dernier commit** : 918ddb0 — docs: update CHANGELOG and README for V1.3.3
-**Status** : clean (seul dev/SCW/bacasable.sh untracked, sandbox ignoré)
+**Dernier commit** : 5d6e1b0 — feat(mvaf): score mVAF v1.4 = mean(sqrt(bootstrap_scores))^2 (R&D)
+**Status** : clean (seul dev/SCW/bacasable.sh untracked, sandbox)
 
 ## Où j'en suis
-Session terminée : feature **Check_Input** (QC des fichiers d'entrée en amont du merge)
-implémentée + **retrait du rapport PDF**, version **V1.3.3 publiée ET qualifiée en
-production** (QUALIF OK 3/3). Aucune tâche en cours.
+Feature **mVAF v1.4** committée et pushée (R&D, NON qualifiée). `mean(sqrt(scores))²`
+sur les 200 scores bootstrap, 2 flux : `--bootstrap` (file 1 → 3 sorties scores+props+V1.4)
+et `--MVAF1_4` rétrospectif (file 2 `bootstrap_trasnfo.R`, transfo seule). Aucune tâche en cours.
 
 ## Ce qui marche / ce qui foire
-- ✓ Check_Input : input KO → run SUCCESS + REPORT/metadata.json (status=FAILED_QC_INPUT + reason), seul Check_Input ; input OK → pipeline normal ; autre erreur → crash standard
-- ✓ Retrait PDF : génération rmarkdown désactivée, conformité (2 scripts) + doc nettoyées ; Raima_report → JSON uniquement
-- ✓ Gotcha NF documenté : channel vide → emit de sous-workflow qui plante (No such property DataflowBroadcast) → fix = retrait emits inutilisés (Beta_epic/Frag/IV). Voir [[check-input-qc]]
-- ✓ V1.3.3 : /test_bam2beta TEST OK 3/3 + /qualif-bam2beta QUALIF OK 3/3 (bit-à-bit vs V1.3.2), tag + release GitHub publiés
-- ✓ Score mVAF prod = raima:latest **0.5.0** (vérifié : 0.5.2 = bootstrap R&D `--bootstrap` uniquement, inactif en prod/qualif)
-- ⏳ Cas "input absent" (dossier inexistant) : pas de json possible dans NF (checkIfExists plante à l'init) ; dossier vide existant → json OK. Garde-fou amont (bash) si besoin, non implémenté
+- ✓ Vérif statique : R parse OK ×2, bloc transfo bit-à-bit identique entre file 1 et file 2, zéro orphelin MVAF1_3/Raima_score_v1_3
+- ✓ Renommage `--MVAF1_3` → `--MVAF1_4` (ancien rétrospectif v1.3 supprimé), import swap, param config
+- ✓ file 2 = container défaut bam2beta (R base, pas de raima) ; file 1 = raima:0.5.3, option `--id`
+- ✗ **Gate bit-à-bit SORTIE 1 NON faite** : `rowSums(props 4 cancers)` vs ancien appel direct `.bootstrap_v1.tsv` — à valider sur un vrai run `--bootstrap`
+- ⚠️ Boris a **reverté** mes fixes (guard `needs_bam`, filtre `.exists()`, param `--exclude`) → `main.nf` garde BAM_FILE inconditionnel + MVAF1_4 en `checkIfExists` strict. Glob-all rétrospectif plante si un sample n'a pas son merged.bam → lancer par sample / s'assurer du merged.bam. NE PAS re-proposer ces fixes.
 
 ## Prochaine étape
-Rien de bloqué. Optionnel si le cas se présente en prod : garde-fou bash (input absent → json
-d'échec) dans launch_SCW.sh. Sinon, prochaine feature.
+Lancer un vrai run `--bootstrap` (depuis ~/Run) pour valider la gate bit-à-bit SORTIE 1 + vérifier que `raima:0.5.3` est buildé avec `bootstrap_model_v1` exporté. Puis, si OK, qualification/montée en version.
