@@ -1,19 +1,20 @@
-# Context — Aima-Tower — 2026-06-24T (clôture session)
+# Context — Aima-Tower — 2026-06-25 (clôture session)
 
 **Branche** : main (push OK origin/main)
-**Dernier commit** : 519348e — feat(ui): scinde /database en R&D + Plateforme ; ID sample sur Monitoring
+**Dernier commit** : 9a87362 — feat(combined): ajoute mvaf_v14 au sélecteur Features
 **Status** : clean (hors `.claude/worktrees/` untracked, hors scope)
 
 ## Où j'en suis
-Session terminée sur 2 features UI front-only livrées + déployées + pushées. (1) Scission de `/database` en 2 pages sidebar : R&D (`/database`) + Plateforme (`/database-platform`). (2) ID sample (`--patient_id`) sur les workflows récents de `/monitoring`. Conteneur redéployé (docker) et healthy. Clôture via `/end-session` en cours (reste commit-claude + maj-todo).
+Session courte close : ajout de la feature mVAF 1.4 (`mvaf_v14`) au sélecteur Features de `/combined`.
+1 ligne ajoutée à `FEATURE_NAMES` (combined-data.ts) + commentaire obsolète rafraîchi + note CLAUDE.md.
+Buildé, déployé (conteneur healthy), commité/pushé. Clôture `/end-session` en cours (reste commit-claude + maj-todo).
 
 ## Ce qui marche / ce qui foire
-- ✓ `/database` (R&D seule) + `/database-platform` (DatabasePlatform.tsx wrappe PlatformView) ; 2 items sidebar "R&D"/"Plateforme" ; 0 backend
-- ✓ Monitoring › Récents : ID sample à droite de CompletedRow, parsé depuis `wf.command_line` (`--patient_id`), `—` si absent
-- ✓ Build + typecheck verts ; conteneur déployé healthy ; commit 519348e pushé
-- ⚠ Vérif visuelle finale par Boris en cours (rendu validé itérativement pendant la session)
-- ⚠ 3 vieux workflows sans command_line affichent `—` (avaient `DEV` dans params_json) — accepté
-- ℹ Titres h1 de page gardent "Database R&D"/"Database Plateforme" (seuls labels sidebar raccourcis)
+- ✓ `mvaf_v14` visible dans le sélecteur `/combined` (confirmé dans le bundle JS servi)
+- ✓ Combos mvaf_v14 déjà calculés côté Feature (scores.csv speedvac_no + speedvac_yes) → lookup OK
+- ✓ Build front vert + conteneur redéployé healthy (`Application startup complete`, port 8050)
+- ✓ Commit 9a87362 pushé sur origin/main
+- ℹ Gotcha gravé : `FEATURE_NAMES` est une liste figée à synchroniser **à la main** avec `Feature/script/main.sh` (pas de lecture dynamique ; `features_disponibles.tsv` supprimé)
 
 ## Prochaine étape
-Rien en cours : les 2 features sont closes. Si besoin, repli `params_json` quand command_line vide (2 lignes) reste optionnel.
+Rien en cours. À la prochaine feature ajoutée côté pipeline Feature, penser à l'ajouter manuellement dans combined-data.ts.
