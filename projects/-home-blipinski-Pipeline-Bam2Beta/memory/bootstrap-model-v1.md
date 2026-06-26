@@ -55,7 +55,7 @@ Score **mVAF v1.4 = `mean(sqrt(scores))^2`** appliqué aux 200 scores bootstrap.
 
 - **file 1 — `bin/bootstrap_model_v1.1.R`** (remplace l'appel de `bootstrap_model_v1.R`, pointé par le process `bootstrap_model`) : 1 seul appel `bootstrap_model_v1(return_all_props=TRUE)`, puis `scores <- rowSums(props[, c("colon_1","lung_1","breast_1","ovary_1")])`. **3 sorties** : `<id>.merged.all.bootstrap_v1.tsv` (200 scores) + `.bootstrap_v1.props.tsv` (props) + `<id>.merged.epic.raima_score.V1.4.tsv`. Option **`--id`** (remplace `--name`). publishDir : BOOTSTRAP/ (bootstrap_v1*) + BETA/ (V1.4). Container `raima:0.5.3`.
 - **file 2 — `bin/bootstrap_trasnfo.R`** (NOUVEAU, process `bootstrap_transfo`) : transfo **seule** rétrospective. `scores <- scan(input)` du `.bootstrap_v1.tsv` → 1 sortie V1.4. **Pas de raima → container défaut `bam2beta:latest`** (R base suffit, donc pas de `withName`). Option `--id`.
-- Format sortie V1.4 (colonnes `name`/`mvaf`/`model`) : `name = opt$id` (id brut, choix Boris), `model = "v1.4"`.
+- Format sortie V1.4 (colonnes `name`/`mvaf`/`model`) : `name = opt$id` (id brut, choix Boris), `model = "v1.4"`. `mvaf` exprimé en **% (×100)** puis arrondi : `x>=1 → round(x,2)` (2 décimales) / `x<1 → signif(x,2)` (2 chiffres signif., garde la précision des petites valeurs). Bloc identique dans les 2 scripts (commit 2026-06-26).
 
 ### Câblage main.nf
 - Bloc rétrospectif **`--MVAF1_3` SUPPRIMÉ**, remplacé par **`--MVAF1_4`** : `BAM_PATH.map{...}` → `file("${output}/${ID}/BOOTSTRAP/${ID}.merged.all.bootstrap_v1.tsv", checkIfExists:true)` → `bootstrap_transfo`. Import `Raima_score_v1_3` (devenu orphelin) retiré, `bootstrap_transfo` ajouté. Param `MVAF1_3`→`MVAF1_4` dans nextflow.config.
