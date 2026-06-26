@@ -61,6 +61,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [x] **Feature/ + Tower — unité d'éval "suspect"** — flag `--include-suspicious` (`select_cohort_eval.py`) empile 25 imageries suspectes (HCL Lung-DI précoce, `unit='suspect'`, label NULL, hors KPI) ; additivité prouvée 2 variantes (eval_kpis byte-identique, scores existants 0 diff). Tower : onglet "Suspects" (dotplot scores + seuil + compteur N/25), backend `get_suspect_scores` + route, frontend hook + `SuspectChart`. Commits Feature `f08e582`/`47ce642` + Tower `e76f3c3`→`040e515`. Détails : [suspect-eval-unit.md](../-home-blipinski-Pipeline-Feature/memory/suspect-eval-unit.md).
 - [x] **Bam2Beta — flux small_fragment (rename short_read)** — stratégie ultra-simple 2-temps : le BAM filtré 75-200 se fait passer pour `merged.bam` dans `CGFL_small_fragments`, cœur du pipeline inchangé. Rename `SHORT_READ`→`SMALL_FRAGMENTS` + module `Small_Fragment`, gotcha `stageAs` anti-collision, Temps 1 testé OK. Commit `d6d4556`, tag rollback `pre-small-fragment`. Détails : [small-fragment-flow.md](../-home-blipinski-Pipeline-Bam2Beta/memory/small-fragment-flow.md).
+- [x] **Bam2Beta — arrondi sortie mVAF v1.4** — `mvaf` exprimé en % (×100) puis `x>=1 → round(x,2)` / `x<1 → signif(x,2)`, bloc identique dans bootstrap_trasnfo.R + bootstrap_model_v1.1.R. Commit `f99812e`.
 
 ## 2026-06-25 — Aima-Tower mvaf_v14 sélecteur /combined + trace-prod schema v13 + Bam2Beta score mVAF v1.4
 
