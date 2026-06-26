@@ -57,6 +57,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-06-26 — Feature/Tower unité d'éval "suspect" (imageries suspectes)
+
+- [x] **Feature/ + Tower — unité d'éval "suspect"** — flag `--include-suspicious` (`select_cohort_eval.py`) empile 25 imageries suspectes (HCL Lung-DI précoce, `unit='suspect'`, label NULL, hors KPI) ; additivité prouvée 2 variantes (eval_kpis byte-identique, scores existants 0 diff). Tower : onglet "Suspects" (dotplot scores + seuil + compteur N/25), backend `get_suspect_scores` + route, frontend hook + `SuspectChart`. Commits Feature `f08e582`/`47ce642` + Tower `e76f3c3`→`040e515`. Détails : [suspect-eval-unit.md](../-home-blipinski-Pipeline-Feature/memory/suspect-eval-unit.md).
+
 ## 2026-06-25 — Aima-Tower mvaf_v14 sélecteur /combined + trace-prod schema v13 + Bam2Beta score mVAF v1.4
 
 - [x] **Aima-Tower — mvaf_v14 dans sélecteur /combined** — feature mVAF 1.4 ajoutée à `FEATURE_NAMES` (combined-data.ts), buildé + déployé (conteneur healthy). Gotcha gravé : liste figée à synchroniser à la main avec `Feature/script/main.sh` (combos lus dynamiquement). Commit `9a87362`.
