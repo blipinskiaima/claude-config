@@ -1,20 +1,22 @@
-# Context — Bam2Beta — 2026-06-25T13:07:44+0000
+# Context — Bam2Beta — 2026-06-26T07:46:51+0000
 
 **Branche** : main
-**Dernier commit** : 5d6e1b0 — feat(mvaf): score mVAF v1.4 = mean(sqrt(bootstrap_scores))^2 (R&D)
-**Status** : clean (seul dev/SCW/bacasable.sh untracked, sandbox)
+**Dernier commit** : d6d4556 — refactor(small_fragment): renomme flux short_read -> small_fragment + module filtre Temps 1
+**Status** : clean côté pipeline (seuls dev/SCW/launch_SCW.sh modifié + bacasable.sh untracked, sandbox)
 
 ## Où j'en suis
-Feature **mVAF v1.4** committée et pushée (R&D, NON qualifiée). `mean(sqrt(scores))²`
-sur les 200 scores bootstrap, 2 flux : `--bootstrap` (file 1 → 3 sorties scores+props+V1.4)
-et `--MVAF1_4` rétrospectif (file 2 `bootstrap_trasnfo.R`, transfo seule). Aucune tâche en cours.
+Flux **small_fragment** (ex short_read) — rename complet committé+pushé (d6d4556, R&D non qualifié).
+Stratégie **ultra-simple 2-temps** : le BAM filtré 75-200 bp se fait passer pour `merged.bam` dans
+l'arbo `CGFL_small_fragments`, **cœur du pipeline strictement inchangé** (beta.nf + branches merge/rétro
+intactes, `merged` jamais paramétré). Temps 1 (run filtre seul) testé OK sur Bladder_Blood_01_001.
 
 ## Ce qui marche / ce qui foire
-- ✓ Vérif statique : R parse OK ×2, bloc transfo bit-à-bit identique entre file 1 et file 2, zéro orphelin MVAF1_3/Raima_score_v1_3
-- ✓ Renommage `--MVAF1_3` → `--MVAF1_4` (ancien rétrospectif v1.3 supprimé), import swap, param config
-- ✓ file 2 = container défaut bam2beta (R base, pas de raima) ; file 1 = raima:0.5.3, option `--id`
-- ✗ **Gate bit-à-bit SORTIE 1 NON faite** : `rowSums(props 4 cancers)` vs ancien appel direct `.bootstrap_v1.tsv` — à valider sur un vrai run `--bootstrap`
-- ⚠️ Boris a **reverté** mes fixes (guard `needs_bam`, filtre `.exists()`, param `--exclude`) → `main.nf` garde BAM_FILE inconditionnel + MVAF1_4 en `checkIfExists` strict. Glob-all rétrospectif plante si un sample n'a pas son merged.bam → lancer par sample / s'assurer du merged.bam. NE PAS re-proposer ces fixes.
+- ✓ Rename `SHORT_READ`→`SMALL_FRAGMENTS` + `Short_Read_Filter`→`Small_Fragment` + fichier→`small_fragment.nf`, parse Nextflow OK
+- ✓ Temps 1 : `--MERGE false --SMALL_FRAGMENTS true`, lit merged.bam prod, publie `${ID}.merged.bam` dans `${output}_small_fragments/` — testé OK
+- ✓ Gotcha collision résolu : input stagé `stageAs: 'source.merged.bam'` (sinon samtools -o tronque l'entrée)
+- ✓ CHANGELOG historique laissé intact ; CLAUDE.md + mémoire à jour
+- ✗ Temps 2 (pipeline rétro BETA+ichorCNA sur la nouvelle arbo) **pas encore lancé** — attendre baisse du load serveur (était à ~546/32 cœurs)
+- ✗ Rename S3 `CGFL_short_read`→`CGFL_small_fragments` **non fait** (copy only, jamais delete — sous contrôle Boris)
 
 ## Prochaine étape
-Lancer un vrai run `--bootstrap` (depuis ~/Run) pour valider la gate bit-à-bit SORTIE 1 + vérifier que `raima:0.5.3` est buildé avec `bootstrap_model_v1` exporté. Puis, si OK, qualification/montée en version.
+Lancer le **Temps 2** sur Bladder_Blood_01_001 (`--input .../CGFL_small_fragments/${ID} --output .../CGFL_small_fragments --MERGE false --BETA true --ICHORCNA true`) quand le load serveur sera retombé, puis vérifier les sorties. Phase 2 (v1.3/v1.4/bootstrap) différée (bloquée par hardcode `merged` du 28M).
