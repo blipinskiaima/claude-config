@@ -62,6 +62,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **trace-prod schema v14 — bootstrap_props** — colonne `retd_suivis.bootstrap_props` OK/KO (présence S3 `bootstrap_v1.props.tsv`), liquid only, calque exact de `bootstrap` v12 (pattern preserve). Ajout via `/add-trace-prod`, backfill CGFL 804 + HCL 513 + exports. Commit `b9abd0c`.
 - [x] **trace-prod mode `probs --probs_bootstrap`** — probs epic = moyenne des 200 réplicats bootstrap (`extract_bootstrap_means`, vérifié == awk), écrase epic / préserve loyfer, NULL si absent, réversible via `probs --probs`. Backfill CGFL 791/804 + HCL 502/513. Commit `b9abd0c`. Détails : mémoire `probs-bootstrap-mode`.
 - [x] **trace-prod schema v15 — dilution enrichie** (session //) — table `dilution` + frag SC + mvaf_v14 + bootstrap_props, retrait frag v1. Commit `b9abd0c`.
+- [x] **Feature — Bladder exclu du KPI (--exclude-bladder)** — flag eval.R (câblé main.sh) retire le Bladder sang des unités active/active_nomut ; contre-intuitif : Sens_Active_NoMut +2 à +6 pts (cas difficiles, pas gonflage). Reste dans le train. Commits `885658b`+`1086238`, mémoire `bladder-kpi-exclusion.md`.
 
 ## 2026-06-26 — Feature/Tower unité d'éval "suspect" (imageries suspectes)
 
