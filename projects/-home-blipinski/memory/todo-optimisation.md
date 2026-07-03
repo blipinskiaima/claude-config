@@ -57,6 +57,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-07-03 — Tower : toggle mVAF v1.4 exploration
+- [x] **Toggle Score mVAF v1 / v1.4 sur /exploration** — sélecteur pilotant toute la page (tables Sens/Spé + graphes) via `score_source` ; mvaf_v14 lu depuis retd_suivis (VARCHAR virgule FR, KO exclu de la cohorte). Fix bundlé : 4 endpoints graphes (qc/dotplot/methylation/bladder) qui plantaient sur main. Validé live (v1 78.5%/88.4%, v1.4 81.7%/85.3%). Détails : `memory/exploration_score_source_toggle.md`.
+
 ## 2026-06-26 — Feature/Tower unité d'éval "suspect" (imageries suspectes)
 
 - [x] **Feature/ + Tower — unité d'éval "suspect"** — flag `--include-suspicious` (`select_cohort_eval.py`) empile 25 imageries suspectes (HCL Lung-DI précoce, `unit='suspect'`, label NULL, hors KPI) ; additivité prouvée 2 variantes (eval_kpis byte-identique, scores existants 0 diff). Tower : onglet "Suspects" (dotplot scores + seuil + compteur N/25), backend `get_suspect_scores` + route, frontend hook + `SuspectChart`. Commits Feature `f08e582`/`47ce642` + Tower `e76f3c3`→`040e515`. Détails : [suspect-eval-unit.md](../-home-blipinski-Pipeline-Feature/memory/suspect-eval-unit.md).
