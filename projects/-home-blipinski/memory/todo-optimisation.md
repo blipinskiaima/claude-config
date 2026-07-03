@@ -57,8 +57,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-07-03 — Tower : toggle mVAF v1.4 exploration
+## 2026-07-03 — Tower toggle mVAF v1.4 + trace-prod v14/v15 + probs_bootstrap
 - [x] **Toggle Score mVAF v1 / v1.4 sur /exploration** — sélecteur pilotant toute la page (tables Sens/Spé + graphes) via `score_source` ; mvaf_v14 lu depuis retd_suivis (VARCHAR virgule FR, KO exclu de la cohorte). Fix bundlé : 4 endpoints graphes (qc/dotplot/methylation/bladder) qui plantaient sur main. Validé live (v1 78.5%/88.4%, v1.4 81.7%/85.3%). Détails : `memory/exploration_score_source_toggle.md`.
+- [x] **trace-prod schema v14 — bootstrap_props** — colonne `retd_suivis.bootstrap_props` OK/KO (présence S3 `bootstrap_v1.props.tsv`), liquid only, calque exact de `bootstrap` v12 (pattern preserve). Ajout via `/add-trace-prod`, backfill CGFL 804 + HCL 513 + exports. Commit `b9abd0c`.
+- [x] **trace-prod mode `probs --probs_bootstrap`** — probs epic = moyenne des 200 réplicats bootstrap (`extract_bootstrap_means`, vérifié == awk), écrase epic / préserve loyfer, NULL si absent, réversible via `probs --probs`. Backfill CGFL 791/804 + HCL 502/513. Commit `b9abd0c`. Détails : mémoire `probs-bootstrap-mode`.
+- [x] **trace-prod schema v15 — dilution enrichie** (session //) — table `dilution` + frag SC + mvaf_v14 + bootstrap_props, retrait frag v1. Commit `b9abd0c`.
 
 ## 2026-06-26 — Feature/Tower unité d'éval "suspect" (imageries suspectes)
 
