@@ -1,20 +1,22 @@
-# Context — Aima-Tower — 2026-06-25 (clôture session)
+# Context — Aima-Tower — 2026-07-03 (clôture session)
 
 **Branche** : main (push OK origin/main)
-**Dernier commit** : 9a87362 — feat(combined): ajoute mvaf_v14 au sélecteur Features
+**Dernier commit** : 107c636 — feat(exploration): toggle Score mVAF v1 / v1.4 sur toute la page
 **Status** : clean (hors `.claude/worktrees/` untracked, hors scope)
 
 ## Où j'en suis
-Session courte close : ajout de la feature mVAF 1.4 (`mvaf_v14`) au sélecteur Features de `/combined`.
-1 ligne ajoutée à `FEATURE_NAMES` (combined-data.ts) + commentaire obsolète rafraîchi + note CLAUDE.md.
-Buildé, déployé (conteneur healthy), commité/pushé. Clôture `/end-session` en cours (reste commit-claude + maj-todo).
+Feature livrée : toggle **Score mVAF v1 / v1.4** sur `/exploration`, pilotant toute la page
+(tables Sens/Spé + graphes) via param `score_source`. 2 commits pushés : fix bug pré-existant
+(4 endpoints graphes morts) + feat. Session close via /end-session.
 
 ## Ce qui marche / ce qui foire
-- ✓ `mvaf_v14` visible dans le sélecteur `/combined` (confirmé dans le bundle JS servi)
-- ✓ Combos mvaf_v14 déjà calculés côté Feature (scores.csv speedvac_no + speedvac_yes) → lookup OK
-- ✓ Build front vert + conteneur redéployé healthy (`Application startup complete`, port 8050)
-- ✓ Commit 9a87362 pushé sur origin/main
-- ℹ Gotcha gravé : `FEATURE_NAMES` est une liste figée à synchroniser **à la main** avec `Feature/script/main.sh` (pas de lecture dynamique ; `features_disponibles.tsv` supprimé)
+- ✓ Toggle fonctionnel bout-en-bout (validé live conteneur : v1 78.5%/88.4%, v1.4 81.7%/85.3%)
+- ✓ mvaf_v14 lu depuis retd_suivis (VARCHAR virgule FR), KO→exclu cohorte (~8 cancers en moins)
+- ✓ 4 endpoints graphes (qc/dotplot/methylation/bladder) réparés (étaient morts sur main)
+- ✓ Conteneur healthy redéployé, docker-restart OK
+- ℹ Gotcha : `_load_from_duckdb` connecte read_only SANS retry → 500 pendant un job trace-prod
+  qui tient le lock write (`check_samples update-column`). Tester sur copie de la DB.
 
 ## Prochaine étape
-Rien en cours. À la prochaine feature ajoutée côté pipeline Feature, penser à l'ajouter manuellement dans combined-data.ts.
+Rien en cours. Feature terminée. Si besoin d'un score_source supplémentaire (mvaf_v13...),
+le pattern est en place : ajouter la colonne au parsing + option ScoreSource front.

@@ -85,7 +85,24 @@
       "Bash(cd ~/.claude/** && *)",
       "Bash(cd /scratch/** && *)",
       "Bash(cd /tmp/** && *)",
-      "Bash(git * && git *)"
+      "Bash(git * && git *)",
+      "WebFetch(domain:www.medrxiv.org)",
+      "WebFetch(domain:pubmed.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:www.biorxiv.org)",
+      "WebFetch(domain:genomemedicine.biomedcentral.com)",
+      "WebFetch(domain:www.yfish.org)",
+      "WebFetch(domain:www.researchgate.net)",
+      "WebFetch(domain:link.springer.com)",
+      "WebFetch(domain:europepmc.org)",
+      "Bash(mkdir -p /scratch/boris/meanmeth/script /scratch/boris/meanmeth/data/Breast_19 /scratch/boris/meanmeth/result/Breast_19)",
+      "Bash(Rscript -e 'library\\(data.table\\); cat\\(\"data.table\", as.character\\(packageVersion\\(\"data.table\"\\)\\), \"OK\\\\n\"\\)')",
+      "Bash(gzip -dc /scratch/boris/meanmeth/data/Breast_19/Breast_19.merged.all.chr22.bedMethyl.gz)",
+      "Bash(Rscript test_features_lib.R)",
+      "Bash(Rscript compute_features.R --data-dir /scratch/boris/meanmeth/data/Breast_19 --id Breast_19 --bin-size 1000000 --out /scratch/boris/meanmeth/result/Breast_19/smoke_chr22_1Mb.tsv)",
+      "Bash(chmod +x /scratch/boris/meanmeth/script/run_poc.sh *)",
+      "Bash(Rscript -e 'invisible\\(parse\\(\"bin/compute_methyl_features.R\"\\)\\); cat\\(\"R parse OK\\\\n\"\\)')",
+      "Bash(bgzip --version)",
+      "Bash(Rscript -e 'library\\(parallel\\); cat\\(\"parallel OK, detectCores:\", detectCores\\(\\), \"\\\\n\"\\)')"
     ],
     "deny": [
       "Bash(aws s3 rm:*)",
@@ -108,6 +125,10 @@
       "Bash(mkfs:*)",
       "Bash(mkfs.ext4:*)",
       "Bash(mkfs.xfs:*)"
+    ],
+    "additionalDirectories": [
+      "/scratch/boris/meanmeth/result/Breast_19",
+      "/home/blipinski/.claude/projects/-home-blipinski/memory/context"
     ]
   },
   "hooks": {
@@ -147,6 +168,6 @@
     "frontend-design@claude-plugins-official": true
   },
   "autoUpdatesChannel": "latest",
-  "agentPushNotifEnabled": true,
-  "tui": "fullscreen"
+  "tui": "fullscreen",
+  "agentPushNotifEnabled": true
 }
