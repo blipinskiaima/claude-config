@@ -128,7 +128,8 @@
     ],
     "additionalDirectories": [
       "/scratch/boris/meanmeth/result/Breast_19",
-      "/home/blipinski/.claude/projects/-home-blipinski/memory/context"
+      "/home/blipinski/.claude/projects/-home-blipinski/memory/context",
+      "/home/blipinski/.claude/projects/-home-blipinski/memory"
     ]
   },
   "hooks": {
