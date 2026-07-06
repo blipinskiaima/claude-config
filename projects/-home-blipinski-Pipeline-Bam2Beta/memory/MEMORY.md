@@ -2,8 +2,8 @@
 
 ## Key Facts
 
-- Current version: **V1.3.3** (2026-06-23, Check_Input QC gate amont du merge + bootstrap mVAF v1 + retrait rapport PDF ; score mVAF prod toujours raima 0.5.0). Voir [check-input-qc.md](check-input-qc.md)
-- Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest` (0.5.0) + `blipinskiaima/raima:0.5.3` (bootstrap only, latest reste intacte)
+- Current version: **V2.0.0** (2026-07-06, BREAKING : le champ `tf` du rapport = mVAF v1.4 bootstrap 28M au lieu de l'ancienne mVAF ; `Raima_report` sorti de `Beta_epic` -> module `rapport` dans main.nf, param `--RAPPORT` ; BETA_28M actif prod ; raima:latest promu 0.5.3 ; repro v1.4 via tri bgzf `LC_ALL=C` + `set.seed(1)`). Qualif Healthy_826 tf=0.58 bit-a-bit vs V1.3.3 ; repro prouvee Healthy_826 (0.58 ×3) + Breast_48 (64.91 ×3). Voir [bootstrap-model-v1.md](bootstrap-model-v1.md)
+- Container: `blipinskiaima/bam2beta:latest` + `blipinskiaima/raima:latest` (**0.5.3** depuis V2.0.0, promu depuis le tag 0.5.3 ; superset de 0.5.0, scores V2/frag/CNV/bedMethyl bit-a-bit inchanges)
 - Raima package version: **0.5.0** dans raima:latest depuis 2026-06-05 (requis par mVAF v1.3 + fragmento v2). Avant: 0.4.17 (2026-05-27)
   - Retrocompatibilite 0.4.13 -> 0.4.17 confirmee bit-a-bit sur Healthy_826 CGFL liquid (test 2026-05-27 vs V1.1.2)
   - Image `raima:0.4.17` (tag dedie) existait deja depuis 2026-05-07 mais `raima:latest` etait reste sur 0.4.13
@@ -44,6 +44,8 @@
 - [covdepth QC valorization](covdepth-qc-valorization.md) — chantier R&D QC depth/coverage ; **Étape 1 livrée** (Fig.1 cumulative depth-vs-breadth + Fig.2 positionnelle multi-échelle/bandes déplétion, 4 samples) ; finding 067 vide (34M reads alignés, depth=0) + concordance mosdepth↔trace-prod ; roadmap multi-échelle
 
 ## Debugging Insights
+
+- [gh release 403 → fallback token](github-release-token.md) — `gh release create` échoue en 403 avec le `GITHUB_TOKEN` de `github.sh` (PAT sans perm releases) ; fix `env -u GITHUB_TOKEN gh release ...`
 
 - **raima 0.4.5 casse Raima_process_CNV** : `depth_per_region` n'est pas exportee dans 0.4.5. Fix: utiliser raima 0.4.3 dans le Dockerfile.
 - **Container raima:latest doit etre rebuild** apres modification du Dockerfile — sinon Docker utilise l'ancienne image cachee.
