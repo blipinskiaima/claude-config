@@ -1,23 +1,22 @@
-# Context — Bam2Beta — 2026-06-26T14:55:40+0000
+# Context — Bam2Beta — 2026-07-06T13:42:06+0000
 
 **Branche** : main
-**Dernier commit** : f99812e — feat(mvaf): arrondi sortie mVAF v1.4 en % (round/signif) + fix flags launch_SCW
-**Status** : clean (seul dev/SCW/bacasable.sh untracked, sandbox perso)
+**Dernier commit** : a32c09b — chore(dev): maj scripts de lancement pour V2.0.0
+**Status** : 2 fichiers laissés (launch_SCW.sh modifié, bacasable.sh untracked — perso Boris)
 
 ## Où j'en suis
-Feature **mVAF v1.4** (R&D, non qualifié) : formatage de la sortie `mvaf` finalisé.
-La valeur est désormais exprimée en **% (×100)** puis arrondie. Bloc de transfo identique
-dans les 2 scripts (`bootstrap_trasnfo.R` rétrospectif + `bootstrap_model_v1.1.R` from-scratch).
-En parallèle, flux **small_fragment** : Temps 2 toujours en attente (cf. snapshot précédent).
+V2.0.0 **livrée et qualifiée en production** (QUALIF/V2.0.0 écrit). Feature = le champ `tf`
+du rapport porte désormais la mVAF v1.4 (bootstrap 28M) au lieu de l'ancienne mVAF.
+Chantier bouclé de bout en bout : feature → repro → docker → test → maj → qualif.
 
 ## Ce qui marche / ce qui foire
-- ✓ Arrondi sortie V1.4 : `x=mvaf*100` → `x>=1 → round(x,2)` / `x<1 → signif(x,2)`, committé (f99812e)
-- ✓ Les 2 scripts (model_v1.1 + trasnfo) cohérents bit-à-bit sur le bloc transfo
-- ✓ launch_SCW.sh corrigé : `~/Run2`→`~/Run12`, `--cpu`→`--cpus_max`
-- ✗ Validation bit-à-bit SORTIE 1 (`rowSums(props)` vs ancien appel direct) toujours non faite — gate lors d'un vrai run `--bootstrap`
-- ✗ Temps 2 small_fragment (Bladder_Blood_01_001) pas encore lancé (load serveur)
+- ✓ Module `rapport` (main.nf) : injecte mVAF v1.4 dans `tf` (JSON) + `mvaf` (metadata.json)
+- ✓ Repro mVAF v1.4 : `set.seed(1)` + tri déterministe des bgzf (`LC_ALL=C`) avant bootstrap
+- ✓ QUALIF OK : tf=0.58, scores V2/frag/bedMethyl/CNV bit-à-bit identiques vs V1.3.3
+- ✓ Repro prouvée : Healthy_826 (0.58 ×3) + Breast_48 (64.91 ×3), 6 runs complets
+- ✓ Docker `raima:latest`=0.5.3 poussé sur Docker Hub + tag/release GitHub V2.0.0
+- ✗ Token Tower en clair dans `nextflow.config` (~L59), committé — hors périmètre, à traiter
 
 ## Prochaine étape
-Lors du prochain run `--bootstrap` réel : valider bit-à-bit la SORTIE 1 de bootstrap_model_v1.1.R
-(rowSums des props vs ancien appel direct) ET vérifier le nouveau formatage % des sorties V1.4.
-Puis débloquer le Temps 2 small_fragment quand le load serveur retombe.
+Sécuriser le token Tower (`nextflow.config` ~L59) : sortir en var d'env / `.env` gitignoré
+(violation golden rule secrets). Sinon V2.0.0 est complète.
