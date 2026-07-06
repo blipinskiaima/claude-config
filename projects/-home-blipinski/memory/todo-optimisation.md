@@ -57,6 +57,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-07-06 — Bam2Beta V2.0.0 (mVAF v1.4 dans le rapport)
+
+- [x] **Bam2Beta V2.0.0 — mVAF v1.4 dans le champ `tf` du rapport** — `Raima_report` sorti de `Beta_epic` → module `rapport` (main.nf), injecte la mVAF v1.4 (bootstrap 28M) dans `tf` (JSON) + `mvaf` (metadata.json), remplace l'ancienne mVAF. Repro assurée : `set.seed(1)` + tri déterministe des bgzf (`LC_ALL=C`) corrige l'ordre non déterministe de modkit. QUALIF OK (tf=0.58 bit-à-bit vs V1.3.3), repro prouvée Healthy_826 (0.58 ×3) + Breast_48 (64.91 ×3). Docker raima:latest=0.5.3 poussé, release GitHub V2.0.0. Clôt le « gate qualif restant » du 2026-06-25. Détails : [bootstrap-model-v1.md](../-home-blipinski-Pipeline-Bam2Beta/memory/bootstrap-model-v1.md).
+
 ## 2026-07-03 — Tower toggle mVAF v1.4 + trace-prod v14/v15 + probs_bootstrap
 - [x] **Toggle Score mVAF v1 / v1.4 sur /exploration** — sélecteur pilotant toute la page (tables Sens/Spé + graphes) via `score_source` ; mvaf_v14 lu depuis retd_suivis (VARCHAR virgule FR, KO exclu de la cohorte). Fix bundlé : 4 endpoints graphes (qc/dotplot/methylation/bladder) qui plantaient sur main. Validé live (v1 78.5%/88.4%, v1.4 81.7%/85.3%). Détails : `memory/exploration_score_source_toggle.md`.
 - [x] **trace-prod schema v14 — bootstrap_props** — colonne `retd_suivis.bootstrap_props` OK/KO (présence S3 `bootstrap_v1.props.tsv`), liquid only, calque exact de `bootstrap` v12 (pattern preserve). Ajout via `/add-trace-prod`, backfill CGFL 804 + HCL 513 + exports. Commit `b9abd0c`.
