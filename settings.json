@@ -103,7 +103,12 @@
       "Bash(Rscript -e 'invisible\\(parse\\(\"bin/compute_methyl_features.R\"\\)\\); cat\\(\"R parse OK\\\\n\"\\)')",
       "Bash(bgzip --version)",
       "Bash(Rscript -e 'library\\(parallel\\); cat\\(\"parallel OK, detectCores:\", detectCores\\(\\), \"\\\\n\"\\)')",
-      "Bash(date +%Y-%m-%d *)"
+      "Bash(date +%Y-%m-%d *)",
+      "Bash(env -u GITHUB_TOKEN gh release create V2.0.1 --title V2.0.1 --notes ' *)",
+      "Bash(env -u GITHUB_TOKEN gh release view V2.0.1)",
+      "Bash(command -v samtools)",
+      "Read(//scratch/**)",
+      "Bash(sudo du -xhd1 /)"
     ],
     "deny": [
       "Bash(aws s3 rm:*)",

@@ -28,6 +28,22 @@ Bootstrap du score mVAF v1 : `raima::bootstrap_model_v1` rééchantillonne les r
 - Câblé en **from-scratch** dans `workflow Beta_28M` (à côté de Raima_process_loyfer) ET en **rétrospectif** via main.nf.
 - `bootstrap_model_v1` : `n_boot=200`, `seed=1` → reproductible. Résultat invariant au `ncores` (juste levier de perf, vérifié par le package).
 
+## Tri déterministe pré-bootstrap (V2.0.1, 2026-07-07)
+
+- `modkit extract full --threads` écrit les lignes dans un ordre non déterministe → bootstrap (rééchantillonnage par ligne) non reproductible malgré `set.seed`. Fix : trier chaque bgzf (header conservé, `LC_ALL=C`) avant le bootstrap.
+- **V2.0.0** : `LC_ALL=C sort` full-line (ligne entière comme clé). **V2.0.1** : `sort -t $'\t' -k1,1 -k3,3n -k14,14` = clé explicite **read_id (col1) + ref_position (col3) + mod_code (col14)**.
+- **Pourquoi 3 colonnes** : chaque site CpG a **2 lignes** (`mod_code` m=5mC / h=5hmC, non fusionnées par `extract full`). Prouvé sur Breast_19 chr22 : `(read_id, ref_position)` = **576k ex-æquo** ; `(read_id, ref_position, mod_code)` = **0 collision** (clé unique). Sans mod_code, GNU `sort` retombe sur la ligne entière en dernier recours (déterministe mais dépendance cachée).
+- **Bit-à-bit conforme** : 200 scores bootstrap + `raima_score.V1.4` identiques à QUALIF V2.0.0 sur Healthy_826 (tf=0.58). Le bootstrap est donc insensible au choix full-line vs clé 3-col (pour des reads alignés, ref_position et forward_read_position ordonnent les positions d'un read de façon équivalente).
+- Code : [beta_28M.nf] process `bootstrap_model`, commit efeae5b.
+
+## set.seed(1) R = code mort (V2.0.2, 2026-07-07)
+
+- `bin/bootstrap_model_v1.1.R` avait `set.seed(1)` (ligne 11) censé assurer la repro du bootstrap parallèle (furrr). **Prouvé inerte et supprimé en V2.0.2** (commit 9f964c3).
+- Pourquoi inerte : `raima::bootstrap_model_v1` **seede furrr EN INTERNE** (parallel-safe, `seed=1` défaut raima), indépendamment de l'état RNG maître R → le `set.seed(1)` au niveau R est écrasé/ignoré. Le résultat est **invariant au ncores** (8 ou 10 cpus, prouvé Breast_10/Lung_138).
+- **Preuve bit-à-bit** : 2 runs indépendants SANS seed R (Healthy_826) → 200 scores bootstrap + V1.4 identiques entre eux ET à QUALIF V2.0.0 (md5 `6ebc70623be720ac07c5be4160a39dc4`, tf=0.58). TEST OK.
+- **Correction de compréhension** : la repro du bootstrap = **tri déterministe** (le vrai fix de la variance Breast_48) + **seeding interne raima**. PAS le `set.seed(1)` R. Le commentaire CHANGELOG V2.0.0 (« set.seed(1) état RNG maître, furrr dérive les seeds ») était factuellement faux.
+
+
 ## Mode rétrospectif --bootstrap (main.nf, miroir de --MVAF1_3)
 
 - `params.bootstrap = false` (nextflow.config). `include { bootstrap_model } from beta_28M.nf`.
