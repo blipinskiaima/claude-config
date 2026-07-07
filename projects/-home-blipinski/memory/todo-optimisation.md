@@ -57,6 +57,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-07-07 — Bam2Beta module raréfaction cascade
+
+- [x] **Bam2Beta module raréfaction cascade** — nouveau `Rarefaction_Cascade` (BAM rarifiés nestés 20M→10M→5M→2M→1M via `samtools -s`, 2 temps façon small_fragment). Bug racine trouvé + corrigé : `samtools -s` = hash absolu du read-name, même seed en cascade → seuils composés en MIN → comptes faux ; fix = seed incrémenté par niveau. Validé (±0,13 %, nesting 0 orphelin, bug reproduit sur donnée réelle). Commit `b2648b5`, détails [rarefaction-cascade.md](../-home-blipinski-Pipeline-Bam2Beta/memory/rarefaction-cascade.md).
+
 ## 2026-07-06 — Bam2Beta V2.0.0 (mVAF v1.4 dans le rapport)
 
 - [x] **Bam2Beta V2.0.0 — mVAF v1.4 dans le champ `tf` du rapport** — `Raima_report` sorti de `Beta_epic` → module `rapport` (main.nf), injecte la mVAF v1.4 (bootstrap 28M) dans `tf` (JSON) + `mvaf` (metadata.json), remplace l'ancienne mVAF. Repro assurée : `set.seed(1)` + tri déterministe des bgzf (`LC_ALL=C`) corrige l'ordre non déterministe de modkit. QUALIF OK (tf=0.58 bit-à-bit vs V1.3.3), repro prouvée Healthy_826 (0.58 ×3) + Breast_48 (64.91 ×3). Docker raima:latest=0.5.3 poussé, release GitHub V2.0.0. Clôt le « gate qualif restant » du 2026-06-25. Détails : [bootstrap-model-v1.md](../-home-blipinski-Pipeline-Bam2Beta/memory/bootstrap-model-v1.md).
