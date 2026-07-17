@@ -1,24 +1,25 @@
-# Context — Bam2Beta — 2026-07-07T21:17:04+0000
+# Context — Bam2Beta — 2026-07-17T14:38:54+00:00
 
 **Branche** : main
-**Dernier commit** : b2648b5 — feat(rarefaction): module Rarefaction cascade (subsample BAM 20M->1M nested)
-**Status** : WIP dev/ perso laissée (Bam2Beta.sh, launch_SCW.sh, bacasable.sh untracked)
+**Dernier commit** : b1a966b — chore(dev): maj scripts SCW + gitignore des bacs a sable
+**Status** : clean
 
 ## Où j'en suis
-Feature raréfaction en cascade développée, validée et commitée. `Rarefaction_Cascade`
-(workflow/rarefaction.nf) produit des BAM rarifiés NESTÉS 20M→10M→5M→2M→1M via
-`samtools -s`, 2 temps façon small_fragment. Prêt à re-lancer Temps 1 en prod.
+Chantier TOO (Tumor of Origin) **TERMINÉ** : les 7 étapes de la roadmap sont livrées.
+V2.1.0 taguée, publiée sur GitHub et **qualifiée** (QUALIF/V2.1.0, 27/27 conformes).
+Session close proprement — rien en cours, aucun run actif.
 
 ## Ce qui marche / ce qui foire
-- ✓ Cascade corrigée validée : comptes ±0,13 %, nesting 0 orphelin (1M⊂2M⊂5M⊂10M⊂20M)
-- ✓ Bug racine trouvé : `samtools -s` = hash absolu du read-name ; même seed en cascade →
-  seuils composés en MIN → comptes faux (frac×N_merged). Fix = seed INCRÉMENTÉ par niveau
-- ✓ Bug reproduit bit-à-bit sur donnée réelle (buggy 10M→15M = ta table prod)
-- ✓ Commit b2648b5 (rarefaction.nf + conf/base.config + main.nf + nextflow.config + CLAUDE.md)
-- ✗ Sorties S3 prod actuelles (`CGFL_rarefaction`/`HCL_rarefaction`) FAUSSES (bug) → à re-run
-- ✗ KO=0 sur Lung_121 / Prostate_45 / Lung_13 = échecs Temps 2 SÉPARÉS (crash), non investigués
+- ✓ **V2.1.0 qualifiée** : QUALIF/V2.1.0 écrit depuis la release GitHub (`-r V2.1.0`), 27 vérifications / 27 conformes. Devient la référence des prochains tests.
+- ✓ **Module TOO actif en prod** — 5 classes, gate mVAF 0.32 + max_p 0.8257. Container `too:0.4.1`.
+- ✓ **JSON V2 refondu (18 champs)** — BREAKING : `score` supprimé (doublon de `tf`), `model` → `"v1.4"`. Les 2 seuils TOO sortent du **bundle** (`run_too5.R` → CSV → `rapport.nf`), pas d'un param → le JSON ne peut pas contredire la décision qu'il publie.
+- ✓ **Qualif refondue** : Lung_9 = 2e sample, 12 valeurs nommées figées, bit-à-bit abandonné (cassait à chaque ajout de champ + ne nommait pas la métrique fautive).
+- ✓ Lung_9 bit-à-bit identique au 1er run S3 du 15/07 ; interprétation identique au golden (écarts ≤ 1.6e-03, graine du bootstrap mVAF v1.4).
+- ✗ **Bug channel latent non corrigé** sur `RAIMA_MODEL1/2`, `ANCESTRY_MODEL`, `BED`, `FASTA`, `FAI` : queue channel à 1 item consommé en `path()` simple → 1 exécution par invocation. Inoffensif en prod (1 sample/run), casse le multi-samples. Candidat V2.1.1 : `.first()` sur les 6.
+- ✗ **3 Rscript/cp pointent vers des fichiers absents** après l'archivage (`bin/archive/`) : `bootstrap_trasnfo.R`, `raima_score_v1_3.R`, `ctdna_report_template.Rmd`. Tous sur chemins morts aujourd'hui — piège si on décommente `beta_28M.nf:43-53`.
+- ✗ `maj-bam2beta` utilise `git describe --tags` → attrape les checkpoints (`pre-too`) au lieu des versions. `run-test.sh` filtre correctement avec `git tag -l 'V*'`.
 
 ## Prochaine étape
-Re-lancer Temps 1 (code corrigé) sur les 10 samples puis Temps 2. Décider écrasement S3
-vs nouveau dossier. Toggle = `--RAREFACTIONS` (pluriel !), depths = `--rarefaction '20M,10M,5M,2M,1M'`.
-Artefacts de test conservés : /scratch/boris/rare_test/
+Rien de bloquant sur TOO. Deux chantiers dorment, par ordre d'urgence :
+1. **Raréfaction** — les sorties S3 de prod sont FAUSSES (produites avant le fix `b2648b5`) et n'ont jamais été re-générées ; 3 échecs non investigués (Lung_121 / Prostate_45 / Lung_13). Détail versé dans [rarefaction-cascade.md](../../-home-blipinski-Pipeline-Bam2Beta/memory/rarefaction-cascade.md) (section « État opérationnel »).
+2. Patch V2.1.1 : `.first()` sur les 6 canaux restants (aucun changement de comportement en prod, débloque le multi-samples).
