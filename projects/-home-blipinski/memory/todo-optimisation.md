@@ -57,6 +57,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-07-17 — Bam2Beta V2.1.0 (module TOO)
+
+- [x] **Module TOO (Tumor of Origin) en production** — TOO5 v0.4.1 câblé (`workflow/too.nf`), 5 classes tumorales, actif en profil prod. V2.1.0 taguée, publiée et **qualifiée** (QUALIF/V2.1.0, 27/27 conformes). Détails dans [too-module.md](../../-home-blipinski-Pipeline-Bam2Beta/memory/too-module.md).
+- [x] **raima_score.V2.json refondu (18 champs)** — BREAKING : `score` supprimé (doublon de `tf`), `model` → `"v1.4"`. Les 2 seuils TOO sortent du bundle (pas d'un param) → le JSON ne peut pas contredire la décision publiée.
+- [x] **Qualification refondue autour de 12 valeurs nommées** — Lung_9 comme 2e sample, flag `VALEUR KO` greppable, abandon du bit-à-bit ; fix race `.git/index.lock` (runs qualif séquentiels).
+
 ## 2026-07-07 — Bam2Beta module raréfaction cascade
 
 - [x] **Bam2Beta module raréfaction cascade** — nouveau `Rarefaction_Cascade` (BAM rarifiés nestés 20M→10M→5M→2M→1M via `samtools -s`, 2 temps façon small_fragment). Bug racine trouvé + corrigé : `samtools -s` = hash absolu du read-name, même seed en cascade → seuils composés en MIN → comptes faux ; fix = seed incrémenté par niveau. Validé (±0,13 %, nesting 0 orphelin, bug reproduit sur donnée réelle). Commit `b2648b5`, détails [rarefaction-cascade.md](../-home-blipinski-Pipeline-Bam2Beta/memory/rarefaction-cascade.md).
