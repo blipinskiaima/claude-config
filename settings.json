@@ -108,7 +108,28 @@
       "Bash(env -u GITHUB_TOKEN gh release view V2.0.1)",
       "Bash(command -v samtools)",
       "Read(//scratch/**)",
-      "Bash(sudo du -xhd1 /)"
+      "Bash(sudo du -xhd1 /)",
+      "Bash(find / -iname \"prop_loyfer*\")",
+      "Bash(find / -iname \"*.R\" -path \"*raima*\")",
+      "Bash(Rscript --version)",
+      "Bash(Rscript -e 'for \\(p in c\\(\"dplyr\",\"stringr\",\"tibble\",\"tidyr\",\"xgboost\"\\)\\) cat\\(sprintf\\(\"%-10s %s\\\\n\", p, ifelse\\(requireNamespace\\(p, quietly=TRUE\\), \"OK\", \"MANQUANT\"\\)\\)\\)')",
+      "Bash(Rscript tumor_of_origin/predict_too5.R --version 0.4.1 --input-csv tumor_of_origin/releases/too5_v0_4_1/input_features_template.csv --output /tmp/claude-1005/-home-blipinski-Pipeline-Bam2Beta/ce4f6b78-c3ca-471b-a60a-d1b2791e6745/scratchpad/too5_test.csv)",
+      "Bash(zcat /scratch/dependencies/raima-model/model_loyfer_data.tsv.gz)",
+      "Bash(mkdir -p /tmp/claude-1005/-home-blipinski-Pipeline-Bam2Beta/ce4f6b78-c3ca-471b-a60a-d1b2791e6745/scratchpad/raima_inspect)",
+      "Bash(tar -tzf /home/blipinski/Pipeline/Bam2Beta/docker/raima_0.5.3.tar.gz)",
+      "Bash(Rscript -e 'find.package\\(\"raima\"\\)')",
+      "Bash(Rscript -e 'library\\(raima\\); packageVersion\\(\"raima\"\\)')",
+      "Bash(Rscript -e 'ls\\(getNamespace\\(\"raima\"\\)\\)')",
+      "Bash(Rscript -e 'library\\(raima\\); print\\(args\\(model_v1\\)\\); cat\\(\"\\\\n---prop_loyfer---\\\\n\"\\); print\\(args\\(prop_loyfer\\)\\)')",
+      "Bash(Rscript -e ' *)",
+      "Bash(Rscript /home/blipinski/Pipeline/Bam2Beta/bin/TOO/run_too5.R --model /scratch/dependencies/too-model/too5_v0_4_1.rds --input-csv /tmp/too5_tmpl.csv --output /tmp/too5_out.csv)",
+      "Bash(Rscript /tmp/claude-1005/-home-blipinski-Pipeline-Bam2Beta/ce4f6b78-c3ca-471b-a60a-d1b2791e6745/scratchpad/gen_too5_fixture.R)",
+      "Bash(bash /home/blipinski/Run/too_test_Bladder089.sh > /home/blipinski/Run/too_test.log 2>&1)",
+      "Bash(Rscript /home/blipinski/Pipeline/Bam2Beta/bin/TOO/run_too5.R --model /scratch/dependencies/too-model/too5_v0_4_1.rds --input-csv /tmp/too_dbg.csv --output /tmp/too_dbg_out.csv)",
+      "Bash(bash /home/blipinski/Run/too_test_10.sh > /home/blipinski/Run/too_test10.log 2>&1)",
+      "Bash(echo \"=== Recherche du depot exploratory-analysis-CGFL-HCL ===\" *)",
+      "Read(//mnt/**)",
+      "Bash(timeout 180 Rscript screening_top10_xgb/predict_themelio.R --version 1.0 --input-csv screening_top10_xgb/releases/themelio_1_0/input_features_template.csv --output /tmp/claude-1005/-home-blipinski-Pipeline-Bam2Beta/2e80e615-d3d7-48d3-8939-11babb7ea6db/scratchpad/themelio_test.csv)"
     ],
     "deny": [
       "Bash(aws s3 rm:*)",
@@ -135,9 +156,11 @@
     "additionalDirectories": [
       "/scratch/boris/meanmeth/result/Breast_19",
       "/home/blipinski/.claude/projects/-home-blipinski/memory/context",
-      "/home/blipinski/.claude/projects/-home-blipinski/memory"
+      "/home/blipinski/.claude/projects/-home-blipinski/memory",
+      "/home/blipinski/Run"
     ]
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -174,6 +197,7 @@
     "superpowers@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true
   },
+  "effortLevel": "xhigh",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "agentPushNotifEnabled": true

@@ -36,3 +36,21 @@ Consequence en cascade seed=42 partout : niveau k = `frac_k x N_merged` (pas `fr
 - **Buggy reproduit** (seed 42 fige, meme donnee) : 10M->14 999 399, 5M->10 003 255, 2M->5 998 585, 1M->5 003 204 = exactement `frac x 30M` et le motif prod de Boris. Diagnostic prouve empiriquement.
 - **Nesting** : `comm -23` des read-names entre paliers consecutifs = **0 orphelin** partout -> 1M subset 2M subset 5M subset 10M subset 20M confirme.
 - Artefacts de test : `/scratch/boris/rare_test/` (scripts + BAM fixed_*, Boris les garde).
+
+## État opérationnel — RESTE À FAIRE (relevé du snapshot de contexte du 2026-07-07)
+
+Le bug est corrigé et commité (`b2648b5`), mais **les conséquences sur les données ne sont pas traitées** :
+
+- ⚠ **Les sorties S3 de production sont FAUSSES** — `processed/MRD/RetD/{liquid,solid}/{CGFL,HCL}_rarefaction/`
+  ont été produites AVANT le fix (seed identique en cascade → comptes faux, trop hauts :
+  `frac_k × N_merged` au lieu de `frac_k × count_précédent`). **Elles n'ont jamais été re-générées.**
+  Quiconque les consomme aujourd'hui travaille sur des comptes erronés.
+  → Re-lancer le Temps 1 (code corrigé) sur les 10 samples, puis le Temps 2.
+  → Décider au préalable : écraser sur S3 (interdit sans accord explicite de Boris,
+    cf. [[feedback_s3_no_delete]]) ou écrire dans un nouveau dossier.
+
+- ⚠ **3 échecs du Temps 2 jamais investigués** : `KO=0` sur **Lung_121**, **Prostate_45**, **Lung_13**
+  (crashs séparés, sans rapport avec le bug de seed). Cause inconnue.
+
+Rappels d'usage : toggle `--RAREFACTIONS` (au **pluriel**), profondeurs via
+`--rarefaction '20M,10M,5M,2M,1M'`. Artefacts de test conservés dans `/scratch/boris/rare_test/`.

@@ -1,160 +1,52 @@
 # trace-prod Memory
 
+## Feedback / règles de travail
 - [Scratch workspace + BAM read-only](feedback_scratch_workspace.md) — analyses ad-hoc dans /scratch/boris/<topic>/, source BAM/POD5 strictement en lecture seule
 - [Rebasecalled POD5 — ne pas propager](feedback_rebasecalled_pod5.md) — laisser NULL après update-column stockage_pod5, ne pas copier depuis l'original
+- [STATUS_COLUMNS = OK/KO/WARNING strict](feedback_status_columns.md) — y mettre une VARCHAR libre (ichorcna_score) → _parse_status() écrase tout en KO
+- [Probs loyfer manquantes = décalage extraction](feedback_probs_loyfer_lag.md) — loyfer NULL + epic OK → props_loyfer généré après la dernière passe loyfer (pas un bug). Fix `probs -P`. `-s` mono-sample → boucler
+
+## Schemas & features
 - [Schema v6 — colonnes IV/QC](project_schema_v6_iv_qc.md) — 4 colonnes retd_suivis (read_start_time, ancestry, sex_proba, sex_predicted), path IV/ sœur de QC/
-- [Schema v7 — short_read](project_schema_v7_short_read.md) — colonne retd_suivis.short_read, vérifie 6 dossiers S3 dans bucket mirror {labo}_short_read (liquid uniquement)
-- [Schema v8 — short_read_metrics](project_schema_v8_short_read_metrics.md) — nouvelle table 28 colonnes (10 DECIMAL + 16 probs) pour métriques quantitatives short read, CLI check-short-read indépendante du check standard
-- [Schema v9 — dilution](project_schema_v9_dilution.md) — table AUTONOME 64 colonnes (PK sample_name, pas de FK), lot 480 samples Dilution, préfixe .merged → réutilise BaseChecker sans override, CLI check/update-column/export-dilution sans args type/labo
-- [Schema v10 — frag softclipped](project_schema_v10_frag_sc.md) — 3 colonnes retd_suivis (frag_status_sc/frag_mode1_sc/frag_mode2_sc), calque EXACT du frag v1, source Fragmentomics/filtered_softclipped
-- [Schema v11 — mvaf_v13 + frag_score_v2_sc](project_schema_v11_mvaf_v13_frag_score.md) — 2 colonnes retd_suivis VARCHAR, liquid only, mvaf_v13 calque mvaf_v12 (raima V1.3) + frag_score_v2_sc (nouveau, fragmentomics_score.V2.tsv softclipped)
-- [Schema v12 — bootstrap](project_schema_v12_bootstrap.md) — colonne retd_suivis.bootstrap OK/KO, présence S3 BOOTSTRAP/{s}.merged.all.bootstrap_v1.tsv, liquid only, pattern preserve via _s3_exists, export entre Short Read et BAM
-- [Schema v13 — mvaf_v14](project_schema_v13_mvaf_v14.md) — colonne retd_suivis.mvaf_v14, calque mvaf_v13 SAUF extraction cols[1] (colonne mvaf, fichier V1.4 à 3 colonnes name·mvaf·model), liquid only, export après mVAF v1.3
-- [Schema v14 — bootstrap_props](project_schema_v14_bootstrap_props.md) — colonne retd_suivis.bootstrap_props OK/KO, présence S3 BOOTSTRAP/{s}.merged.all.bootstrap_v1.props.tsv, calque EXACT de bootstrap (v12), liquid only
-- [Mode probs --probs_bootstrap](project_probs_bootstrap_mode.md) — probs epic = moyenne des 200 réplicats bootstrap (bootstrap_v1.props.tsv), écrase les 16 col epic (NULL si absent), liquid CGFL+HCL, réversible via probs --probs
-- [Schema v16 — rarefaction](project_schema_v16_rarefaction.md) — table AUTONOME (pseudo-samples {sample}_{niveau}, PK nom dossier, pas de FK), BAM raréfiés 20M/10M/5M/2M/1M dans {labo}_rarefaction, calque dilution, CLI check-rarefaction {CGFL|HCL}/update-column-rarefaction/export-rarefaction (probs DB-only), mvaf_v13 toujours NA
-- [Colonnes v2-v7 — index](project_columns_index.md) — synthèse des colonnes ajoutées + patterns transversaux (collision mapping, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
-- [Frag softclip vs trim barcode](project_frag_softclip_trim.md) — AlCapone re-basecallé offline hétérogène (trim ON/OFF). frag_mode v1 gonflé jusqu'à +148bp sur ~81 samples ; seul frag_mode_sc fiable. Delta filtered−sc = détecteur du trim manquant
-- [Probs loyfer manquantes = décalage extraction](feedback_probs_loyfer_lag.md) — loyfer NULL + epic OK → fichier props_loyfer généré après dernière passe loyfer (pas un bug). upsert_probs préserve loyfer en mode v1 seul. Fix `probs -P`. `-s` mono-sample → boucler
-- [Samples Twist](project_twist_samples.md) — « twist » = 11 samples liquid CGFL (titration validation enrichissement Twist, blanc Twist_Diluant_RB), pas un type/cohorte/commande → check via `-s` sur liquid CGFL puis export liquid CGFL --gsheet
+- [Schema v7 — short_read](project_schema_v7_short_read.md) — retd_suivis.short_read, 6 dossiers S3 dans le mirror {labo}_short_read (liquid only). Gotcha `s3 ls --recursive` = clés complètes
+- [Schema v8 — short_read_metrics](project_schema_v8_short_read_metrics.md) — table 28 colonnes (FK sample_id), CLI check-short-read indépendante + export-short-read-like
+- [Schema v9 — dilution](project_schema_v9_dilution.md) — table AUTONOME 64 col (PK sample_name, pas de FK), 480 samples, préfixe .merged → BaseChecker sans override, CLI sans args type/labo
+- [Schema v10 — frag softclipped](project_schema_v10_frag_sc.md) — 3 col retd_suivis, calque EXACT du frag v1, source Fragmentomics/filtered_softclipped. Quirk NA vs KO selon check/update-column
+- [Schema v11 — mvaf_v13 + frag_score_v2_sc](project_schema_v11_mvaf_v13_frag_score.md) — 2 col VARCHAR liquid only, mvaf_v13 calque mvaf_v12 (raima V1.3)
+- [Schema v12 — bootstrap](project_schema_v12_bootstrap.md) — retd_suivis.bootstrap OK/KO, présence S3 bootstrap_v1.tsv, pattern preserve via _s3_exists
+- [Schema v13 — mvaf_v14](project_schema_v13_mvaf_v14.md) — calque mvaf_v13 SAUF cols[1] (V1.4 à 3 colonnes) + format_mvaf4() (jamais de notation scientifique)
+- [Schema v14 — bootstrap_props](project_schema_v14_bootstrap_props.md) — calque EXACT de bootstrap (v12), fichier bootstrap_v1.props.tsv
+- [Schema v16/v17 — rarefaction](project_schema_v16_rarefaction.md) — table AUTONOME, PK composite (sample_name, labo) depuis v17 (collision inter-labo), niveaux 20M/10M/5M/2M/1M, calque dilution. Pipeline terminé 15/07/2026 : 1355 lignes, PROD OK 100%, toutes métriques remplies
+- [Mode probs --probs_bootstrap](project_probs_bootstrap_mode.md) — probs epic = moyenne des 200 réplicats bootstrap, écrase les 16 col epic (NULL si absent), réversible via probs --probs
+- [Colonnes v2-v7 — index](project_columns_index.md) — colonnes v2-v7 + patterns transversaux (collision mapping TSV_TO_DB, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
+
+## Données & infra
+- [Infra POD5/BAM/export](reference_infra_pod5_bam_export.md) — extraction barcode (+ workaround logs Pod2Bam), POD5 storage 6 colonnes, structure S3 AWS/SCW, BETA_28M, ordre export, IchorCNA, date_done, gsheet config, CLI defaults
+- [Frag softclip vs trim barcode](project_frag_softclip_trim.md) — AlCapone re-basecallé offline hétérogène (trim ON/OFF). frag_mode v1 gonflé jusqu'à +148bp sur ~81 samples ; **seul frag_mode_sc est fiable** en cross-cohorte
+- [Samples Twist](project_twist_samples.md) — 11 samples liquid CGFL (titration enrichissement Twist), pas un type/cohorte/commande
+- [HCL Verification](project_hcl_verification.md) — 275 samples vérifiés, transfert raw→S3 intègre, raw purgé 12/03/2026
+- [Script pod5_verification](reference_pod5_verification.md) — génération de pod5_verification.tsv
 
 ## Architecture
-- CLI entry: `database/check_samples.py` (Click)
-- Core: `lib/checkers.py`, `lib/duckdb.py`, `lib/utils.py`, `lib/extractors.py`
-- S3 fallback: `lib/s3_fallback.py` — SmartPath inherits Path, transparent S3 download via boto3
-- DB: DuckDB file at `database/samples_status.duckdb`
-- Schema single source of truth: `DuckDBService.SCHEMA` (lib/duckdb.py)
+- CLI entry : `database/check_samples.py` (Click) — Core : `lib/checkers.py`, `lib/duckdb.py`, `lib/utils.py`, `lib/extractors.py`
+- S3 fallback : `lib/s3_fallback.py` — SmartPath hérite de Path, download S3 transparent via boto3
+- DB : `database/samples_status.duckdb`. Schéma = source unique `DuckDBService.SCHEMA` (lib/duckdb.py)
+- Checkers dédiés (n'héritent pas tous pareil) : `checkers_short_read.py` (override 4 méthodes, préfixe minLen75), `checkers_dilution.py` + `checkers_rarefaction.py` (BaseChecker sans override, préfixe .merged)
 
 ## Key Mappings (lib/)
-- `COLUMN_MAPPING` dict: display names → DB column names
-- `NUMERIC_COLUMNS` set: columns with DECIMAL casting on import
-- `LIQUID_HEADERS`, `SOLID_HEADERS` (utils.py): export column order
-- `COLUMN_CHECKERS` (check_samples.py): column name → checker method for `update-column`
-- `_BAM_COLS` (utils.py): BAM column export order
+- `COLUMN_MAPPING` : display → DB column. `NUMERIC_COLUMNS` : cast DECIMAL à l'import. `STATUS_COLUMNS` : OK/KO/WARNING strict uniquement
+- `LIQUID_HEADERS` / `SOLID_HEADERS` (utils.py) : ordre des colonnes export. `_BAM_COLS` : ordre export BAM
+- `COLUMN_CHECKERS` (check_samples.py) : colonne → méthode checker pour `update-column` (+ variantes `DILUTION_` / `RAREFACTION_`)
 
 ## DuckDB Gotchas
-- UPSERT creates dead blocks (copy-on-write) — use `clean-database` to compact
-- `CREATE TABLE AS SELECT` loses PK/FK — always use DDL + INSERT INTO SELECT
-- European decimal conversion: comma→dot + KO/NA→NULL before insert
-- DuckDB single writer lock — cannot run concurrent queries during update-column
-- `update-column` runs must be **sequential** (not parallel) due to single writer lock
-
-## Export GSheet Column Order (liquid)
-- Removed 6 individual rarefaction columns (20M..1M), replaced by single "Rarefaction" (computed at export)
-- Removed "QC" column from both liquid and solid exports
-- "Taille BAM (GiB)" réintégrée dans l'export (calculée via NFS stat, entier GiB)
-- "BEDMETH EPICS" moved right after "BAM"
-- "Dorado Model" moved before "Version Dorado Model"
-- Rarefaction logic: OK if all thresholds ≤ nb_reads_total are OK, KO if any isn't, OK if no applicable threshold (< 1M reads)
-
-## Rarefaction Consolidation (display-only)
-- `_RAREFACTION_THRESHOLDS = {"20M": 20, "15M": 15, "10M": 10, "5M": 5, "2M": 2, "1M": 1}`
-- Implemented in both `GSheetsService._consolidated_rarefaction()` and `DuckDBService._consolidated_rarefaction()`
-- NOT stored in DB — computed at export time from `nb_reads_total` + `threshold_*` columns
-
-## Date Done Bug Fix (update-column)
-- `update-column date_done` was failing: checker returns DD-MM-YYYY but DuckDB DATE column expects YYYY-MM-DD
-- `_parse_date()` conversion only existed in `upsert_sample()` path, not in `update-column` path
-- Fixed in `check_samples.py` update_column(): added date format conversion for `column == 'date_done'`
-
-## BAM Metadata Extraction
-- `BAMExtractor._extract_with_samtools()`: timeout increased 10s → 30s, added 1 retry on timeout
-- Columns extracted by `check`: dorado_model, dorado_model_version, run_id, barcode, taille_bam
-- Columns NOT extracted by `check`: reads_per_flowcell, samples_per_run (aggregate, via `update-column`)
-- Barcode extraction: from BAM filename (`barcode\d+` regex), NOT from RG header
-- **Rebasecalled samples** (and some non-rebasecalled, e.g. Colon_NN_rep merged BAM) have no barcode in filename or RG header → barcode stays NA
-  - Workaround: extract from Pod2Bam align logs at `/mnt/aima-bam-data/processed/Pod2Bam/RetD/{run}/{version}/align_trimmed/{sample}.log` (subdir is **align_trimmed**, NOT align ; version ex `V0.9.6_V5.0.0` ; the `{run}` dir embeds the run_id prefix, e.g. `..._962143e5_pod5_rep1`)
-  - Log line `command: dorado aligner ... {run_id}_barcode{N}.bam` contains the barcode (log has no zero-pad, DB stores `barcodeNN` zero-padded)
-  - No automated code fallback — recovery is a manual SQL UPDATE on `bam_metadata.barcode`
-  - 36 rebasecalled barcodes recovered this way (CGFL liquid, mars 2026) ; 8 Colon_17-20_rep1/rep2 recovered juin 2026 (barcode19/28/30/32, rep1+rep2 share barcode per Colon number)
-  - 82 older rebasecalled (V4.3.0/V4.2.0) have no Pod2Bam logs → barcode remains NA
-
-## POD5 Storage System (bam_metadata)
-- Columns: `stockage_pod5`, `sample_type_pod5`, `taille_pod5`, `pod5_adresse`, `nb_pod5`, `pod5_completude`
-- Update: `update-column stockage_pod5` → updates all 6 columns together
-- Dispatch: COLUMN_CHECKERS type='storage' → `_update_pod5_storage()`
-- `check` ne lance plus `_update_pod5_storage()` — uniquement via `update-column`
-- `taille_pod5` calculée via `aws s3 ls --summarize` (entier GiB, cache `_s3_size_gib()`)
-- `pod5_completude` = `round(nb_pod5 / (max_index + 1) * 100)` — détecte fichiers POD5 manquants
-  - > 100% = multi-run mixing (indices de flowcells différents dans même dossier)
-- `taille_bam` calculée via `aws s3 ls --summarize --profile=scw` sur le merged BAM S3 (entier GiB)
-- `nb_bam` + `bam_completude` calculés via `aws s3 ls --recursive --profile=scw` sur BAM raw
-- `bam_completude` = nb_bam / (max_index + 1) × 100, special case: 1 BAM = 100%
-- "Nb POD5" et "Nb BAM" retirés de l'export GSheet (colonnes internes uniquement)
-- "Complétude BAM" ajoutée à l'export GSheet
-
-### S3 Structure
-- Bucket: `aima-pod-data`, 2 providers (AWS profil `aws`, SCW profil `scw`)
-- AWS path: `s3://aima-pod-data/CGFL/liquid/{run}/`
-- SCW path: `s3://aima-pod-data/data/CGFL/liquid/{run}/` (same but with `data/` prefix)
-- CGFL formats: `pod5_pass/{sample}/`, `pod5/` flat, `pod5_repN/`, racine `.pod5`
-- CGFL matching: run_id[:8] → S3 hash, fallback sample_name dans pod5_pass/
-- HCL: dossiers `{sample_name}/` avec POD5 directement dedans
-- HCL raw NANO: `/mnt/aima-bam-data/data/HCL/raw/NANO{NN}_{YY}_N{X}/no_sample_id/{run_id}/`
-- Dedup (`_dedup_cgfl_folders()`): `=OK` > original > `=moche`
-
-### POD5 Verification (mars 2026)
-- CGFL liquid: 462 detected, 112 not (104 Lung_Alc + 8 Colon rep without POD5 address)
-- AWS+SCW: tailles identiques 148/148, nombre diff de 1 (fichier metadata extra côté AWS)
-- Concordance gsheet CGFL (Sample name / Run number): 285/293 oui, 8 non (Colon_17-20_rep sans adresse DB)
-- POD5 index contiguity: AWS 89/93 runs 100%, SCW 33/36 runs 100%
-- 3 runs ~74% (mars 2025, anciens), 1 run 98.6% (7 indices manquants)
-
-### Dorado Model Split
-- `dorado_model` + `dorado_model_version` — split sur `@` dans BAMExtractor._parse_rg_line
-- gsheet "dorado version" = software version (ex: 7.6.7), DB = model version (ex: v4.3.0)
-
-## Sample Counts (liquid CGFL, mars 2026)
-- 628 in DB (mars 2026, après ajout rebasecalled V5.0.0)
-- Stockage: 285 AWS, 148 AWS+SCW, 37 SCW, 104 NULL (anciens Lung_Alc)
-- 93 unique AWS addresses, 36 unique SCW addresses
-
-## GSheet Config
-- Config: `database/gsheets_config.json`
-- metadata_CGFL: spreadsheet `1v1KUuCoMQV4Qk5jfbHLxhrUK6q_FETLiH8TuCQMdNxA`, worksheet "VAF"
-- metadata_HCL: spreadsheet `1XcWPn3_PT1atR-i5DmOM1t0ldgb5_PnxhQUwNUxWpQg`, worksheet "VAF"
-- Fetch: `fetch-gsheet metadata_CGFL` / `fetch-gsheet metadata_HCL`
-
-## Scripts utilitaires (dev/)
-- `dev/pod5_verification_gen.py` — génère `pod5_verification.tsv` (vérification croisée POD5 AWS/SCW pour CGFL, filtre rebasecalled)
-- `dev/hcl_verification_gen.py` — génère `hcl_verification.tsv` (vérification croisée POD5/BAM raw↔S3 pour HCL)
-- `dev/hcl_correspondance_rapports.tsv` — correspondance 66 runs NANO Dir / Run Number / Adresse Rapport
-- `rapport/` — 36 rapports HTML Dorado copiés depuis SCW
-
-## BETA_28M Check (avril 2026, BREAKING)
-- `check_beta_28m()` exige **44 fichiers réels** (size > 0) + **≤ 1 ghost** (size = 0). Avant : tolérait 44 ou 45 sans distinguer ghost vs réel → faux-positif "44 total = 43 réels + 1 ghost"
-- Les 2 flags `--combine-mods` + `--combine-strands` dans le log chr22 restent obligatoires
-- Méthode `_has_single_ghost()` supprimée, remplacée par comptage direct via `_s3_ls_lines()`
-- Audit avril 2026 : 1 faux-positif détecté = `Healthy_26_rebasecalled_V4.3.0` (HCL) — `chr18.bedMethyl.gz` manquant (43 réels + 1 ghost)
-
-## CLI Defaults (avril 2026)
-- Jobs par défaut : **4** pour `check`, `update-column`, `probs` (revert du 12→4 car 12 saturait S3)
-- `update-column --sample` accepte multiple samples (`-s sample1 -s sample2`)
-- `_update_pod5_storage()` et `_update_bam_sizes()` supportent le filtrage par samples via `sample_filter`
-
-## HCL Verification (mars 2026)
-- [Détails complets](project_hcl_verification.md)
-
-## IchorCNA Column (mars 2026)
-- Column: `ichorcna_score` in `retd_suivis` — VARCHAR, NOT in STATUS_COLUMNS
-- Value: tumor fraction with comma decimal (ex: "0,01271") or "KO" if absent
-- Source: `{sample_dir}/ichorCNA/{sample}.params.txt`, line 2, col 2 (tab-separated)
-- S3 read-only via `_s3_read_text()`, fallback NFS
-- [STATUS_COLUMNS gotcha](feedback_status_columns.md)
+- **`CREATE TABLE AS SELECT` perd les PK/FK** — toujours DDL original + `INSERT INTO ... SELECT` pour les migrations
+- UPSERT crée des blocs morts (copy-on-write) → `clean-database` compacte. ⚠ Ajouter toute nouvelle table à `compact()` (sinon perte au prochain clean)
+- **Single writer lock** → `update-column` / `check` séquentiels, jamais en parallèle (CGFL puis HCL)
+- Conversion euro : virgule→point + KO/NA→NULL avant insert
 
 ## Conventions
-- Valid combos: liquid×(CGFL|HCL), solid×CGFL only
-- Status: OK, KO, WARNING
-- European format: comma decimals, DD-MM-YYYY dates
-- Missing: "NA" in exports, NULL in DB
-- samples table: colonne `sample_type` (pas `type`)
+- Combos valides : liquid×(CGFL|HCL), solid×CGFL. Solid×HCL invalide
+- Statuts : OK, KO, WARNING (+ RUNNING pour prod_status). Format euro : virgule décimale, DD-MM-YYYY
+- Manquant : "NA" en export, NULL en DB. Table `samples` : colonne `sample_type` (pas `type`)
 
-## Schemas v2-v7 + patterns transversaux
-Détails déportés vers [columns-index](project_columns_index.md) :
-- v2 (mVAF raréfiée, frag_mode, bam_horaire, 4 metadata cols)
-- v3-v5 (metadata gsheet : grade, speedvac, cohort)
-- v6 (IV/QC : read_start_time, ancestry, sex_proba, sex_predicted)
-- v7 (short_read)
-- Patterns : collision mapping TSV_TO_DB, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT, BAM completude fallback
-
-Sections détaillées par colonne : voir `~/Pipeline/trace-prod/README.md` Tables 2/3/4 et `~/Pipeline/trace-prod/CLAUDE.md`.
+Détails par colonne : `~/Pipeline/trace-prod/README.md` (Tables 2/3/4) et `~/Pipeline/trace-prod/CLAUDE.md`.

@@ -22,15 +22,18 @@ plugins/
 
 # Runtime daemon (machine-specific state)
 daemon.log
+daemon.lock
+daemon.status.json
 daemon/
 jobs/
 scheduled_tasks.lock
 
-# Projects: ignore session logs, keep memory/
+# Projects: ignore session logs + per-session workflow artefacts, keep memory/
 projects/**/*.jsonl
 projects/**/subagents/
 projects/**/sessions-index.json
 projects/**/tool-results/
+projects/**/workflows/
 
 # Machine-specific settings
 settings.local.json
