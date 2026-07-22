@@ -57,8 +57,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-07-22 — Bam2Beta V2.2.0 (module THEMELIO)
+## 2026-07-22 — Bam2Beta V2.2.0 (THEMELIO) + trace-prod v18/v19 (tracking themelio/too)
 
+- [x] **trace-prod schema v18 — themelio_score** — colonne `retd_suivis` (liquid only) lisant `THEMELIO/{s}.themelio_predictions.csv` (col 2, score P(cancer)), virgule précision complète, calque mvaf_v14. Ajout via `/add-trace-prod`, backfill 1322 liquid + export gsheet. Commit `37762f3`. Détails : [project_schema_v18_themelio.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v18_themelio.md).
+- [x] **trace-prod schema v19 — too_predicted_class + too_final_decision** — 2 colonnes `retd_suivis` (liquid only) du classifieur TOO, source `TOO/{s}.too5_predictions.csv` col 9 + col 20, **parsing module csv obligatoire** (virgule interne dans confidence_stratum). Backfill 1323 liquid (Lung 549 / Bladder+Pancreas 370 / Colon 256 / Breast 95 / Prostate 53) + export. Commit `6b22116`. Détails : [project_schema_v19_too.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v19_too.md).
 - [x] **Module THEMELIO (dépistage cancer) en production** — Themelio 1.0.0 câblé (`workflow/themelio.nf`), score P(cancer) XGBoost Top10 + catégorie dual-threshold, actif en prod/liquid. Wrapper minimal (aucun vendorisé), versions lues des artefacts, mode rétro `--THEMELIO_RETRO`, gardes-fous `SCRIPT_FOR_MODEL`. V2.2.0 taguée, publiée et **qualifiée** (QUALIF/V2.2.0, 37/37). Détails dans [themelio-module.md](../../-home-blipinski-Pipeline-Bam2Beta/memory/themelio-module.md).
 - [x] **metadata.json devient le contrat de sortie unique (29 champs)** — BREAKING : `raima_score.V2.json` supprimé, `metadata.json` en est un sur-ensemble strict + bloc versions (`version_bam2beta/raima/too/themelio`) lu de l'artefact, jamais d'un param.
 - [x] **Qualif THEMELIO 2 niveaux** — Lung_9 (0.855261) + Lung_100 (0.846397) figés dans `check-conformity.sh` (score + catégorie) ; 6 samples `example_scores` du dépôt reproduits au dernier chiffre via `--THEMELIO_RETRO`, tracés (non rejoués). Comparaison QUALIF vs plateforme TESTV220 : 0 différence de résultat.
