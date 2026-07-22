@@ -1,30 +1,27 @@
-# Context — Bam2Beta — 2026-07-22T12:46:00+0000
+# Context — Bam2Beta — 2026-07-22T14:06:06+0000
 
 **Branche** : main
-**Dernier commit** : c1bd572 — refactor(qualif): refonte check-conformity 6 etapes + nettoyage procedure conformite
+**Dernier commit** : 7e7d90e — feat(too): mode retrospectif --TOO_RETRO (miroir de --THEMELIO_RETRO)
 **Status** : clean (0 fichier modifié)
 
 ## Où j'en suis
-Refonte complète de `conformity/check-conformity.sh` (procédure de qualif Bam2Beta) **terminée,
-testée sur un vrai run V2.2.1, commitée et poussée** (c1bd572). La procédure est alignée de bout en
-bout : le check, les 2 skills qui l'utilisent, et `test.sh`. Chantier clos.
+Ajout du mode rétrospectif **`--TOO_RETRO`** (miroir strict de `--THEMELIO_RETRO`) : score TOO
+depuis les 4 sorties déjà sur S3, sans recalcul. **Terminé, vérifié au lint, commité et poussé**
+(7e7d90e). En amont, fix de `THEMELIO_RETRO` (crash sur input manquant) commité séparément
+(4d9fcdb). Chantier clos.
 
 ## Ce qui marche / ce qui foire
-- ✓ **check-conformity.sh en 6 étapes** : fichiers, mVAF/frag, TOO (CSV), THEMELIO (CSV),
-  metadata.json, non-régression **PROD vs QUALIF** (14 valeurs natives + JSON exhaustif hors champs
-  volatils/contexte). Pattern valeur figée inline + 3 helpers d'extraction (`tsv_val`/`json_val`/`csv_val`).
-- ✓ **Testé sur run réel V2.2.1** (`/test_bam2beta`, 2 samples Healthy_826 + Lung_9) vs QUALIF/V2.2.0 →
-  **54/54 CONFORME**. Détection de régression prouvée (2 valeurs falsifiées capturées).
-- ✓ **Alignement** : `run-qualif.sh` — Lung_100 retiré (3→2 samples) ; `test.sh` → `check-test.sh`
-  (2 samples en étape 1). `run-test.sh` déjà OK. `maj-bam2beta` n'utilise pas check-conformity.
-- ✓ Fix `patient_name`/`client_uuid`/`analysis_name` exclus de la non-régression (champs de contexte
-  de lancement, pas des calculs).
-- ✓ Commit c1bd572 inclut aussi le nettoyage conformity/THEMELIO/docs fait par Boris en parallèle
-  (check-run-output simplifié, archivages dev/archive/, suppression bin/THEMELIO/test/).
-- ✗ Le `test_report.md` S3 du run V2.2.1 dit encore **TEST KO** (généré avant le fix patient_name) —
-  non régénéré.
+- ✓ **`--TOO_RETRO`** : bloc `if (params.TOO_RETRO)` dans main.nf (4 fichiers : bootstrap props +
+  Loyfer + raima_score.V1.4 + `IV/sex.tsv`), includes `TOO_build_input`/`TOO_score`, param dans
+  nextflow.config. Réutilise les process de too.nf tels quels, écrit uniquement dans `TOO/`.
+- ✓ **fix `THEMELIO_RETRO`** : `checkIfExists: true` → `.filter { .exists() }` + `log.warn` →
+  skip silencieux des samples incomplets au lieu de tuer tout le run batch.
+- ✓ **Vérif lint NF 25.04** : +0 erreur (13 avant = 13 après), +1 warning de style préexistant.
+- ✓ Doc à jour : CLAUDE.md (params `--TOO_RETRO` + `--THEMELIO_RETRO` oublié), MEMORY.md (gotcha checkIfExists).
+- ✗ **Pas encore testé sur un vrai run rétrospectif** (prod S3 — Boris garde la main).
+- ⚠ **`--bootstrap` et `--METHYL_FEATURES` gardent `checkIfExists: true`** → même crash possible en batch multi-samples (candidats au même fix).
 
 ## Prochaine étape
-Rien de bloquant. Optionnel : régénérer le `TEST OK` du run V2.2.1 via
-`run-test.sh -s --output s3://.../DEV/V2.2.1/run_2026-07-22_09-42-59`. La procédure de qualif est
-prête pour la prochaine release (`/maj-bam2beta`).
+Optionnel : lancer un vrai run `--MERGE false --TOO_RETRO` depuis `~/Run` sur un batch de samples
+ayant déjà leurs sorties S3, pour valider en conditions réelles. Sinon, appliquer le même skip-silencieux
+à `--bootstrap` / `--METHYL_FEATURES`.
