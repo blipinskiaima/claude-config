@@ -152,7 +152,9 @@
       "WebFetch(domain:www.ncbi.nlm.nih.gov)",
       "WebFetch(domain:europeanlung.org)",
       "Skill(save-context)",
-      "Skill(save-context:*)"
+      "Skill(save-context:*)",
+      "Skill(maj-todo-list)",
+      "Skill(maj-todo-list:*)"
     ],
     "deny": [
       "Bash(aws s3 rm:*)",

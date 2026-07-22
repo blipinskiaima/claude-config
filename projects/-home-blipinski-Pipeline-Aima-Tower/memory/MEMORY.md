@@ -1,5 +1,8 @@
 # Aima Tower — Auto Memory
 
+## Page `/reproductibilite` (2026-07-22)
+Dispersion de plusieurs mesures d'un même prélèvement. **2 onglets = 2 protocoles séparés par le `run_id`** : **pure** (`Colon_17..24` CGFL, plusieurs runs, extraction constante) et **extraction** (9 patients, **un seul run**, 2-4 kits). **Sémantique des suffixes trace-prod, non documentée ailleurs** : `bis`/`ter`/`quater` = Promega/Macherey-Nagel/Qiagen ; `_moche` = POD5 rangés hors chemins standards S3 — **PAS un défaut de qualité** (les moche sont souvent plus profonds) ; `_OK` = sous-ensemble du même `run_id` (5-6× moins de reads) → exclus des stats. **Ne pas réutiliser `_get_prepared`** : /exploration élimine les réplicats à 3 niveaux. ⚠ **mVAF v1.4 est une feature d'entrée de themelio** → mesures non indépendantes. Métriques CV + accord (`pairwise_agreement_rate` copié du R). Détails : [reproducibilite_page.md](reproducibilite_page.md)
+
 ## Page `/exploration` — toggle Score mVAF v1 / v1.4 (2026-07-03)
 Sélecteur **Score** (sidebar) pilotant toute la page (tables Sens/Spé + graphes) via param `score_source` (`mvaf_v1` défaut = `qc_metrics` float / `mvaf_v14` = `retd_suivis` VARCHAR virgule FR, `KO` exclu de la cohorte). Swap dans `_prepare_base_dataset` AVANT filtre `score.notna`, threadé comme `dorado_version` (caches + 11 méthodes + `ExplorationFilters`). **Bug pré-existant corrigé** : 4 endpoints graphes (qc-data/mvaf-dotplot/methylation-vaf/bladder) plantaient (mauvais passage d'args) → refonctionnels. Validé live : v1 78.5%/88.4%, v1.4 81.7%/85.3%. Détails : [exploration_score_source_toggle.md](exploration_score_source_toggle.md)
 
