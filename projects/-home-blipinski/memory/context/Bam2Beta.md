@@ -1,25 +1,30 @@
-# Context — Bam2Beta — 2026-07-22T07:47:02+0000
+# Context — Bam2Beta — 2026-07-22T12:46:00+0000
 
 **Branche** : main
-**Dernier commit** : 03ffa1c — docs(qualif): trace l'equivalence depot sur 6 samples
-**Status** : 2 fichiers modifiés (dev/PLT + dev/SCW, modifs de Boris, non commitées)
+**Dernier commit** : c1bd572 — refactor(qualif): refonte check-conformity 6 etapes + nettoyage procedure conformite
+**Status** : clean (0 fichier modifié)
 
 ## Où j'en suis
-Module THEMELIO (dépistage cancer, Themelio 1.0.0) intégré, qualifié et **releasé en V2.2.0**
-(tag + release GitHub + QUALIF/V2.2.0 sur S3, QUALIF OK 37/37). Chantier terminé côté Bam2Beta.
-Reste 3 dettes hors-périmètre, non traitées.
+Refonte complète de `conformity/check-conformity.sh` (procédure de qualif Bam2Beta) **terminée,
+testée sur un vrai run V2.2.1, commitée et poussée** (c1bd572). La procédure est alignée de bout en
+bout : le check, les 2 skills qui l'utilisent, et `test.sh`. Chantier clos.
 
 ## Ce qui marche / ce qui foire
-- ✓ V2.2.0 releasée : module THEMELIO, metadata.json contrat unique (29 champs, raima_score.V2.json
-  supprimé), bloc versions lu des artefacts, mode --THEMELIO_RETRO, gardes-fous SCRIPT_FOR_MODEL
-- ✓ Qualif THEMELIO : Lung_9 (0.855261) + Lung_100 (0.846397) figés dans check-conformity.sh ;
-  6 samples example_scores reproduits au dernier chiffre via --THEMELIO_RETRO (tracé, pas rejoué)
-- ✓ Comparaison QUALIF vs plateforme TESTV220 : 0 différence de résultat (seuls identité/horodatage)
-- ✗ **trace-platform/check_platform.py** : correctif "OU metadata.json" ÉCRIT mais NON COMMITÉ
-  (mêlé aux modifs de Boris) + colonne metadata_json en base pas ajoutée → session dédiée
-- ✗ **beta_28M.nf:215** pointe vers bin/bootstrap_trasnfo.R déplacé dans bin/archive/ → casse --MVAF1_4
-- ✗ **Token Tower en clair** dans nextflow.config (+ historique git) → à révoquer côté Seqera
+- ✓ **check-conformity.sh en 6 étapes** : fichiers, mVAF/frag, TOO (CSV), THEMELIO (CSV),
+  metadata.json, non-régression **PROD vs QUALIF** (14 valeurs natives + JSON exhaustif hors champs
+  volatils/contexte). Pattern valeur figée inline + 3 helpers d'extraction (`tsv_val`/`json_val`/`csv_val`).
+- ✓ **Testé sur run réel V2.2.1** (`/test_bam2beta`, 2 samples Healthy_826 + Lung_9) vs QUALIF/V2.2.0 →
+  **54/54 CONFORME**. Détection de régression prouvée (2 valeurs falsifiées capturées).
+- ✓ **Alignement** : `run-qualif.sh` — Lung_100 retiré (3→2 samples) ; `test.sh` → `check-test.sh`
+  (2 samples en étape 1). `run-test.sh` déjà OK. `maj-bam2beta` n'utilise pas check-conformity.
+- ✓ Fix `patient_name`/`client_uuid`/`analysis_name` exclus de la non-régression (champs de contexte
+  de lancement, pas des calculs).
+- ✓ Commit c1bd572 inclut aussi le nettoyage conformity/THEMELIO/docs fait par Boris en parallèle
+  (check-run-output simplifié, archivages dev/archive/, suppression bin/THEMELIO/test/).
+- ✗ Le `test_report.md` S3 du run V2.2.1 dit encore **TEST KO** (généré avant le fix patient_name) —
+  non régénéré.
 
 ## Prochaine étape
-Traiter les 3 dettes hors-périmètre, en priorité check_platform.py (bloque le dashboard sur les
-runs V2.2.0). Décider du sort du correctif déjà écrit dans trace-platform (garder/committer).
+Rien de bloquant. Optionnel : régénérer le `TEST OK` du run V2.2.1 via
+`run-test.sh -s --output s3://.../DEV/V2.2.1/run_2026-07-22_09-42-59`. La procédure de qualif est
+prête pour la prochaine release (`/maj-bam2beta`).

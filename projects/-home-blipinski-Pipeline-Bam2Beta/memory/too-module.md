@@ -5,6 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 19867b45-e45c-44b5-8bc4-85e392acf56f
+  modified: 2026-07-22T09:08:26.751Z
 ---
 
 # Module TOO — Tumor of Origin (V2.1.0, 2026-07-16)
@@ -68,6 +69,8 @@ pures, aucun risque de dérive → les params sont leur bonne place.
   sur `RAIMA_MODEL1/2`, `ANCESTRY_MODEL`, `BED`, `FASTA`, `FAI` (candidat patch V2.1.1).
 
 ## Qualification
+
+> **MAJ 2026-07-22** — check-conformity refondu (6 etapes, **Lung_100 retire**, valeurs figees lues du CSV natif PUIS du JSON, etape 6 non-regression PROD). Voir [[qualif-check-conformity]]. Ci-dessous = etat V2.1.0.
 
 Règle : **Healthy_826 qualifie les process actuels, Lung_9 (HCL liquid) qualifie TOO5**. Les 2
 tournent en parallèle, 2 lignes Nextflow, même output, même profil.

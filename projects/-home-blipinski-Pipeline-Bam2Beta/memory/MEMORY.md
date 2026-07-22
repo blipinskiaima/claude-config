@@ -44,6 +44,7 @@
   - See [s3-volumetry.md](s3-volumetry.md) for details
 
 - [Module TOO](too-module.md) — Tumor of Origin TOO5 v0.4.1 : vendoring vs wrapper, source de verite des seuils (le bundle, pas too_common.R), gotchas parse quote-aware / apostrophe awk / `pred$x <- NULL`, qualification Lung_9
+- [Qualif check-conformity](qualif-check-conformity.md) — refonte 2026-07-22 : qualif 6 etapes, pattern valeur figee inline, 3 helpers d'extraction, **Lung_100 retire**, etape 6 non-regression PROD bloquante (teste 54/54). Remplace la description qualif de too/themelio-module
 - [Batch effect investigation](batch-effect-investigation.md) — Investigation complète CGFL vs HCL : 17% FP Healthy HCL (V1), CNV biaisé, pas d'effet taille fragments
 - [Soft clipping & longueur FRAG](softclip-fragmentomics-length.md) — FRAG = length(SEQ), soft clips inclus ; vérifié Lung_115/95, ne pas migrer vers span réf
 - [Coverage analysis CGFL vs HCL](coverage-analysis-cgfl-hcl.md) — outil dev/coverage_analysis (binning per-base mosdepth 100kb) ; couverture autosomale équivalente CGFL/HCL, trous = non-mappable, pas d'effet labo ; Healthy_780 per-base corrompu

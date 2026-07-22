@@ -129,7 +129,14 @@
       "Bash(bash /home/blipinski/Run/too_test_10.sh > /home/blipinski/Run/too_test10.log 2>&1)",
       "Bash(echo \"=== Recherche du depot exploratory-analysis-CGFL-HCL ===\" *)",
       "Read(//mnt/**)",
-      "Bash(timeout 180 Rscript screening_top10_xgb/predict_themelio.R --version 1.0 --input-csv screening_top10_xgb/releases/themelio_1_0/input_features_template.csv --output /tmp/claude-1005/-home-blipinski-Pipeline-Bam2Beta/2e80e615-d3d7-48d3-8939-11babb7ea6db/scratchpad/themelio_test.csv)"
+      "Bash(timeout 180 Rscript screening_top10_xgb/predict_themelio.R --version 1.0 --input-csv screening_top10_xgb/releases/themelio_1_0/input_features_template.csv --output /tmp/claude-1005/-home-blipinski-Pipeline-Bam2Beta/2e80e615-d3d7-48d3-8939-11babb7ea6db/scratchpad/themelio_test.csv)",
+      "WebFetch(domain:delfidiagnostics.com)",
+      "mcp__pubmed__search_pubmed",
+      "Bash(./.venv-pdf/bin/pip install *)",
+      "Bash(./.venv-pdf/bin/python -)",
+      "mcp__pubmed__fetch_summary",
+      "mcp__pubmed__get_fulltext",
+      "Edit(/.claude/skills/qualif-bam2beta/**)"
     ],
     "deny": [
       "Bash(aws s3 rm:*)",

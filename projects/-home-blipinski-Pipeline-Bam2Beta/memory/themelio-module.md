@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 2e80e615-d3d7-48d3-8939-11babb7ea6db
-  modified: 2026-07-21T11:02:36.850Z
+  modified: 2026-07-22T09:08:29.351Z
 ---
 
 # Module THEMELIO — Depistage cancer (V2.2.0, 2026-07-21)
@@ -127,6 +127,8 @@ liquide ; la fragmentomique ne mesure pas le meme phenomene sur tissu solide). L
   d'instabilite reelle — mais toute derive de la fragmentomique se verra d'abord ici.
 
 ## Qualification (methode en 2 niveaux, definie par Boris)
+
+> **MAJ 2026-07-22** — check-conformity refondu : **Lung_100 retire** (seul Lung_9 + Healthy_826), 6 etapes, valeurs lues du CSV natif PUIS du JSON, etape 6 non-regression PROD bloquante. Voir [[qualif-check-conformity]].
 
 Le **bit-a-bit vis-a-vis du depot de recherche est hors d'atteinte par construction** : le
 pipeline recalcule les features au lieu de lire un snapshot trace-prod. D'ou :
