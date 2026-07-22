@@ -5,6 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: cea008d8-7d46-4e63-b926-d16b2c6cd03e
+  modified: 2026-07-20T10:33:44.350Z
 ---
 
 # Check_Input — QC des fichiers d'entree en amont du merge (2026-06-23)
@@ -60,6 +61,26 @@ fragile. Apres retrait, l'aval tolere le vide (ne tourne juste pas). Non-regress
   `conformity/check-conformity.sh`, doc (README.md, CLAUDE.md, overview/S3.md, overview/README.md).
 - Le retrait de l'emit `rapport = Raima_report.out.rapport` etait AUSSI requis ici (l'output etant
   commente, le reference aurait plante) -> converge avec le fix gotcha ci-dessus.
+
+## ✅ RISQUE LEVE — les emits re-ajoutes ne cassent PAS le chemin gracieux (verifie 2026-07-20)
+
+Le fix de juin (retirer les `emit:` de Beta_epic/Frag/IV) a ete **annule de fait** depuis :
+`Beta_epic.out.report_input` + `Beta_28M.out.{mvaf14,props_bootstrap,score_loyfer}` + `IV.out.tsv`
+sont consommes par TOO/RAPPORT (V2.1.0), et `Frag.out.frag` par THEMELIO (V2.2.0).
+
+On pouvait donc craindre que le gotcha « channel vide -> emit qui plante a la construction »
+soit reactive, et que le chemin gracieux input-KO soit casse en prod. **TESTE : ce n'est pas le cas.**
+
+Test du 2026-07-20, profil `scw,docker,prod` (TOO + THEMELIO + RAPPORT tous actifs, tous leurs
+emits references), dossier d'entree contenant `garbage.bam` (faux BAM) + `notes.csv` (non whiteliste) :
+- run **SUCCESS**, exit 0, 5.5s, aucune erreur `No such property ... DataflowBroadcast`
+- seul `REPORT/metadata.json` publie, `status=FAILED_QC_INPUT`, `reason` nommant les 2 fichiers fautifs
+- aval bien coupe : 0 `raima_score.V2.json`, 0 fichier THEMELIO
+
+**Conclusion** : le gotcha de juin ne se declenche que dans la configuration precise rencontree
+alors (emit reference mais jamais consomme en aval). Des lors qu'un emit est reellement consomme,
+la cascade tolere le channel vide. Ne pas re-supprimer les emits « par precaution » : ils sont tous
+utiles et le chemin gracieux fonctionne avec eux. Voir [[too-module]] et [[themelio-module]].
 
 ## Validation (2026-06-23)
 
