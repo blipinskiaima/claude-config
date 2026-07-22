@@ -57,6 +57,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-07-22 — Bam2Beta V2.2.0 (module THEMELIO)
+
+- [x] **Module THEMELIO (dépistage cancer) en production** — Themelio 1.0.0 câblé (`workflow/themelio.nf`), score P(cancer) XGBoost Top10 + catégorie dual-threshold, actif en prod/liquid. Wrapper minimal (aucun vendorisé), versions lues des artefacts, mode rétro `--THEMELIO_RETRO`, gardes-fous `SCRIPT_FOR_MODEL`. V2.2.0 taguée, publiée et **qualifiée** (QUALIF/V2.2.0, 37/37). Détails dans [themelio-module.md](../../-home-blipinski-Pipeline-Bam2Beta/memory/themelio-module.md).
+- [x] **metadata.json devient le contrat de sortie unique (29 champs)** — BREAKING : `raima_score.V2.json` supprimé, `metadata.json` en est un sur-ensemble strict + bloc versions (`version_bam2beta/raima/too/themelio`) lu de l'artefact, jamais d'un param.
+- [x] **Qualif THEMELIO 2 niveaux** — Lung_9 (0.855261) + Lung_100 (0.846397) figés dans `check-conformity.sh` (score + catégorie) ; 6 samples `example_scores` du dépôt reproduits au dernier chiffre via `--THEMELIO_RETRO`, tracés (non rejoués). Comparaison QUALIF vs plateforme TESTV220 : 0 différence de résultat.
+
 ## 2026-07-17 — Bam2Beta V2.1.0 (module TOO)
 
 - [x] **Module TOO (Tumor of Origin) en production** — TOO5 v0.4.1 câblé (`workflow/too.nf`), 5 classes tumorales, actif en profil prod. V2.1.0 taguée, publiée et **qualifiée** (QUALIF/V2.1.0, 27/27 conformes). Détails dans [too-module.md](../../-home-blipinski-Pipeline-Bam2Beta/memory/too-module.md).
