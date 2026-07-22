@@ -23,7 +23,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 ## Moyenne priorité
 
-- [ ] **Terminer reclassification concurrents (22 articles restants)** — script `~/Pipeline/Aima-Survey/scripts/reclassify_competitors.py` killé après 75/97 articles (2026-04-22). Les 22 restants ont `sector IS NULL` → cron daily Aima-Survey (`classify_pending`) les picke automatiquement. Vérifier demain que l'onglet Concurrence de `/survey` affiche bien les articles IMBdx (+ autres co-signatures concurrent). Si besoin relance manuelle : `bash ~/Pipeline/Aima-Survey/run_veille.sh --no-fetch --no-score --report`.
 - [ ] **Rotation secrets Aima-Tower compromis** — `.env` était tracked dans git jusqu'au 2026-04-21 (historique pushé sur `aima-dx/Aima-Tower`, repo privé). Révoquer `ANTHROPIC_API_KEY` (console.anthropic.com > API Keys) + `accessToken` Seqera (cloud.seqera.io > Tokens), regénérer les 2 et mettre à jour `.env` local + `docker compose restart`. Voir `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/project_env_leak.md`.
 ### Skills bioinformatiques
 - [ ] **Améliorer skills v1 avec /meta-skills-creator** — sample, debug-nf, check-consistency sont fonctionnels mais créés sans le processus rigoureux. Raffiner après usage.
@@ -57,7 +56,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-07-22 — Bam2Beta V2.2.0 (THEMELIO) + trace-prod v18/v19 (tracking themelio/too)
+## 2026-07-22 — Bam2Beta V2.2.0 (THEMELIO) + trace-prod v18/v19 (tracking themelio/too) + Aima-Survey audit & veille DELFI
+
+- [x] **Reclassification concurrents terminée** — les 22 articles restants ont bien été absorbés par le cron daily (`classify_pending`) : **0 article avec `sector IS NULL`** sur 707 en base, tous scorés et classifiés. Répartition : 425 public / 32 private / 22 mixed / 228 unknown.
+- [x] **Audit prod Aima-Survey après 3 mois** — cron sain (dernier run 22/07 08:00). **Bug identifié non corrigé** : `lib/fetcher.py` omet `entrez_date` depuis le 2026-04-21 → `first_seen_at` retombe sur `now()`. ⚠ Le fix naïf casserait Aima-Tower (écart médian EDAT/découverte = 28 j → ~50 % des articles sortiraient de la vue « semaine »). Détails : [entrez_date_bug.md](../-home-blipinski-Pipeline-Aima-Survey/memory/entrez_date_bug.md).
+- [x] **Couplage Tower ↔ Survey cartographié** — Tower lit la DuckDB en **read-only uniquement**, son seen/bookmark vit dans des JSON séparés (colonnes DB mortes des deux côtés), et **toutes** les vues lisent DuckDB : la doc affirmant que day/week parsent le markdown est fausse depuis le 2026-04-22. Corrigé dans les CLAUDE.md. Détails : [tower_survey_coupling.md](../-home-blipinski-Pipeline-Aima-Survey/memory/tower_survey_coupling.md).
+- [x] **Veille concurrentielle DELFI/FirstLook** — 2 rapports livrés (P1 technique bioinfo, P2 marché direction) + PDF combiné 13 pages, chiffres vérifiés en fact-check adversarial contre les publications en texte intégral. Constats clés : vraies perfs **84 %/53 % observées** (et non 80/58 pondérées), Guardant occupe déjà le créneau méthylation+fragmentomique, la méthylation ne garantit pas la performance stade I (Galleri à 18 %). Détails : [delfi_firstlook.md](../-home-blipinski-Pipeline-Aima-Survey/memory/delfi_firstlook.md).
 
 - [x] **trace-prod schema v18 — themelio_score** — colonne `retd_suivis` (liquid only) lisant `THEMELIO/{s}.themelio_predictions.csv` (col 2, score P(cancer)), virgule précision complète, calque mvaf_v14. Ajout via `/add-trace-prod`, backfill 1322 liquid + export gsheet. Commit `37762f3`. Détails : [project_schema_v18_themelio.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v18_themelio.md).
 - [x] **trace-prod schema v19 — too_predicted_class + too_final_decision** — 2 colonnes `retd_suivis` (liquid only) du classifieur TOO, source `TOO/{s}.too5_predictions.csv` col 9 + col 20, **parsing module csv obligatoire** (virgule interne dans confidence_stratum). Backfill 1323 liquid (Lung 549 / Bladder+Pancreas 370 / Colon 256 / Breast 95 / Prostate 53) + export. Commit `6b22116`. Détails : [project_schema_v19_too.md](../-home-blipinski-Pipeline-trace-prod/memory/project_schema_v19_too.md).
