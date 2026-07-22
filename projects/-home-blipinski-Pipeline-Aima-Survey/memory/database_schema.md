@@ -3,6 +3,7 @@ name: Database schema v6 (DuckDB)
 description: Schéma DuckDB single-table multi-source de Aima-Survey, stratégie UPSERT avec COALESCE sur état utilisateur
 type: project
 originSessionId: 39895026-ccd6-4902-95d9-095b93ed61ed
+modified: 2026-07-22T16:11:29.847Z
 ---
 ## Table `articles` — source de vérité unique (refonte v6)
 
@@ -34,7 +35,7 @@ Lors d'un `fetch` PubMed (ou futur) :
 
 **Why :** un re-fetch d'un article déjà lu/noté/scoré ne doit rien perdre. Boris peut poser un bookmark depuis Aima-Tower et relancer un `fetch` le lendemain sans rien casser.
 
-**How to apply :** dans `lib/db.py`, la requête `_UPSERT_FETCH_SQL` ne mentionne QUE les colonnes métadonnées dans `DO UPDATE SET`. Ne jamais y ajouter `seen`, `score`, etc. Passer par les méthodes dédiées (`update_state`, `upsert_score`, `upsert_synthesis`, `mark_email_sent`).
+**How to apply :** dans `lib/db.py`, la requête `_UPSERT_FETCH_SQL` ne mentionne QUE les colonnes métadonnées dans `DO UPDATE SET`. Ne jamais y ajouter `seen`, `score`, etc. Passer par les méthodes dédiées (`update_state`, `upsert_score`, `upsert_classification`, `mark_email_sent`).
 
 ### DuckDB piège : `CURRENT_TIMESTAMP` dans ON CONFLICT DO UPDATE SET
 
@@ -56,7 +57,7 @@ reste OK dans le DDL CREATE TABLE.
 | `upsert_score(src, eid, score, why, tags, model)` | UPDATE scoring uniquement |
 | `update_state(src, eid, seen=?, bookmarked=?, note=?)` | UPDATE état utilisateur |
 | `mark_email_sent(src, eid)` | `email_sent_at = COALESCE(email_sent_at, now())` |
-| `upsert_synthesis(src, eid, synthesis, model)` | UPDATE synthèse Sonnet |
+| `upsert_classification(...)` | UPDATE sector/org_type/org_name/classification_* |
 | `delete(src, eid) -> bool` | DELETE + `RETURNING` pour savoir si la ligne existait |
 | `get(src, eid) -> dict \| None` | SELECT row, renvoie dict des colonnes |
 | `query(sql, params) -> (cols, rows)` | SQL passthrough (pour CLI) |

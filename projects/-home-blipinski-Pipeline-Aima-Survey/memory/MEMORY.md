@@ -7,3 +7,6 @@
 - [Aima-Survey v6.1](aima_survey_v61.md) — classification sector/org_type/org_name via Haiku + migration Pro/Max, short-circuit gratuit sans affiliations, taxonomie enums fixes
 - [Explorer projets jumeaux d'abord](explore_pipeline_siblings_first.md) — pour toute tâche AIMA, chercher le pattern dans les autres ~/Pipeline/* avant de designer from-scratch
 - [Paysage concurrentiel AIMA](competitive_landscape.md) — 22 concurrents listés dans Aima-Survey/data/competitors.json + docs/COMPETITORS.md, query PubMed competitive_affiliations active, doublons UI Tower assumés
+- [Bug entrez_date + piège du fix](entrez_date_bug.md) — fetcher omet entrez_date depuis 2026-04-21 ; corriger naïvement ferait sortir ~50 % des articles des vues de Tower
+- [Couplage réel Tower ↔ Survey](tower_survey_coupling.md) — Tower en read-only, seen/bookmark en JSON séparés, et TOUTES les vues lisent DuckDB (la doc day/week markdown est obsolète depuis 2026-04-22)
+- [DELFI FirstLook](delfi_firstlook.md) — mécanique du concurrent fragmentomique, vraies perfs (84/53 observé, pas 80/58), et pourquoi la méthylation n'est pas une garantie au stade I

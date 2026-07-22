@@ -150,7 +150,9 @@
       "WebFetch(domain:www.statnews.com)",
       "WebFetch(domain:www.genomeweb.com)",
       "WebFetch(domain:www.ncbi.nlm.nih.gov)",
-      "WebFetch(domain:europeanlung.org)"
+      "WebFetch(domain:europeanlung.org)",
+      "Skill(save-context)",
+      "Skill(save-context:*)"
     ],
     "deny": [
       "Bash(aws s3 rm:*)",
