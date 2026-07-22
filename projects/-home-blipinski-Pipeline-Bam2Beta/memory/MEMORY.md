@@ -62,6 +62,8 @@
 
 - **Channel.fromPath = queue channel a 1 item** (gotcha NF, 2026-07-16) : consomme en `path()` simple, il limite le process a **UNE execution par invocation**, quel que soit le nombre de samples. Sans effet en prod (1 sample par run -> 1 item suffit) ; en multi-samples, 7/10 samples perdaient leur `props_loyfer` et etaient droppes par le join TOO. **Fait manquer des sorties, jamais de resultat faux.** Fix `.first()` (-> value channel reutilisable). Pose sur RAIMA_LOYFER + RAIMA_V1_WL ; **le motif subsiste sur RAIMA_MODEL1/2, ANCESTRY_MODEL, BED, FASTA, FAI** (inoffensif en prod, candidat patch). Voir [too-module.md](too-module.md)
 
+- **`checkIfExists: true` dans un `.map` de mode retro tue TOUT le run batch** (gotcha NF, 2026-07-22) : si UN seul fichier source manque, l'exception est levee a la CONSTRUCTION du channel -> le run entier s'arrete, meme les samples valides. Fix : retirer `checkIfExists` et chainer `.filter { ID, f1, f2... -> f1.exists() && f2.exists() && ... }` + `log.warn` -> le sample incomplet est **skippe silencieusement**, les complets sont scores, le run va au bout. Pose sur **THEMELIO_RETRO** (fix, commit 4d9fcdb) + **TOO_RETRO** (neuf). ⚠️ **`--bootstrap` et `--METHYL_FEATURES` gardent encore `checkIfExists: true`** -> meme crash possible en batch multi-samples (candidats au meme fix).
+
 ## Architecture Notes
 
 - `main.nf` orchestre les modules via conditionals (`params.BETA`, `params.FRAG`, etc.)

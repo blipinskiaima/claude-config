@@ -16,6 +16,8 @@
 - [Schema v12 — bootstrap](project_schema_v12_bootstrap.md) — retd_suivis.bootstrap OK/KO, présence S3 bootstrap_v1.tsv, pattern preserve via _s3_exists
 - [Schema v13 — mvaf_v14](project_schema_v13_mvaf_v14.md) — calque mvaf_v13 SAUF cols[1] (V1.4 à 3 colonnes) + format_mvaf4() (jamais de notation scientifique)
 - [Schema v14 — bootstrap_props](project_schema_v14_bootstrap_props.md) — calque EXACT de bootstrap (v12), fichier bootstrap_v1.props.tsv
+- [Schema v18 — themelio_score](project_schema_v18_themelio.md) — retd_suivis liquid only, score Thémélio BAM2BETA, CSV THEMELIO/{s}.themelio_predictions.csv L2C2, virgule précision complète, calque mvaf_v14. ⚠ chemin réel THEMELIO/ (pas OUTPUT/)
+- [Schema v19 — too_predicted_class + too_final_decision](project_schema_v19_too.md) — 2 col retd_suivis liquid only, classifieur TOO BAM2BETA, CSV TOO/{s}.too5_predictions.csv col 9 + col 20, texte brut (indications). ⚠ parsing module csv OBLIGATOIRE (virgule interne dans confidence_stratum col 10)
 - [Schema v16/v17 — rarefaction](project_schema_v16_rarefaction.md) — table AUTONOME, PK composite (sample_name, labo) depuis v17 (collision inter-labo), niveaux 20M/10M/5M/2M/1M, calque dilution. Pipeline terminé 15/07/2026 : 1355 lignes, PROD OK 100%, toutes métriques remplies
 - [Mode probs --probs_bootstrap](project_probs_bootstrap_mode.md) — probs epic = moyenne des 200 réplicats bootstrap, écrase les 16 col epic (NULL si absent), réversible via probs --probs
 - [Colonnes v2-v7 — index](project_columns_index.md) — colonnes v2-v7 + patterns transversaux (collision mapping TSV_TO_DB, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
