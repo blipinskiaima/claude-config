@@ -136,7 +136,21 @@
       "Bash(./.venv-pdf/bin/python -)",
       "mcp__pubmed__fetch_summary",
       "mcp__pubmed__get_fulltext",
-      "Edit(/.claude/skills/qualif-bam2beta/**)"
+      "Edit(/.claude/skills/qualif-bam2beta/**)",
+      "WebFetch(domain:nanoporetech.com)",
+      "WebFetch(domain:aacrjournals.org)",
+      "WebFetch(domain:www.nature.com)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "Bash(/tmp/claude-1005/-home-blipinski-Pipeline-Aima-Survey/2cf74f69-f6e5-4e35-926d-561f28925c84/scratchpad/.venv-pdf/bin/python -)",
+      "WebFetch(domain:pmc.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:insights.citeline.com)",
+      "WebFetch(domain:www.prnewswire.com)",
+      "WebFetch(domain:my.clevelandclinic.org)",
+      "WebFetch(domain:clinicaltrials.gov)",
+      "WebFetch(domain:www.statnews.com)",
+      "WebFetch(domain:www.genomeweb.com)",
+      "WebFetch(domain:www.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:europeanlung.org)"
     ],
     "deny": [
       "Bash(aws s3 rm:*)",
