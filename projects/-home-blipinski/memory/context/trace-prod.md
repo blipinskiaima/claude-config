@@ -1,18 +1,17 @@
-# Context — trace-prod — 2026-07-03T12:56:10+0000
+# Context — trace-prod — 2026-07-22T14:50:00+0000
 
 **Branche** : main
-**Dernier commit** : b9abd0c — feat: schema v14 (bootstrap_props) + v15 (dilution enrichie) + mode probs --probs_bootstrap
-**Status** : clean (tracké)
+**Dernier commit** : 6b22116 — feat: schema v19 — too_predicted_class + too_final_decision
+**Status** : clean (synchro origin/main, 15 commits pushés cette session dont rattrapage rarefaction v16/v17)
 
 ## Où j'en suis
-Session multi-features (3 sessions Claude //), tout committé b9abd0c. Livré : colonne `bootstrap_props` (v14), table `dilution` enrichie (v15, session //), mode `probs --probs_bootstrap` (epic = moyenne 200 réplicats bootstrap). Backfills + exports gsheet faits.
+Deux features ajoutées via /add-trace-prod (calque themelio → too), développées pas-à-pas (A→D validées une par une), documentées, committées, pushées, backfillées et exportées gsheet. Session terminée, rien d'engagé.
 
 ## Ce qui marche / ce qui foire
-- ✓ `bootstrap_props` (v14) : OK/KO présence `bootstrap_v1.props.tsv`, liquid, calque `bootstrap` v12. Backfill CGFL 804 + HCL 513 + exports.
-- ✓ Mode `probs --probs_bootstrap` : epic = moyenne bootstrap (vérifié == awk), backfill CGFL 791/804 + HCL 502/513, préserve loyfer, réversible via `probs --probs`.
-- ✓ Backfill `mvaf_v14` (1305) + v15 dilution (`check-dilution` 480 + `export-dilution`) faits.
-- ✗ `APIError 503` gspread transient a cassé une chaîne `&&` de tmux (export-dilution) → rattrapé à la main.
-- ⚠ Enrichissement EPIC raté sur des `Bladder_Urine` (epic ~0, mVAF non fiable) — investigation mise de côté.
+- ✓ Schema v18 `themelio_score` : CSV THEMELIO/{s}.themelio_predictions.csv L2C2, format_comma précision complète, liquid only. Backfill 1322 liquid + export OK (1re tentative).
+- ✓ Schema v19 `too_predicted_class` (col 9) + `too_final_decision` (col 20) : parsing module csv OBLIGATOIRE (virgule interne dans confidence_stratum col 10). Backfill 1323 liquid + export OK. Éventail : Lung 549, Bladder+Pancreas 370, Colon 256, Breast 95, Prostate 53.
+- ✓ Chemins réels : dossier direct sous le sample (THEMELIO/ et TOO/, PAS OUTPUT/). Fichier too `.too5_predictions.csv` un seul point.
+- ⚠ 147 lignes solid à 'KO' sur les colonnes liquid-only = normal (jamais exportées, défaut DDL non écrasé).
 
 ## Prochaine étape
-Rien d'engagé. Optionnel : helper retry(3×) gsheet réutilisable (503 récurrent) ; reprendre l'investigation enrichissement EPIC.
+Rien d'engagé. Si demande future : les colonnes too/themelio passent aussi par le `check` général (câblées LiquidChecker), donc remplies automatiquement pour les nouveaux samples.
