@@ -10,3 +10,4 @@
 - [Bug entrez_date + piège du fix](entrez_date_bug.md) — fetcher omet entrez_date depuis 2026-04-21 ; corriger naïvement ferait sortir ~50 % des articles des vues de Tower
 - [Couplage réel Tower ↔ Survey](tower_survey_coupling.md) — Tower en read-only, seen/bookmark en JSON séparés, et TOUTES les vues lisent DuckDB (la doc day/week markdown est obsolète depuis 2026-04-22)
 - [DELFI FirstLook](delfi_firstlook.md) — mécanique du concurrent fragmentomique, vraies perfs (84/53 observé, pas 80/58), et pourquoi la méthylation n'est pas une garantie au stade I
+- [Signal mitochondrial mesuré (Bam2Beta)](mitochondrial_signal_aima.md) — chrM déjà dans nos BAM à 2-148x, méthylation 0,69 % vs 71 % nucléaire, et l'abondance mito confondue par la cohorte à AUC 0,977
