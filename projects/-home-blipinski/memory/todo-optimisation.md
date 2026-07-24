@@ -56,6 +56,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-07-24 — Aima-Tower alignement Exis 1.1 + skill QARA
+
+- [x] **Alignement /exploration sur Exis 1.1 (mVAF v1.4)** — page alignée au chiffre près sur le rapport réglementaire Exis 1.1 : seuil quantile **type 1** (0,0042), exclusion `CGFL_26BM01841`, sélecteur **Cohorte Avancés/Précoce** (§2.2/§2.3), `cohort_mode` threadé partout. Seul écart accepté = Prostate_21 (donnée MàJ après le PDF). Rompt l'équivalence vs R main (type 6 → `TestRegressionVsR` skip). User guide + comparaison vulgarisés dans le Google Doc. Commits `f3a4783`+`c913356`. Détails : [exis_alignment.md](../-home-blipinski-Pipeline-Aima-Tower/memory/exis_alignment.md).
+- [x] **Skill /qara-tower + baseline T0** — skill de traçabilité QARA temporelle (snapshot → compare T_n/T_{n-1} → append Doc → journal), **double** local+global (même journal partagé), journal immuable `qara/qara_snapshots.jsonl` versionné, réglages Exis figés, **aucun recalcul maison** (appelle `compute()`). T0 posé (Doc + JSONL). Créé via `/meta-skills-creator`. Commit `6df189d`. Détails : [qara_tower_skill.md](../-home-blipinski-Pipeline-Aima-Tower/memory/qara_tower_skill.md).
+
 ## 2026-07-22 — Bam2Beta V2.2.0 (THEMELIO) + trace-prod v18/v19 (tracking themelio/too) + Aima-Tower /reproductibilite + Aima-Survey audit & veille DELFI
 
 - [x] **Page Aima-Tower `/reproductibilite`** — dispersion de plusieurs mesures d'un même prélèvement, 2 onglets que le `run_id` sépare : réplicats purs (Colon_17..24, plusieurs runs, extraction constante) vs méthode d'extraction (9 patients, un seul run, 2-4 kits). 3 modèles (mVAF v1.0/v1.4 + themelio 1.0 dual-threshold, alimenté par le schema v18 du jour), métriques CV + accord des verdicts (`pairwise_agreement_rate` repris du R). **Le kit d'extraction pèse bien plus lourd que le run** : CV médian 26,2 % / accord 19/30 contre 1,2 % / 44/48. Sémantique des suffixes trace-prod élucidée (« moche » = POD5 rangés hors chemins S3 standards, **pas** un défaut qualité ; bis/ter/quater = Promega/Macherey-Nagel/Qiagen ; `_OK` = sous-ensemble du même run). Commits `8088a4e`+`486e043`, 61 tests. Détails : [reproducibilite_page.md](../-home-blipinski-Pipeline-Aima-Tower/memory/reproducibilite_page.md).
