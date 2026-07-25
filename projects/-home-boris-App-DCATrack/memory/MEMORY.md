@@ -4,9 +4,8 @@
 - [Profil DCA](reference_profil_dca.md) — Profils multiples (PEA, CTO…), donut chart, localStorage avec migration ancienne clé
 - [Strategy Wizard](reference_strategy_wizard.md) — 7 étapes, 7 marchés (US/Europe/France/Emerging/Asia/World/Sectoriel), filtrage strict + preselectFromPool
 - [Side menu & navigation](reference_side_menu.md) — Drawer ☰ avec Vue Générale / DCATrack / Profil + Aide/Paramètres/À propos + Actions
-- [Independent indicators](feedback_independent_indicators.md) — Pas de verdict global, chaque ETF est évalué indépendamment, Boris échelonne dans le mois
 - [Stack et fichiers clés](reference_stack.md) — Architecture, libs choisies, fichiers cœur
-- [Score formula](reference_score_formula.md) — Composite drawdown + mean reversion, seuils 40/20
+- [No market timing](feedback_no_market_timing.md) — DCATrack abandonne le score, devient pur tracker DCA avec gamification de la régularité
 - [justETF endpoint](reference_justetf_api.md) — URL, headers, shape de réponse
 - [Tableau récap & PEA](reference_tableau_recap.md) — WATCHLIST=32 ETF (13 favori=true + 19 false), PEA_PRESET=3 ISINs, user_favorites table Supabase
 - [Allouable réel](reference_allocation_real.md) — Algo computeAllocations(), flow priceByIsin server→client + usePrices hook, capture shares/price_at_execution à l'exécution
