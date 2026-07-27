@@ -1,16 +1,29 @@
-# Context — trace-prod — 2026-07-27T09:55:00+0000
+# Context — trace-prod — 2026-07-27T14:48:39+00:00
 
 **Branche** : main
-**Dernier commit** : 6b22116 — feat: schema v19 — too_predicted_class + too_final_decision
-**Status** : clean (synchro origin/main)
+**Dernier commit** : 5cf8c50 — feat: schema v20 — 5 métriques mito (retd_suivis, liquid)
+**Status** : clean (17 untracked préexistants : backups .duckdb, CSV dev/, rapports HTML)
 
 ## Où j'en suis
-Session courte post-v18/v19 : investigation du stockage POD5 de 3 samples CGFL liquid (Bladder_Urine_02_117/118/119). Conclusion : leurs POD5 n'ont jamais été déposés sur Scaleway. Rien d'engagé côté code.
+Schema v20 (5 métriques mito dans retd_suivis, liquid only) implémenté de bout en
+bout via le skill add-trace-prod : étapes A→D validées et poussées. Le backfill
+tourne encore en tmux `tp_mito` (script scratchpad/backfill_mito.sh, log
+backfill_mito.log) : 4/10 update-column faits à 14h48, puis 2 export --gsheet
+avec retry 503 en fin de script.
 
 ## Ce qui marche / ce qui foire
-- ✓ Diagnostic POD5 : les 3 samples sont séquencés (BAM processed 54G/25G/24G) mais sans metadata (run_number NULL) → `update-column stockage_pod5` retourne NULL faute de mapping run.
-- ✗ POD5 absents de Scaleway : run PBM55727 (run_id 1ecd4428, séquencé 29/06/2026) introuvable dans `s3://aima-pod-data/data/CGFL/liquid/` ; dernier run déposé = 23/06/2026. Dépôt POD5 manquant en amont, pas un bug trace-prod.
-- ✓ /pull-claude : ~/.claude à jour (skills daily-diet/weekly-muscu + mémoires ZTHapp/DCATrack), travail local deep-dive-concurency préservé (non commité).
+- ✓ Code v20 complet et vérifié : DDL + migration v20 en base, 5 checkers testés
+  (HCL Colon_1 = 18,23/100/5,133307299/1,1007/150,066 = référence Boris), NULL→NA,
+  export TSV headers en positions 36-40/52 avec arrondi 2 déc (base = précision complète).
+- ✓ Doc à jour : CLAUDE.md, README.md, mémoire project_schema_v20_mito.md + MEMORY.md.
+- ✗ Backfill NON terminé au moment du snapshot — les 6 update-column restants et les
+  2 exports gsheet n'ont pas encore été vérifiés. Compteurs par labo à contrôler.
+- ⚠ Piège rencontré : `Colon_1` existe en CGFL ET HCL avec des valeurs mito différentes.
+- ⚠ Piège rencontré : `update-column -s` sur un sample absent du labo ciblé affiche
+  « N samples mis à jour » sans toucher aucune ligne (compteur d'itérations) — un test
+  négatif fait sur le mauvais labo semble passer à tort.
 
 ## Prochaine étape
-Rien d'engagé sur trace-prod. Côté POD5 : si Boris veut les récupérer, il faut les redéposer sur Scaleway en amont (question infra/séquençage, pas trace-prod).
+Relire scratchpad/backfill_mito.log : confirmer 10/10 update-column, les comptages
+par labo (~582 CGFL / ~513 HCL non-NULL attendus) et le succès des 2 exports gsheet.
+Si un export a épuisé ses 5 retries 503, le relancer seul.
