@@ -1,4 +1,5 @@
 - [Reprise juillet 2026](project_reprise_2026-07.md) — LE plan actif : déficit direct 2001 dès 27/07, repas verrouillés Raptor Club + Riz Œuf, rampe sport S1/S2, skills daily-diet + weekly-muscu, bilans dominicaux
+- [Todo pro only](feedback_todo_pro_only.md) — todo-optimisation = strictement AIMA/Pipeline, jamais d'entrées perso ZTHapp (retirées le 27/07)
 - [Tableau programme à jour](project_programme_actuel.md) — Boris dit "tableau programme" → lire docs/programme-actuel.md (source de vérité formatée)
 - [Project overview](project_overview.md) — App suivi nutrition + sport + pas pour ZTH P3, clone DCATrack étendu
 - [Project phasing](project_phasing.md) — 4 phases (0 Bootstrap ✅ · 1 Nutrition · 2 Sport · 3 Pas · 4 Supabase futur)
