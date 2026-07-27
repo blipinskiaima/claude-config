@@ -10,6 +10,15 @@ Gemini 3 favors direct, concise prompts. Short prompts that state a clear goal o
 
 Google's own recommendation: always provide few-shot examples. 2-3 varied examples is the sweet spot. Too many causes overfitting.
 
+**Spécificité Gemini — divergence assumée.** Google maintient explicitement *"we recommend to always include
+few-shot examples in your prompts"* (doc `prompting-strategies`, juin 2026), là où Anthropic et OpenAI ont réduit
+le poids du few-shot sur leurs modèles à raisonnement. Ne pas généraliser la doctrine « moins d'exemples » à Gemini.
+
+## Verbosité
+
+Gemini 3 est **moins verbeux par défaut** que la génération précédente. Si un ton conversationnel ou développé est
+souhaité, il faut le demander explicitement — l'inverse du réflexe « demander d'être concis » utile ailleurs.
+
 ## Input/Output Prefixes
 
 Label semantic parts explicitly for transformation tasks:
@@ -35,11 +44,24 @@ For long context: place all context first, questions at the end. Use bridging ph
 
 Pick one structural format (XML tags, markdown) and stick with it throughout. Mixing formats confuses the model.
 
+## Thinking Level (Gemini 3.x)
+
+Gemini 3 remplace le budget de tokens de raisonnement par `thinking_level` : `minimal` / `low` / `medium` / `high`.
+Défaut `high` sur Gemini 3.1 Pro et 3 Flash.
+
+**Migration CoT → thinking_level.** Recommandation officielle : un prompt qui portait un échafaudage chain-of-thought
+élaboré sur Gemini 2.5 doit être **simplifié** et confié à `thinking_level: high` — *"elaborate step-by-step
+scaffolding often just adds noise"*. Même doctrine que chez Anthropic et OpenAI.
+
 ## Temperature Settings
 
-- Garder le **défaut du modèle** (aucun "1.0 by default" universel n'est documenté officiellement par Google)
-- Lower (near 0) for deterministic/factual tasks only
-- Higher for creative tasks
+⚠️ **Sur Gemini 3, garder la température à 1.0 et ne pas y toucher.** Descendre en dessous de 1.0 peut produire des
+comportements inattendus — bouclage, performance dégradée. Retirer explicitement tout réglage de température hérité
+d'un prompt Gemini 2.x, y compris sur les tâches factuelles ou déterministes où baisser la température était
+auparavant le réflexe.
+
+Source : [Gemini 3 Developer Guide](https://ai.google.dev/gemini-api/docs/gemini-3) — *"Changing the temperature
+(setting it below 1.0) may lead to unexpected behavior, such as looping or degraded performance"*.
 
 ## Enhanced Reasoning
 

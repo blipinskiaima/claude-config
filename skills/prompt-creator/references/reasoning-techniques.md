@@ -18,22 +18,24 @@ Then provide your final answer.
 **When to use**: complex reasoning, math, multi-step logic, debugging.
 **When to skip**: simple lookups, factual questions, models with built-in reasoning (GPT o-series, Claude with adaptive thinking).
 
-## Adaptive Thinking + Effort Param (Claude 4.6+)
+## Adaptive Thinking + Effort Param (famille Claude 5)
 
-Sur Claude Sonnet 4.6 et Opus 4.7, le raisonnement interne est contrôlé par le paramètre `effort` plutôt que par des prompts CoT explicites.
+Sur la famille Claude 5, le raisonnement interne est contrôlé par le paramètre `effort` plutôt que par des prompts CoT explicites. `budget_tokens` est **supprimé** (erreur 400).
 
 ```python
 # Au lieu d'écrire "think step by step" dans le prompt :
 output_config={"effort": "high"}    # max | xhigh | high | medium | low
-thinking={"type": "adaptive"}
+thinking={"type": "adaptive"}       # actif par défaut si omis sur Opus 5 / Fable 5
 ```
 
-Valeurs `effort` :
-- `max` — pas de contrainte sur la profondeur
-- `xhigh` — exploration étendue (Opus 4.7 uniquement)
-- `high` — raisonnement profond (défaut, recommandé pour code/agentic)
-- `medium` — équilibré, skip thinking sur queries simples
-- `low` — rapide, skip thinking sur tâches simples
+Valeurs `effort` (les cinq niveaux sont disponibles sur toute la famille 5) :
+- `max` — pas de contrainte sur la profondeur, réservé au correctness-over-cost
+- `xhigh` — coding et agentic les plus durs
+- `high` — défaut de l'API, minimum pour tout travail intelligence-sensitive
+- `medium` — compromis coût/qualité
+- `low` — sous-agents, tâches courtes et cadrées
+
+⚠️ **Sur Opus 5, `low` et `medium` sont anormalement forts** — souvent au niveau du `xhigh` des générations précédentes. Démarrer haut puis balayer vers le bas sur ses propres evals ; les valeurs héritées d'un modèle antérieur ne se transposent pas.
 
 Pour les détails complets, voir [anthropic-best-practices.md](anthropic-best-practices.md).
 
@@ -57,6 +59,8 @@ Before each action, briefly state:
 ```
 
 ## Self-Critique (Google)
+
+> ⚠️ **Ne PAS appliquer à la famille Claude 5.** Opus 5 vérifie déjà son propre travail spontanément ; lui demander de se relire produit de la **sur-vérification** sans gain de capacité. C'est une inversion assumée d'une best practice par ailleurs saine — voir [anthropic-best-practices.md](anthropic-best-practices.md) § « Supprimer les instructions de vérification ». Les deux sections ci-dessous restent valables sur Gemini et GPT.
 
 Ask the model to evaluate and revise its own output:
 
@@ -94,10 +98,12 @@ Phase 3 — Synthesis: Combine findings into a coherent answer with citations
 
 **Pas de "think step by step" sur ces modèles** :
 - **OpenAI o-series** (o3, o4-mini) — raisonnement interne natif. Recommandation officielle : *"prompting them to 'think step by step' is unnecessary."*
-- **Claude avec adaptive thinking** — utiliser `effort: high` (ou `xhigh` sur Opus 4.7) plutôt que des instructions CoT manuelles.
+- **Famille Claude 5** — le thinking est adaptatif et actif par défaut (toujours actif sur Fable 5). Utiliser `effort` plutôt que des instructions CoT manuelles.
 
 **Pas de CoT non plus pour** :
 - Classification ou lookup simples — ajoute de la latence sans bénéfice
-- Tâches déjà bien définies — Claude 4.6+ et GPT-5.x raisonnent déjà efficacement par défaut
+- Tâches déjà bien définies — la famille Claude 5 et GPT-5.x raisonnent déjà efficacement par défaut
+
+**Cas particulier — Claude 5 avec thinking désactivé** : ne pas écrire « ne raisonne pas » / « ne réfléchis pas » pour limiter la sortie. Sur Opus 5 cette consigne **augmente** la fuite de balises `<thinking>` dans la réponse visible. Préférer thinking activé à `low`/`medium`.
 
 Voir [openai-best-practices.md](openai-best-practices.md) pour la distinction reasoning vs standard models et [anthropic-best-practices.md](anthropic-best-practices.md) pour l'utilisation détaillée du paramètre `effort`.

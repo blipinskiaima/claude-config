@@ -1,13 +1,17 @@
-# Phase 0 — Cadrage et prérequis
+# Phase 0 — Cadrage et prérequis (entrée de la Partie 2)
 
-## 1. Charger le référentiel AIMA — non négociable
+## 1. Charger le profil AIMA — non négociable
+
+Le profil AIMA est la **Partie 1** du deep-dive, maintenue à part. Le charger comme référence
+figée avant toute analyse — voir [../aima/profil.md](../aima/profil.md).
 
 ```bash
 cat ~/Pipeline/Aima-Survey/docs/AIMA-POSITIONING.md
 ```
 
-Sans cette fiche, la comparaison sera approximative et différente d'une analyse à l'autre.
-Si elle manque ou paraît obsolète, le signaler à Boris **avant** de continuer.
+Sans ce profil, la comparaison sera approximative et différente d'une analyse à l'autre.
+S'il manque ou paraît obsolète (journal de MAJ ancien, chiffres divergents), le signaler à Boris
+**avant** de continuer — et déclencher au besoin une mise à jour du profil (Partie 1).
 
 ## 2. Déterminer la ligne de produit concernée
 

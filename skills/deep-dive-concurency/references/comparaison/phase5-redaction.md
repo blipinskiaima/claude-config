@@ -1,4 +1,12 @@
-# Phase 5 — Rédaction des deux rapports
+# Phase 5 — Comparaison & rédaction des deux rapports
+
+## Point de départ : la fiche concurrent structurée
+
+Les deux rapports **dérivent** de `docs/competitors/{NOM}-PROFIL.md` (produite en Partie 2,
+figée par le fact-check) confrontée au **profil AIMA** (`docs/AIMA-POSITIONING.md`). Les deux ont
+les mêmes axes : la comparaison est un **diff axe par axe** (§2 wet lab ↔ §2, §5 perfs ↔ §5,
+§6 verrous ↔ §7 verrous AIMA…). Ne pas réextraire ni recomparer à la main ce qui est déjà dans
+la fiche — la rédaction met en récit ce diff pour deux publics.
 
 ## Règle d'or
 

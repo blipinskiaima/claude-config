@@ -23,11 +23,13 @@ check() {
 }
 
 echo "=== TEST 1 — Versions modèles à jour ==="
-check "Opus 4.7 présent"        "grep -rq 'Opus 4.7' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
-check "Sonnet 4.6 présent"      "grep -rq 'Sonnet 4.6' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
+check "claude-fable-5 présent"  "grep -rq 'claude-fable-5' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
+check "claude-opus-5 présent"   "grep -rq 'claude-opus-5' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
+check "claude-sonnet-5 présent" "grep -rq 'claude-sonnet-5' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
 check "GPT-5.5 présent"         "grep -rq 'GPT-5.5' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
 check "Gemini 3.x présent"      "grep -rq 'Gemini 3.x' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
-check "Pas de 'Claude 4.6)' sans 4.7"  "! grep -rq 'Claude 4.6)' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
+check "Opus 4.7 non présenté comme courant"  "! grep -rqE '\\(Claude Opus 4\\.7|Opus 4\\.7 / Sonnet 4\\.6' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
+check "Pas d'ID suffixé par date"      "! grep -rqE 'claude-(fable|opus|sonnet)-5-[0-9]{8}' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
 check "Pas de 'GPT-5.2)' isolé"        "! grep -rq 'GPT-5.2)' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
 check "Pas de 'Gemini 3)' isolé"       "! grep -rq 'Gemini 3)' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
 
@@ -37,7 +39,17 @@ check "'adaptive' présent"      "grep -rqi 'adaptive' --include='*.md' --exclud
 check "'effort' présent"        "grep -rq 'effort' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
 check "'verbosity' présent"     "grep -rq 'verbosity' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
 check "'developer message' présent"  "grep -rqi 'developer message' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
-check "'budget_tokens' uniquement en déprécié"  "! grep -rq 'budget_tokens' --include='*.md' --exclude-dir='specs' --exclude-dir='plans' || grep -rA3 'budget_tokens' --include='*.md' --exclude-dir='specs' --exclude-dir='plans' | grep -qiE 'déprécié|deprecated'"
+check "'budget_tokens' uniquement en supprimé/déprécié"  "! grep -rq 'budget_tokens' --include='*.md' --exclude-dir='specs' --exclude-dir='plans' || grep -rA3 'budget_tokens' --include='*.md' --exclude-dir='specs' --exclude-dir='plans' | grep -qiE 'déprécié|deprecated|supprim|400'"
+check "'thinking_level' (Gemini 3) présent"  "grep -rq 'thinking_level' --include='*.md' --exclude-dir='specs' --exclude-dir='plans'"
+
+echo ""
+echo "=== TEST 2b — Inversions de best practice famille Claude 5 ==="
+check "inversion vérification documentée"  "grep -rqiE 'sur-vérification|sur-verification' references/anthropic-best-practices.md"
+check "inversion délégation documentée"    "grep -rqi 'plafond' references/anthropic-best-practices.md"
+check "filtres de sévérité documentés"     "grep -rqi 'severite\|sévérité' references/anthropic-best-practices.md"
+check "anti-pattern double-check présent"  "grep -rqi 'double-check' references/anti-patterns.md"
+check "Self-Critique porte un avertissement Claude 5"  "grep -rqi 'Ne PAS appliquer' references/reasoning-techniques.md"
+check "temperature 1.0 Gemini documentée"  "grep -rq '1.0' references/google-best-practices.md"
 
 echo ""
 echo "=== TEST 3 — Anti-patterns confirmés présents ==="

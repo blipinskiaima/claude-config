@@ -11,7 +11,13 @@ Common prompting mistakes to avoid. These waste tokens, confuse models, or produ
 | JSON for wrapping long documents | Performance degrades vs XML/markdown (OpenAI research) | Use XML tags or markdown for document context |
 | Vague length constraints ("be concise") | Subjective, produces inconsistent results | Use concrete limits ("max 5 bullets, each under 15 words") |
 | Over-specifying trivial decisions | Wastes context, limits flexibility | Constrain only what matters for output quality |
-| Anti-laziness on Claude 4.6+ | Model is already proactive, causes runaway execution and overtriggering | Remove "be thorough" / "do not be lazy" / "CRITICAL" prompts. Use plain phrasing |
+| Anti-laziness on Claude 4.6+ / famille 5 | Model is already proactive, causes runaway execution and overtriggering | Remove "be thorough" / "do not be lazy" / "CRITICAL" prompts. Use plain phrasing |
+| "Double-check your answer" / étape de vérification sur Claude Opus 5 | Le modèle se vérifie déjà seul → sur-vérification, coût et latence en pure perte | **Supprimer** l'instruction et l'étape de harness. Inversion assumée d'une best practice standard |
+| "Delegate to subagents when possible" sur Claude Opus 5 | Consigne écrite pour Opus 4.8 qui sous-déléguait ; Opus 5 sur-délègue, ×coût et ×latence | Retirer la consigne et poser un plafond explicite sur le nombre de sous-agents |
+| "Only report high-severity issues" en code review (Claude 5) | Suivi littéralement : les bugs sont trouvés puis tus → recall mesuré en baisse | Demander une couverture exhaustive avec confiance + sévérité, filtrer en aval |
+| Baisser `effort` pour raccourcir la réponse (Claude Opus 5) | `effort` déplace le volume de thinking, pas la longueur du texte rendu | Instruction de concision explicite dans le prompt |
+| `budget_tokens` / `temperature` / `top_p` / prefill assistant sur la famille Claude 5 | Tous supprimés → erreur 400 | `effort` pour la profondeur, prompt pour le style, `output_config.format` pour le format |
+| Prompts pas-à-pas très prescriptifs sur Claude Fable 5 | Dégradent activement la qualité de sortie | Énoncer le but et les contraintes, laisser le modèle choisir la démarche |
 | Forcing tool use with aggressive language | Over-triggers on newer models | Use "when it would be helpful" instead of "you MUST use" |
 | Compound multi-task sentences | Later tasks get ignored or partially executed | One instruction per sentence, numbered if sequential |
 | Copy-pasting from older model guides | Techniques that helped GPT-3.5 may hurt GPT-5.x / Claude 4.6+ / o-series | Use model-specific best practices for current generation |

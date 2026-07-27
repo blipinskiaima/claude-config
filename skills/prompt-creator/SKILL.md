@@ -4,9 +4,14 @@ description: Expert prompt engineering for creating effective prompts for Claude
 ---
 
 <objective>
-Create highly effective prompts using proven techniques from Anthropic (Claude Opus 4.7 / Sonnet 4.6), OpenAI (GPT-5.5 / o-series), and Google (Gemini 3.x) research. Every prompt created should be clear, specific, and optimized for the target model.
+Create highly effective prompts using proven techniques from Anthropic (famille Claude 5 — Fable 5 / Opus 5 / Sonnet 5), OpenAI (GPT-5.5 / o-series), and Google (Gemini 3.x) research. Every prompt created should be clear, specific, and optimized for the target model.
 
 This skill covers all major prompting methodologies: clarity, structure, examples, reasoning, and advanced patterns.
+
+**Une best practice générique n'est pas neutre selon le modèle.** Trois conseils standards sont désormais
+contre-productifs sur la famille Claude 5 — demander au modèle de se relire, l'encourager à déléguer, et filtrer
+les findings par sévérité. Toujours passer par [anthropic-best-practices.md](references/anthropic-best-practices.md)
+§ « Les inversions de best practice » avant de livrer un prompt ciblant Claude.
 </objective>
 
 <workflow>
@@ -49,8 +54,8 @@ Apply these universal principles (always):
 
 Apply these selectively (when relevant):
 - **Few-shot examples** for classification, extraction, formatting
-- **Chain-of-thought** for reasoning, math, multi-step logic
-- **Self-check loops** for high-stakes outputs
+- **Chain-of-thought** for reasoning, math, multi-step logic — *sauf* sur les modèles à raisonnement natif (o-series, famille Claude 5), où l'on pilote par `effort` / `reasoning_effort`
+- **Self-check loops** for high-stakes outputs — ⚠️ **ne pas appliquer à la famille Claude 5** (sur-vérification, voir les inversions)
 - **Scope discipline** to prevent over-engineering
 - **Persona anchoring** for consistent tone
 
@@ -63,6 +68,9 @@ Self-check before delivering:
 3. **Completeness**: Does the prompt define success criteria?
 4. **Conciseness**: Can any section be cut without losing meaning?
 5. **Example alignment**: Do examples demonstrate ALL the rules stated?
+6. **Model fit**: le prompt contient-il une technique contre-indiquée sur le modèle cible ? Balayer les
+   anti-patterns model-specific de [anti-patterns.md](references/anti-patterns.md) — en particulier les consignes
+   de vérification, de délégation et de filtrage par sévérité si la cible est Claude 5.
 
 ## Step 5: Deliver
 

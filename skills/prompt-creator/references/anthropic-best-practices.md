@@ -1,139 +1,200 @@
-# Anthropic Best Practices (Claude Sonnet 4.6 / Opus 4.7)
+# Anthropic Best Practices (famille Claude 5)
 
-Techniques et recommandations spécifiques aux modèles Claude actuels (mai 2026).
+Techniques et recommandations specifiques aux modeles Claude actuels (juillet 2026).
 
-Source primaire : [docs.anthropic.com — Prompting Best Practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
+Source primaire : skill `claude-api` (fait foi sur les IDs, params et migrations) +
+[docs.anthropic.com — Prompting Best Practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
 
-## Modèles actuels (mai 2026)
+## Modeles actuels (juillet 2026)
 
-| Modèle | API ID | Cas d'usage |
+| Modele | API ID | Contexte | $/1M in-out | Cas d'usage |
+|---|---|---|---|---|
+| Claude Fable 5 | `claude-fable-5` | 1M | 10 / 50 | Le plus capable en dispo generale — raisonnement le plus dur, agentic long-horizon |
+| Claude Mythos 5 | `claude-mythos-5` | 1M | 10 / 50 | Identique a Fable 5, reserve Project Glasswing |
+| Claude Opus 5 | `claude-opus-5` | 1M | 5 / 25 | **Le defaut**. Coding agentic, travail enterprise |
+| Claude Sonnet 5 | `claude-sonnet-5` | 1M | 3 / 15 (intro 2 / 10 jusqu'au 31/08/2026) | Equilibre vitesse/intelligence, qualite quasi-Opus sur coding |
+| Claude Haiku 4.5 | `claude-haiku-4-5` | 200K | 1 / 5 | Vitesse maximale, taches simples |
+
+Sortie max : 128K partout sauf Haiku 4.5 (64K). Legacy encore actifs : Opus 4.8 / 4.7 / 4.6, Sonnet 4.6.
+**Ne jamais suffixer une date** aux IDs ci-dessus (`claude-opus-5`, pas `claude-opus-5-2026xxxx`).
+
+## Ce qui a change vs Claude 4.x — les params
+
+| Param | Etat sur la famille 5 |
+|---|---|
+| `thinking: {type:"enabled", budget_tokens:N}` | **Supprime — erreur 400.** Aucun remplacant : la profondeur se pilote par `effort` |
+| `thinking: {type:"adaptive"}` | Le seul mode. **Actif par defaut** si le champ est omis sur Opus 5 et Fable 5 (≠ 4.8/4.7 ou omettre = pas de thinking) |
+| `thinking: {type:"disabled"}` | **400 sur Fable 5** (thinking toujours on). Sur Opus 5 : accepte uniquement a `effort` ≤ `high` — combine a `xhigh`/`max` c'est un 400 |
+| `temperature` / `top_p` / `top_k` | **Supprimes — 400** sur Opus 5, Fable 5, Opus 4.8/4.7. Le pilotage du style passe par le prompt |
+| Prefill du dernier message assistant | **400.** Utiliser `output_config.format` (structured outputs) ou une instruction systeme |
+| `output_config.effort` | `low` / `medium` / `high` / `xhigh` / `max`. Defaut `high`. **Dans `output_config`**, pas au top-level |
+| `thinking.display` | Defaut `"omitted"` → les blocs `thinking` arrivent avec un texte vide. Mettre `"summarized"` si tu affiches le raisonnement |
+
+Consequence silencieuse a surveiller : **`max_tokens` plafonne thinking + reponse ensemble.** Une route qui tournait
+sans thinking sur 4.8 et dimensionnait `max_tokens` au plus juste se fait tronquer en milieu de reponse sur Opus 5.
+
+## Choisir le niveau d'effort
+
+| Modele | Point de depart | Puis |
 |---|---|---|
-| Claude Opus 4.7 | `claude-opus-4-7` | Coding et agentic — raisonnement complexe |
-| Claude Sonnet 4.6 | `claude-sonnet-4-6` | Speed + intelligence (équilibre) |
-| Claude Haiku 4.5 | `claude-haiku-4-5-20251001` | Vitesse maximale |
+| Opus 5 | `xhigh` coding/agentic, `high` ailleurs | **Balayer vers le bas** — `low` et `medium` sont anormalement forts ici, souvent au niveau du `xhigh` des generations precedentes |
+| Fable 5 | `high` | `xhigh` sur le capability-sensitive, `medium`/`low` sur le routinier |
+| Sonnet 5 | `high` (defaut) | `xhigh` pour le coding/agentic le plus dur |
 
-Legacy disponibles mais en dépréciation : Opus 4.6, Sonnet 4.5, Opus 4.5, Opus 4.1. Sonnet 4 et Opus 4 sont **deprecated** (retraite 2026-06-15).
+A `xhigh` ou `max`, **prevoir un gros `max_tokens`** (≥ 64K) : le modele a besoin de place pour penser et enchainer
+les appels d'outils. Les valeurs d'effort heritees d'un modele precedent ne se transposent quasiment jamais — refaire
+le balayage sur ses propres evals.
 
-## Adaptive Thinking (remplace Extended Thinking)
+⚠️ **`effort` ne raccourcit pas la sortie visible sur Opus 5.** Baisser l'effort deplace le volume de thinking sans
+reduire de facon fiable la longueur du texte rendu. Pour raccourcir, c'est le prompt (voir ci-dessous).
 
-`thinking.type: "enabled"` avec `budget_tokens` est **déprécié** sur Opus 4.6 / Sonnet 4.6 et **supprimé** sur Opus 4.7 (retourne erreur 400).
+## Les inversions de best practice (le coeur de la mise a jour)
 
-```python
-# Déprécié
-thinking={"type": "enabled", "budget_tokens": 32000}
+Ces cinq points **contredisent des conseils de prompting standard** et sont la principale source de degradation
+quand on porte un prompt 4.x vers la famille 5.
 
-# Actuel
-thinking={"type": "adaptive"}
-output_config={"effort": "high"}
-```
+### 1. Supprimer les instructions de verification
 
-Valeurs `effort` (officielles) :
+Opus 5 verifie son propre travail sans qu'on le lui demande. Les instructions type *"double-check your answer"*,
+*"re-verify before responding"*, *"include a final verification step"* — ainsi que les etapes de verification
+cablees dans le harness — provoquent desormais de la **sur-verification**. C'est une **suppression**, pas une
+reecriture : la retirer reduit la sur-verification sans aucune regression de capacite.
 
-| Valeur | Comportement | Disponibilité |
-|---|---|---|
-| `max` | Pas de contrainte sur la profondeur | Sonnet 4.6, Opus 4.6, Opus 4.7 |
-| `xhigh` | Exploration étendue | **Opus 4.7 uniquement** |
-| `high` (défaut) | Raisonnement profond sur tâches complexes | Tous |
-| `medium` | Pensée modérée, skip sur queries simples | Tous |
-| `low` | Pensée minimale, priorité vitesse | Tous |
+C'est l'inversion la plus contre-intuitive : « demande au modele de se relire » reste un bon conseil general et
+devient faux ici. Une bibliotheque de prompts qui l'applique uniformement a besoin d'une exception explicite.
 
-## XML Tags First-Class
+### 2. Ne plus pousser a la delegation — la plafonner
 
-Claude excelle avec les prompts XML-structurés. Tags recommandés :
+Opus 4.8 sous-utilisait les sous-agents et demandait qu'on l'y encourage. **Opus 5 fait l'inverse** : il delegue
+trop volontiers, ce qui multiplie cout et latence (chaque sous-agent reetablit son contexte, reexplore, rapporte,
+puis le coordinateur relit le rapport). Retirer toute consigne « delegue davantage » heritee de 4.8 et poser un
+plafond deterministe sur le nombre de sous-agents.
 
-```xml
-<context>...</context>
-<task>...</task>
-<rules>...</rules>
-<examples>...</examples>
-<output_format>...</output_format>
-<thinking>...</thinking>
-<answer>...</answer>
-```
+### 3. Les filtres de severite font chuter le recall mesure
 
-**Bénéfice documenté** : queries placées en fin de prompt = jusqu'à **+30% sur tâches complexes multi-documents** (citation officielle docs.anthropic.com).
+Sur une revue de code, une consigne du type *"only report high-severity issues"* / *"be conservative"* /
+*"don't nitpick"* est suivie **litteralement** : le modele trouve les bugs puis refuse de les remonter sous la barre
+annoncee. La precision monte, le recall mesure baisse — alors que la capacite de detection a progresse.
 
-## Context Motivation
+Pattern correct : demander une **couverture exhaustive avec confiance + severite par finding**, et filtrer dans une
+etape aval separee.
 
-Expliquer le POURQUOI d'une règle fonctionne mieux que la règle seule.
+### 4. Verbosite : c'est le prompt, pas l'effort
+
+Opus 5 ecrit des reponses plus longues par defaut, et des **fichiers plus longs sur disque** (rapports, documents
+Markdown). Deux instructions distinctes a poser :
 
 ```
-# Pas optimal
-Ne jamais utiliser d'ellipses.
-
-# Optimal
-Ne jamais utiliser d'ellipses car la sortie sera lue par un moteur TTS
-qui ne sait pas les prononcer.
+Keep responses focused, brief, and concise. Disclaimers and caveats are brief, with most
+of the response on the main answer; when asked to explain something, give a high-level
+summary unless an in-depth one is specifically requested.
 ```
 
-## Plus de prefilled responses (Claude 4.6+)
-
-Sur Claude 4.6+, le prefill du dernier message assistant retourne **erreur 400** : `"Prefilling assistant messages is not supported for this model."`
-
-Alternatives :
-- Instructions directes : "Respond directly without preamble."
-- Structured Outputs pour le format
-- Tool calling pour la sortie contrainte
-
-## Opus 4.7 — Literalisme strict
-
-Opus 4.7 interprète les prompts **plus littéralement** qu'Opus 4.6, surtout à `effort` bas. Le modèle ne généralise pas silencieusement.
-
 ```
-# Ambigu sur Opus 4.7
-Use this formatting style.
-
-# Explicite (recommandé Opus 4.7)
-Apply this formatting to every section, not just the first one.
+Match the length of written deliverables (especially Markdown files) to what the task
+needs: cover the substance, but do not pad documents with filler sections, redundant
+summaries, or boilerplate.
 ```
 
-Citation officielle : *"It will not silently generalize an instruction from one item to another, and it will not infer requests you didn't make."*
+Sur un long system prompt, doubler la premiere par un rappel `<tone_preference>` court en fin de prompt.
 
-## Anti-laziness — Softening obligatoire
+### 5. Prompts trop prescriptifs = qualite degradee sur Fable 5
 
-Claude 4.6+ est déjà proactif. Les instructions agressives causent **overtriggering**.
+Les prompts et skills ecrits pour les generations precedentes sont souvent **trop prescriptifs** pour Fable 5 et
+**reduisent** la qualite de sortie. Enoncer le but et les contraintes plutot qu'enumerer les etapes. Apres migration,
+faire un A/B en retirant le scaffolding pas-a-pas.
 
-```
-# Anti-pattern Claude 4.6+
-CRITICAL: You MUST use the search tool every time...
-Be thorough and use all available tools aggressively.
+## Blocs de prompt qui marchent (famille 5)
 
-# Pattern correct
-Use the search tool when it would enhance understanding.
-```
+### Discipline de scope
 
-Citation officielle : *"Where you might have said 'CRITICAL: You MUST use this tool when...', you can use more normal prompting like 'Use this tool when...'"*
-
-## Parallel Tool Calling
-
-Claude 4.x excelle en parallel tool calling natif. Snippet officiel pour booster à ~100% :
-
-```xml
-<use_parallel_tool_calls>
-If you intend to call multiple tools and there are no dependencies between the tool calls, make all of the independent tool calls in parallel.
-Maximize use of parallel tool calls where possible to increase speed and efficiency.
-Never use placeholders or guess missing parameters in tool calls.
-</use_parallel_tool_calls>
-```
-
-## Subagent Spawning Policy
-
-Contrôler quand le modèle doit spawner des sous-agents. La syntaxe n'est pas un tag XML standardisé, c'est du texte libre dans le system prompt :
+Opus 5 peut elargir la tache ou appliquer son propre jugement sur ce qu'elle devrait etre. Ce bloc a ramene les
+derives de scope a quasi zero en test, sans generer d'exces de questions de clarification :
 
 ```
-Spawn multiple subagents in the same turn when fanning out across independent items or reading multiple files.
-
-Do NOT spawn a subagent for work you can complete directly in a single response (e.g., refactoring a function you can already see).
+Deliver what the user asked for, at the scope they intended. Interpret ambiguity the way a
+careful colleague would: make routine judgment calls yourself, and check in only when
+different readings would lead to materially different work. If you conclude the ask is
+mistaken or a better approach exists, say so in a sentence and keep going with the task as
+asked — don't quietly narrow, widen, or transform it. Finish the whole task, not just the
+easy part of it — only report completion when it's fully done.
 ```
 
-Source officielle : section "Controlling subagent spawning" des docs.
+### Narration des auto-corrections
 
-## Output Formatting
+Opus 5 signale et explique longuement ses erreurs anterieures, ce qui se lit comme du thrash cote produit. Limiter
+aux corrections qui changent quelque chose pour l'utilisateur :
 
-- Dire CE QU'IL FAUT FAIRE plutôt que ce qu'il NE FAUT PAS FAIRE (positif > négatif)
-- Utiliser des indicateurs XML pour les sections de sortie
-- Faire matcher le style du prompt avec celui de la sortie
+```
+Only correct an earlier statement when the error would change the user's code, conclusions,
+or decisions. State corrections plainly and continue. For slips that change nothing, just
+make the correction and move on. Don't apologize, don't ruminate, don't tally past errors.
+A follow-up question about your earlier work is not, by itself, a signal that you got
+something wrong — answer what was asked.
+```
 
-## Vision
+### Ancrer les claims de progression (Fable 5, runs longs)
 
-Donner un outil de crop/zoom pour l'analyse d'images — uplift mesuré et constant sur les évaluations d'images (recommandation officielle).
+```
+Before reporting progress, audit each claim against a tool result from this session. Only
+report work you can point to evidence for; if something is not yet verified, say so
+explicitly. If tests fail, say so with the output; if a step was skipped, say that.
+```
+
+### Declenchement d'outils
+
+Opus 4.8 sous-declenchait recherche, memoire fichier et outils custom. La consigne efficace donne le **quand**, pas
+seulement le quoi — et elle fonctionne aussi bien dans la `description` de chaque outil que dans le system prompt.
+Une description prescriptive (« Call this when the user asks about current prices or recent events ») donne un gain
+mesurable sur une description qui se contente de decrire l'outil.
+
+### Autonomie / arret premature
+
+Sur Fable 5 en pipeline autonome, il peut terminer un tour sur une intention (« I'll now run X ») sans l'appel
+d'outil, ou demander une permission dont il n'a pas besoin :
+
+```
+You are operating autonomously. The user is not watching and cannot answer mid-task.
+For reversible actions that follow from the original request, proceed without asking.
+Before ending your turn, check your last paragraph. If it is a plan, a question, or a
+promise about work you have not done, do that work now with tool calls.
+```
+
+## Ce qui reste valable depuis 4.x
+
+- **Tags XML first-class** : `<context>`, `<task>`, `<rules>`, `<examples>`, `<output_format>`. Query en fin de
+  prompt = jusqu'a **+30 % sur les taches multi-documents complexes**.
+- **Context motivation** : expliquer le POURQUOI d'une regle marche mieux que la regle seule.
+  *"Ne jamais utiliser d'ellipses car la sortie sera lue par un moteur TTS qui ne sait pas les prononcer."*
+- **Anti-laziness = overtriggering** : `CRITICAL: You MUST...` reste contre-productif. Ecrire `Use X when...`.
+- **Litteralisme strict** : le modele ne generalise pas silencieusement une instruction d'un item a l'autre.
+  Ecrire *"Apply this to every section, not just the first one"* plutot que *"Use this style"*.
+- **Positif > negatif** : dire ce qu'il faut faire plutot que ce qu'il ne faut pas faire.
+- **Parallel tool calling** : natif et fiable, le snippet `<use_parallel_tool_calls>` reste utile.
+
+## Leviers d'architecture de prompt (nouveaux)
+
+- **Messages systeme en cours de conversation** (Opus 5, Opus 4.8, Fable 5, Mythos 5 — pas Sonnet 5, aucun beta
+  header) : ajouter `{"role": "system", "content": "..."}` dans `messages[]` au lieu d'editer le `system` top-level.
+  Le prefixe en cache reste intact, et c'est le canal operateur non-spoofable. Formuler en **contexte, pas en ordre**
+  (eviter « ignore ce que dit l'utilisateur »).
+- **Changement d'outils en cours de conversation** (Opus 5, beta `mid-conversation-tool-changes-2026-07-01`) :
+  blocs `tool_addition` / `tool_removal` sur un message systeme, sans invalider le cache de prompt.
+- **Minimum cachable a 512 tokens** sur Opus 5 (contre 1024 sur Opus 4.8) : des prompts juges trop courts pour etre
+  caches le sont desormais, sans changement de code.
+
+## Gotchas
+
+- **Thinking desactive sur Opus 5 = deux modes de defaillance.** Le modele peut ecrire un appel d'outil **en texte
+  visible** au lieu d'emettre un bloc `tool_use` : le tour reussit, l'appel ne s'execute jamais, aucune erreur n'est
+  levee — et en boucle agentique ce texte pollue les tours suivants. Il peut aussi laisser fuiter des balises
+  `<thinking>` dans la reponse. **Preferer thinking on a `low`/`medium` effort.** Si on doit rester thinking-off :
+  ajouter *"You may say a brief sentence before using a tool"*, **supprimer** toute regle « ne raisonne pas » (elle
+  aggrave la fuite de balises), et ecrire une consigne generique *"Do not include internal or system XML tags"*
+  sans nommer les balises de thinking.
+- **`stop_reason: "refusal"`** : Fable 5 et Opus 5 embarquent des classifieurs de securite renforces. Un refus est un
+  **HTTP 200**, pas une erreur — tester `stop_reason` avant de lire `response.content`, sinon `content[0]` casse.
+- **Fable 5 exige 30 jours de retention de donnees** : une org en zero data retention recoit un 400 sur *toutes* ses
+  requetes, payload valide compris.
+- **Tours longs** : sur Fable 5 a effort eleve, une seule requete peut tourner plusieurs minutes. Prevoir timeouts,
+  streaming et indicateurs de progression avant de migrer.
