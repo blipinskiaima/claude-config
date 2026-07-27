@@ -62,6 +62,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [x] **Schema v20 trace-prod — 5 métriques mito** — 5 colonnes `mt_*` dans `retd_suivis` (liquid only, 582 CGFL + 513 HCL) depuis `MITO/{s}.mito_qc.tsv`, précision complète en base et arrondi 2 déc à l'export via la nouvelle constante `ROUND2_HEADERS`. Commit `5cf8c50`, backfill en cours en tmux `tp_mito` ; détails dans `project_schema_v20_mito.md`.
 
+- [x] **Module MITO QC Bam2Beta** — QC mito liquid only (`workflow/mito.nf`), TSV 11 cols `MITO/{ID}.mito_qc.tsv` (pas de champs `metadata.json`), from-scratch si `BETA` + rétro si `!BETA` (patron TOO_RETRO), smoke H826 + Colon_1 OK. NUMT différé. Commit `fa3d554`.
+
 ## 2026-07-24 — Aima-Tower alignement Exis 1.1 + skill QARA
 
 - [x] **Alignement /exploration sur Exis 1.1 (mVAF v1.4)** — page alignée au chiffre près sur le rapport réglementaire Exis 1.1 : seuil quantile **type 1** (0,0042), exclusion `CGFL_26BM01841`, sélecteur **Cohorte Avancés/Précoce** (§2.2/§2.3), `cohort_mode` threadé partout. Seul écart accepté = Prostate_21 (donnée MàJ après le PDF). Rompt l'équivalence vs R main (type 6 → `TestRegressionVsR` skip). User guide + comparaison vulgarisés dans le Google Doc. Commits `f3a4783`+`c913356`. Détails : [exis_alignment.md](../-home-blipinski-Pipeline-Aima-Tower/memory/exis_alignment.md).
