@@ -56,6 +56,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-07-27 — trace-prod diagnostic POD5 Bladder_Urine
+
+- [x] **POD5 Bladder_Urine_02_117-119 jamais déposés sur Scaleway** — `stockage_pod5` reste NULL car POD5 absents en amont : run PBM55727 (run_id `1ecd4428`, séquencé 29/06/2026) introuvable dans `s3://aima-pod-data/data/CGFL/liquid/` (dernier run déposé = 23/06). Samples pourtant séquencés (BAM processed 54G/25G/24G). Pas un bug trace-prod → redépôt POD5 amont requis.
+
 ## 2026-07-24 — Aima-Tower alignement Exis 1.1 + skill QARA
 
 - [x] **Alignement /exploration sur Exis 1.1 (mVAF v1.4)** — page alignée au chiffre près sur le rapport réglementaire Exis 1.1 : seuil quantile **type 1** (0,0042), exclusion `CGFL_26BM01841`, sélecteur **Cohorte Avancés/Précoce** (§2.2/§2.3), `cohort_mode` threadé partout. Seul écart accepté = Prostate_21 (donnée MàJ après le PDF). Rompt l'équivalence vs R main (type 6 → `TestRegressionVsR` skip). User guide + comparaison vulgarisés dans le Google Doc. Commits `f3a4783`+`c913356`. Détails : [exis_alignment.md](../-home-blipinski-Pipeline-Aima-Tower/memory/exis_alignment.md).
