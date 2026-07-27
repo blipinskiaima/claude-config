@@ -56,6 +56,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-07-27 — ZTHapp reprise ZTH (recalibrage + mesures + skills)
+
+- [x] **ZTHapp recalibrage reprise post-pause** — audit PDF complet (182 p., 5 agents), déficit direct 2001 kcal validé, repas verrouillés (Raptor Club + Riz Œuf 170 g riz / 5 g huile pesée), rampe sport S1/S2. Plan : `project_reprise_2026-07.md` (mémoire ZTHapp).
+- [x] **ZTHapp page /mesures + fixes** — tracking poids bas hebdo + tour de taille (migration body_metrics en prod), Coach IA réparé (phase_history/taken), backup v2. 6 commits déployés Vercel.
+- [x] **Skills daily-diet + weekly-muscu** — interrogation quotidienne des repas (journal + arbre de décision bilans) et des séances (charges + verdicts progression), via meta-skills-creator.
+
 ## 2026-07-24 — Aima-Tower alignement Exis 1.1 + skill QARA
 
 - [x] **Alignement /exploration sur Exis 1.1 (mVAF v1.4)** — page alignée au chiffre près sur le rapport réglementaire Exis 1.1 : seuil quantile **type 1** (0,0042), exclusion `CGFL_26BM01841`, sélecteur **Cohorte Avancés/Précoce** (§2.2/§2.3), `cohort_mode` threadé partout. Seul écart accepté = Prostate_21 (donnée MàJ après le PDF). Rompt l'équivalence vs R main (type 6 → `TestRegressionVsR` skip). User guide + comparaison vulgarisés dans le Google Doc. Commits `f3a4783`+`c913356`. Détails : [exis_alignment.md](../-home-blipinski-Pipeline-Aima-Tower/memory/exis_alignment.md).
