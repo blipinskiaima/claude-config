@@ -56,9 +56,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-07-27 — trace-prod diagnostic POD5 Bladder_Urine
+## 2026-07-27 — trace-prod : diagnostic POD5 + schema v20 mito
 
 - [x] **POD5 Bladder_Urine_02_117-119 jamais déposés sur Scaleway** — `stockage_pod5` reste NULL car POD5 absents en amont : run PBM55727 (run_id `1ecd4428`, séquencé 29/06/2026) introuvable dans `s3://aima-pod-data/data/CGFL/liquid/` (dernier run déposé = 23/06). Samples pourtant séquencés (BAM processed 54G/25G/24G). Pas un bug trace-prod → redépôt POD5 amont requis.
+
+- [x] **Schema v20 trace-prod — 5 métriques mito** — 5 colonnes `mt_*` dans `retd_suivis` (liquid only, 582 CGFL + 513 HCL) depuis `MITO/{s}.mito_qc.tsv`, précision complète en base et arrondi 2 déc à l'export via la nouvelle constante `ROUND2_HEADERS`. Commit `5cf8c50`, backfill en cours en tmux `tp_mito` ; détails dans `project_schema_v20_mito.md`.
 
 ## 2026-07-24 — Aima-Tower alignement Exis 1.1 + skill QARA
 
