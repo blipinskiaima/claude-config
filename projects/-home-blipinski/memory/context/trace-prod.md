@@ -1,17 +1,16 @@
-# Context — trace-prod — 2026-07-22T14:50:00+0000
+# Context — trace-prod — 2026-07-27T09:55:00+0000
 
 **Branche** : main
 **Dernier commit** : 6b22116 — feat: schema v19 — too_predicted_class + too_final_decision
-**Status** : clean (synchro origin/main, 15 commits pushés cette session dont rattrapage rarefaction v16/v17)
+**Status** : clean (synchro origin/main)
 
 ## Où j'en suis
-Deux features ajoutées via /add-trace-prod (calque themelio → too), développées pas-à-pas (A→D validées une par une), documentées, committées, pushées, backfillées et exportées gsheet. Session terminée, rien d'engagé.
+Session courte post-v18/v19 : investigation du stockage POD5 de 3 samples CGFL liquid (Bladder_Urine_02_117/118/119). Conclusion : leurs POD5 n'ont jamais été déposés sur Scaleway. Rien d'engagé côté code.
 
 ## Ce qui marche / ce qui foire
-- ✓ Schema v18 `themelio_score` : CSV THEMELIO/{s}.themelio_predictions.csv L2C2, format_comma précision complète, liquid only. Backfill 1322 liquid + export OK (1re tentative).
-- ✓ Schema v19 `too_predicted_class` (col 9) + `too_final_decision` (col 20) : parsing module csv OBLIGATOIRE (virgule interne dans confidence_stratum col 10). Backfill 1323 liquid + export OK. Éventail : Lung 549, Bladder+Pancreas 370, Colon 256, Breast 95, Prostate 53.
-- ✓ Chemins réels : dossier direct sous le sample (THEMELIO/ et TOO/, PAS OUTPUT/). Fichier too `.too5_predictions.csv` un seul point.
-- ⚠ 147 lignes solid à 'KO' sur les colonnes liquid-only = normal (jamais exportées, défaut DDL non écrasé).
+- ✓ Diagnostic POD5 : les 3 samples sont séquencés (BAM processed 54G/25G/24G) mais sans metadata (run_number NULL) → `update-column stockage_pod5` retourne NULL faute de mapping run.
+- ✗ POD5 absents de Scaleway : run PBM55727 (run_id 1ecd4428, séquencé 29/06/2026) introuvable dans `s3://aima-pod-data/data/CGFL/liquid/` ; dernier run déposé = 23/06/2026. Dépôt POD5 manquant en amont, pas un bug trace-prod.
+- ✓ /pull-claude : ~/.claude à jour (skills daily-diet/weekly-muscu + mémoires ZTHapp/DCATrack), travail local deep-dive-concurency préservé (non commité).
 
 ## Prochaine étape
-Rien d'engagé. Si demande future : les colonnes too/themelio passent aussi par le `check` général (câblées LiquidChecker), donc remplies automatiquement pour les nouveaux samples.
+Rien d'engagé sur trace-prod. Côté POD5 : si Boris veut les récupérer, il faut les redéposer sur Scaleway en amont (question infra/séquençage, pas trace-prod).
