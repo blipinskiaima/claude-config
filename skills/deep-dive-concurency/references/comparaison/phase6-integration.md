@@ -3,8 +3,11 @@
 ## 1. Générer le PDF combiné
 
 ```bash
+cd ~/Pipeline/Aima-Survey
 python3 ~/.claude/skills/deep-dive-concurency/scripts/md2pdf.py \
-    {CIBLE}.pdf {CIBLE}-P1-TECHNIQUE.md {CIBLE}-P2-MARCHE.md
+    concurency/pdf/{CIBLE}.pdf \
+    concurency/rapports/{CIBLE}-P1-TECHNIQUE.md \
+    concurency/rapports/{CIBLE}-P2-MARCHE.md
 ```
 
 Prérequis : venv avec `weasyprint` + `markdown` (phase 0).
@@ -50,7 +53,7 @@ Ajouter la ligne correspondante dans `MEMORY.md`.
 
 ## 4. Mettre à jour la fiche AIMA si nécessaire
 
-Si l'analyse révèle un manque dans `docs/AIMA-POSITIONING.md` (champ `[À PRÉCISER]` qu'on peut
+Si l'analyse révèle un manque dans `concurency/AIMA-POSITIONING.md` (champ `[À PRÉCISER]` qu'on peut
 désormais remplir, ou barre de performance de marché à inscrire), le proposer à Boris.
 
 ## 5. Référencer dans la documentation projet

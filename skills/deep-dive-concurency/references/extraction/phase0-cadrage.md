@@ -6,7 +6,7 @@ Le profil AIMA est la **Partie 1** du deep-dive, maintenue à part. Le charger c
 figée avant toute analyse — voir [../aima/profil.md](../aima/profil.md).
 
 ```bash
-cat ~/Pipeline/Aima-Survey/docs/AIMA-POSITIONING.md
+cat ~/Pipeline/Aima-Survey/concurency/AIMA-POSITIONING.md
 ```
 
 Sans ce profil, la comparaison sera approximative et différente d'une analyse à l'autre.

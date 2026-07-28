@@ -6,7 +6,7 @@ début de chaque analyse comme référence figée.
 
 ## Où il vit
 
-**Fichier canonique : `~/Pipeline/Aima-Survey/docs/AIMA-POSITIONING.md`.**
+**Fichier canonique : `~/Pipeline/Aima-Survey/concurency/AIMA-POSITIONING.md`.**
 
 C'est l'équivalent, pour AIMA, des rapports P1/P2 qu'on produit pour un concurrent — mais sous
 forme d'un **document unique vivant** plutôt que d'un livrable figé. Il porte les mêmes axes de
@@ -16,7 +16,7 @@ performances, réglementaire, marché), pour que la confrontation en Partie 3 so
 ## Charger le profil — début de chaque deep-dive
 
 ```bash
-cat ~/Pipeline/Aima-Survey/docs/AIMA-POSITIONING.md
+cat ~/Pipeline/Aima-Survey/concurency/AIMA-POSITIONING.md
 ```
 
 Sans lui, la comparaison est approximative et diffère d'une analyse à l'autre. S'il paraît

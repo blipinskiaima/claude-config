@@ -1,9 +1,9 @@
 # Template — Profil concurrent structuré
 
 Fiche produite par la **Partie 2** du deep-dive. C'est le **miroir du profil AIMA**
-(`docs/AIMA-POSITIONING.md`) : mêmes axes, même ordre → la Partie 3 compare axe par axe.
+(`concurency/AIMA-POSITIONING.md`) : mêmes axes, même ordre → la Partie 3 compare axe par axe.
 
-- **Emplacement** : `~/Pipeline/Aima-Survey/docs/competitors/{NOM}-PROFIL.md`
+- **Emplacement** : `~/Pipeline/Aima-Survey/concurency/competitors/{NOM}-PROFIL.md`
 - **Statut** : fiche vivante, remise à jour à chaque nouvelle analyse de la cible (comme le
   profil AIMA). Les rapports `{NOM}-P1-TECHNIQUE.md` / `{NOM}-P2-MARCHE.md` en **dérivent** en
   Partie 3 (rendu narratif pour deux publics) ; le `competitors.json` en reçoit le résumé.

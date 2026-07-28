@@ -2,8 +2,8 @@
 
 ## Point de départ : la fiche concurrent structurée
 
-Les deux rapports **dérivent** de `docs/competitors/{NOM}-PROFIL.md` (produite en Partie 2,
-figée par le fact-check) confrontée au **profil AIMA** (`docs/AIMA-POSITIONING.md`). Les deux ont
+Les deux rapports **dérivent** de `concurency/competitors/{NOM}-PROFIL.md` (produite en Partie 2,
+figée par le fact-check) confrontée au **profil AIMA** (`concurency/AIMA-POSITIONING.md`). Les deux ont
 les mêmes axes : la comparaison est un **diff axe par axe** (§2 wet lab ↔ §2, §5 perfs ↔ §5,
 §6 verrous ↔ §7 verrous AIMA…). Ne pas réextraire ni recomparer à la main ce qui est déjà dans
 la fiche — la rédaction met en récit ce diff pour deux publics.
@@ -23,7 +23,8 @@ géant, les commentaires méthodologiques qui n'apportent pas de décision.
 | `{CIBLE}-P1-TECHNIQUE.md` | bioinformaticiens, data scientists | wet lab, dry lab, features, modèle, performances, comparaison technique, perspectives |
 | `{CIBLE}-P2-MARCHE.md` | direction générale | commercial, réglementaire, remboursement, financement, essais, concurrence, marché, implications |
 
-Emplacement : racine de `~/Pipeline/Aima-Survey/`. PDF combiné via `scripts/md2pdf.py`.
+Emplacement : `~/Pipeline/Aima-Survey/concurency/rapports/`. PDF combiné dans
+`~/Pipeline/Aima-Survey/concurency/pdf/` via `scripts/md2pdf.py`.
 
 Plan détaillé : [../templates/structure-rapports.md](../templates/structure-rapports.md).
 

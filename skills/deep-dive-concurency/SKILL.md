@@ -11,7 +11,7 @@ positionnement AIMA, en trois parties bien séparées.
 
 ```
 PARTIE 1 — PROFIL AIMA          référentiel vivant, base de comparaison, maintenu à part
-    │                            docs/AIMA-POSITIONING.md  (source : rapport Exis 1.1)
+    │                            concurency/AIMA-POSITIONING.md  (source : rapport Exis 1.1)
     ▼
 PARTIE 2 — EXTRACTION CONCURRENT procédure d'extraction vérifiée → fiche {NOM}-PROFIL.md
     │                            cadrage → sources → corpus → fan-out → fact-check ⛔
@@ -38,7 +38,7 @@ profil AIMA**.
 Le profil AIMA est la **base de comparaison** de tout deep-dive, découplée de l'analyse
 concurrente et maintenue dans le temps.
 
-- **Fichier canonique** : `~/Pipeline/Aima-Survey/docs/AIMA-POSITIONING.md`.
+- **Fichier canonique** : `~/Pipeline/Aima-Survey/concurency/AIMA-POSITIONING.md`.
 - **Source de vérité des chiffres** : rapport **Exis 1.1 (SD-02)**, reproduit par la page
   `/exploration` d'Aima Tower ; code `~/Pipeline/` pour les specs techniques.
 - Le charger au début de chaque analyse. S'il paraît obsolète, le mettre à jour **avant**.
@@ -60,7 +60,7 @@ Procédure d'extraction **vérifiée** de la cible, indépendante d'AIMA. Aucune
 on reconstitue et on vérifie.
 
 **Sortie de la Partie 2** : une **fiche concurrent structurée**,
-`~/Pipeline/Aima-Survey/docs/competitors/{NOM}-PROFIL.md`, aux **mêmes axes que le profil AIMA**
+`~/Pipeline/Aima-Survey/concurency/competitors/{NOM}-PROFIL.md`, aux **mêmes axes que le profil AIMA**
 (pour un diff 1:1 en Partie 3). C'est le miroir concurrent du profil AIMA : fiche vivante,
 remise à jour à chaque analyse. Template et discipline de marquage :
 [references/templates/profil-concurrent.md](references/templates/profil-concurrent.md). Les
@@ -147,7 +147,7 @@ Voir [references/comparaison/phase6-integration.md](references/comparaison/phase
 | Besoin | Fichier |
 |---|---|
 | **Charger / mettre à jour le profil AIMA** | [aima/profil.md](references/aima/profil.md) |
-| Le profil AIMA lui-même (contenu) | `~/Pipeline/Aima-Survey/docs/AIMA-POSITIONING.md` |
+| Le profil AIMA lui-même (contenu) | `~/Pipeline/Aima-Survey/concurency/AIMA-POSITIONING.md` |
 | Prérequis, choix de la ligne produit, fiche concurrent | [extraction/phase0-cadrage.md](references/extraction/phase0-cadrage.md) |
 | Extraire une plaquette PDF, analyser les absences | [extraction/phase1-sources-primaires.md](references/extraction/phase1-sources-primaires.md) |
 | Retrouver les vraies publications derrière un produit | [extraction/phase2-corpus-scientifique.md](references/extraction/phase2-corpus-scientifique.md) |
