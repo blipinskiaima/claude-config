@@ -56,10 +56,14 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-07-30 — trace-prod export-cohort (audit d'inclusion cohorte)
+## 2026-07-30 — trace-prod export-cohort + veille concurrentielle 4 volets + seuils QC
 
 - [x] **Export Cohort — audit d'inclusion cohorte Sens/Spé** — nouvelle commande `export-cohort` → onglet 'Cohort' : 1324 liquid, 485 inclus (261 cancers + 224 sains), une ligne par sample avec les métadonnées de la cascade et tous ses motifs d'exclusion. Prédicats importés d'Aima-Tower (aucune règle réimplémentée), fidélité prouvée nominativement + audit adversarial 12 agents 0 divergence ; commit `1a8e05e`, détails dans `project_cohort_export.md`.
 
+- [x] **Dossiers concurrent en 4 volets** — 7 concurrents × P0/P1/P2/P3 servis sur `/profils` d'Aima-Tower, PDF téléchargeable, cron lundi 10h00 (`run_profils.sh`). Deux passes de vérification adversariale : 117 corrections le 29/07, 149 de plus le 30/07 dont **43 dettes résolues** (chiffres justes rabattus à tort au motif « annexe non consultée »).
+- [x] **Onglet AIMA de comparaison chiffrée** — nos perfs recalculées à la spécificité **de chaque concurrent** (fenêtre utile 80–99 % mesurée), 5/7 comparables au lieu d'1. Conforme au rapport Exis au sample près : 214/261 @ 95,1 %, seuil 0,0042.
+- [x] **Pondération des évènements par importance** — `lib/competitive/importance.py`, 3 niveaux, 5 % de la base en T1. Corrige le défaut qui reléguait l'inclusion ACS de Freenome en page 3 : §0 « Faits majeurs » désormais imposé par le skill `deep-dive-concurency`.
+- [x] **Seuils QC biopsie liquide instruits** — 5M reads / 0,25× validés comme conservateurs : Katsman 2022 (PMID 35841107) publie la même règle en ONT natif à 2,5M/0,2×. Mesure sur 1 469 échantillons : longueur alignée médiane **172 pb**, et les deux seuils attrapent des pannes **opposées** (fragments trop longs vs reads sans génome). Voir `Bam2Beta/docs/QC-seuils-biopsie-liquide.md`.
 ## 2026-07-27 — trace-prod POD5/mito + refonte skill deep-dive
 
 - [x] **POD5 Bladder_Urine_02_117-119 jamais déposés sur Scaleway** — `stockage_pod5` reste NULL car POD5 absents en amont : run PBM55727 (run_id `1ecd4428`, séquencé 29/06/2026) introuvable dans `s3://aima-pod-data/data/CGFL/liquid/` (dernier run déposé = 23/06). Samples pourtant séquencés (BAM processed 54G/25G/24G). Pas un bug trace-prod → redépôt POD5 amont requis.
