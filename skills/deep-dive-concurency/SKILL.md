@@ -128,6 +128,15 @@ Les deux rapports **dérivent** de ce diff, pour deux publics : `{NOM}-P1-TECHNI
 et `{NOM}-P2-MARCHE.md` (direction). Chaque chiffre garde son marqueur de preuve et son verdict.
 Section « positionnement vs AIMA » obligatoire dans les deux.
 
+⛔ **Commencer par le §0 « Faits majeurs »**, dans les DEUX rapports :
+
+```bash
+cd ~/Pipeline/Aima-Survey && python3 cli.py competitive-majeurs "{NOM}"
+```
+
+Un rapport ordonné par récence enterre les faits lourds : c'est ce qui a relégué l'inclusion
+ACS de SimpleScreen en page 3 du dossier Freenome. Le §0 l'empêche par construction.
+
 Voir [references/comparaison/phase5-redaction.md](references/comparaison/phase5-redaction.md),
 [references/templates/structure-rapports.md](references/templates/structure-rapports.md) et
 [references/quality/niveaux-preuve.md](references/quality/niveaux-preuve.md).
