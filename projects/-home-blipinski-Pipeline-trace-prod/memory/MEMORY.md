@@ -21,6 +21,7 @@
 - [Schema v20 — 5 métriques mito](project_schema_v20_mito.md) — retd_suivis liquid only, TSV MITO/{s}.mito_qc.tsv index 3/4/7/8/9, split("\t") (pas csv), précision complète en DB + arrondi 2 déc à l'export via ROUND2_HEADERS. ⚠ homonyme Colon_1 CGFL≠HCL ; update-column -s sur mauvais labo affiche "N mis à jour" sans rien toucher
 - [Schema v16/v17 — rarefaction](project_schema_v16_rarefaction.md) — table AUTONOME, PK composite (sample_name, labo) depuis v17 (collision inter-labo), niveaux 20M/10M/5M/2M/1M, calque dilution. Pipeline terminé 15/07/2026 : 1355 lignes, PROD OK 100%, toutes métriques remplies
 - [Mode probs --probs_bootstrap](project_probs_bootstrap_mode.md) — probs epic = moyenne des 200 réplicats bootstrap, écrase les 16 col epic (NULL si absent), réversible via probs --probs
+- [Export Cohort — audit d'inclusion](project_cohort_export.md) — export-cohort, onglet 'Cohort', 1324 liquid → 485 inclus. Importe les prédicats d'Aima-Tower (jamais réimplémentés). ⚠ motifs évalués indépendamment ≠ cascade : c'est le PREMIER motif qui donne le palier de chute
 - [Colonnes v2-v7 — index](project_columns_index.md) — colonnes v2-v7 + patterns transversaux (collision mapping TSV_TO_DB, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
 
 ## Données & infra

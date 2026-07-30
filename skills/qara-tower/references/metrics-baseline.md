@@ -44,10 +44,15 @@ Elles sont listées ici pour interpréter correctement les deltas.
 - **`cancer_truth`** — mutation détectée (`vaf > 0`) **OU** cancer actif déclaré
   (`active_cancer ∈ {yes,oui,y,1,true}`). `src/exploratory_compute.py::_add_flags`.
 - **`healthy_flag`** — le nom de l'échantillon contient « Health ».
-- **Cohorte Avancés** — exclut les échantillons `cohort = 'Lung-DI précoce'` (dépistage
-  précoce, suivi à part). Sains toujours conservés (calcul du seuil).
+- **Cohorte Avancés** — exclut les échantillons `cohort = 'Lung-DI précoce'` (poumon précoce,
+  suivi à part). Sains toujours conservés (calcul du seuil).
 - **Cohorte Précoce** — uniquement `cohort = 'Lung-DI précoce'` **et** `active_cancer = Yes`
   (règle stricte du §2.3 Exis).
+  ⚠ **Contexte DIAGNOSTIQUE, pas dépistage.** Exis 1.1 §2.2, verbatim : *« the lung and bladder
+  cohorts were assembled in a diagnostic setting, before or during the diagnostic work-up, and
+  are therefore reported separately »*. Ce sont des patients déjà adressés pour suspicion, pas
+  une population asymptomatique. Le mot « dépistage » figurait ici jusqu'au 2026-07-28 : il rend
+  le chiffre comparable à un test de screening concurrent, ce qu'il n'est pas.
 - **Exclusion nommée** — `CGFL_26BM01841` est retiré (liste `_EXCLUDED_UNIQUE_IDS`).
 
 ## Ce que le skill mesure à chaque point
