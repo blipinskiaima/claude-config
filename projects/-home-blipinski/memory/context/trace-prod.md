@@ -1,29 +1,33 @@
-# Context — trace-prod — 2026-07-27T14:48:39+00:00
+# Context — trace-prod — 2026-07-30T21:20:02+00:00
 
 **Branche** : main
-**Dernier commit** : 5cf8c50 — feat: schema v20 — 5 métriques mito (retd_suivis, liquid)
-**Status** : clean (17 untracked préexistants : backups .duckdb, CSV dev/, rapports HTML)
+**Dernier commit** : 1a8e05e — feat: export-cohort — audit d'inclusion cohorte Sens/Spé
+**Status** : clean (untracked préexistants only : backups .duckdb, CSV dev/, rapports HTML)
 
 ## Où j'en suis
-Schema v20 (5 métriques mito dans retd_suivis, liquid only) implémenté de bout en
-bout via le skill add-trace-prod : étapes A→D validées et poussées. Le backfill
-tourne encore en tmux `tp_mito` (script scratchpad/backfill_mito.sh, log
-backfill_mito.log) : 4/10 update-column faits à 14h48, puis 2 export --gsheet
-avec retry 503 en fin de script.
+Deux chantiers terminés, rien en cours. (1) Backfill du schema v20 (5 métriques mito)
+clos et vérifié. (2) Nouvelle feature `export-cohort` livrée de bout en bout : audit
+d'inclusion dans la cohorte Sens/Spé de la Tower, onglet 'Cohort' de la gsheet
+trace-prod peuplé, code commité et poussé.
 
 ## Ce qui marche / ce qui foire
-- ✓ Code v20 complet et vérifié : DDL + migration v20 en base, 5 checkers testés
-  (HCL Colon_1 = 18,23/100/5,133307299/1,1007/150,066 = référence Boris), NULL→NA,
-  export TSV headers en positions 36-40/52 avec arrondi 2 déc (base = précision complète).
-- ✓ Doc à jour : CLAUDE.md, README.md, mémoire project_schema_v20_mito.md + MEMORY.md.
-- ✗ Backfill NON terminé au moment du snapshot — les 6 update-column restants et les
-  2 exports gsheet n'ont pas encore été vérifiés. Compteurs par labo à contrôler.
-- ⚠ Piège rencontré : `Colon_1` existe en CGFL ET HCL avec des valeurs mito différentes.
-- ⚠ Piège rencontré : `update-column -s` sur un sample absent du labo ciblé affiche
-  « N samples mis à jour » sans toucher aucune ligne (compteur d'itérations) — un test
-  négatif fait sur le mauvais labo semble passer à tort.
+- ✓ Backfill mito v20 : 10/10 update-column, 0 erreur, CGFL 582/811 + HCL 513/513,
+  les 2 exports gsheet passés dès la 1re tentative.
+- ✓ `export-cohort` : 1324 lignes liquid × 17 colonnes, 485 inclus (261 cancers +
+  224 sains). Vérifié **nominativement** contre `compute_cohort_samples()` — 485
+  communs, 0 manquant, 0 en trop, 0 label divergent — et les 7 deltas de la cascade
+  reproduits exactement (242/254/25/30/134/63/91).
+- ✓ Audit adversarial (workflow 12 agents, 7 lots de prédicats) : **0 divergence
+  confirmée**. Il a tout de même fait remonter 2 vrais défauts, corrigés : 6 mVAF
+  ~1e-7 écrasés en `0` par un `.6f` naïf, et 2 imports morts.
+- ✓ Aucune règle métier dupliquée : le script importe les prédicats d'Aima-Tower.
+- ⚠ Décision laissée ouverte par Boris : les 229 Alcapone portent un motif
+  « indication hors-cible (Lung_Alc) » redondant avec « cohorte Alcapone ». Fidèle
+  à la Tower (car `get_indications()` n'expose pas `Lung_Alc`), mais trompeur à la
+  lecture. Laissé tel quel.
 
 ## Prochaine étape
-Relire scratchpad/backfill_mito.log : confirmer 10/10 update-column, les comptages
-par labo (~582 CGFL / ~513 HCL non-NULL attendus) et le succès des 2 exports gsheet.
-Si un export a épuisé ses 5 retries 503, le relancer seul.
+Rien d'engagé. Si Boris veut nettoyer le libellé : restreindre le motif
+« indication hors-cible » aux 4 vraies indications exclues (TNE, Nuclear,
+Bladder_Blood, Bladder_Urine) dans `dev/cohort_extraction.py`, puis relancer
+`python3 database/check_samples.py export-cohort`. Ne change aucun effectif.
