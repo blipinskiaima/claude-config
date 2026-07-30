@@ -1,19 +1,34 @@
-# Context — Aima-Survey — 2026-07-27T15:19:41+0000
+# Context — Aima-Survey — 2026-07-30T21:20:36+00:00
 
 **Branche** : main
-**Dernier commit** : d1e4c0d — docs: profil AIMA canonique (Exis 1.1) + 1re fiche concurrent Signatera
-**Status** : 10 fichiers non commités (tous PRÉ-EXISTANTS hors session : COMPETITORS.md, rapports FREENOME/GENESEEQ/GUARDANT, images, SYNTHESE)
+**Dernier commit** : a144944 — merge: dossiers concurrent en 4 volets, pondération par importance, taxonomie à 3 niveaux
+**Status** : clean (1 fichier non suivi : SYNTHESE-42285091-fragmentia-ai.md)
 
 ## Où j'en suis
-Refonte du skill `/deep-dive-concurency` en 3 parties (profil AIMA / extraction concurrent / comparaison), terminée et testée de bout en bout sur Natera Signatera. Profil AIMA mis à jour avec le rapport Exis 1.1. Le skill (~/.claude) sera commité par commit-claude ; le test Signatera s'est arrêté avant la Phase 6 (rapports P1/P2 + diff competitors.json non produits).
+Veille concurrentielle complète et déployée : 7 dossiers en 4 volets (P0 faits
+majeurs, P1 technique, P2 marché, P3 trajectoire), onglet AIMA de comparaison
+chiffrée, pondération des évènements par importance. Tout est poussé sur main
+dans les 3 dépôts. Dernière tâche de la session : synthèse QC sur les seuils
+Bam2Beta (5M reads / 0,25×), livrée en analyse — aucun code modifié.
 
 ## Ce qui marche / ce qui foire
-- ✓ Architecture 3 parties câblée, liens vérifiés, docs/AIMA-POSITIONING.md = profil canonique (Exis 1.1 : mVAF v1.4 82%/95,1%)
-- ✓ Template fiche concurrent + 1re fiche NATERA-SIGNATERA-PROFIL.md fact-checkée (5 erreurs corrigées avant rédaction)
-- ✓ Fact-check a bloqué le faux parallèle 82% détection AIMA vs 88-94% MRD-surveillance Signatera
-- ✗ Profil AIMA n'a que des perfs de DÉTECTION (Exis), pas de MRD longitudinale → diff de perfs impossible face à un pur concurrent MRD (gap n°1)
-- ✗ competitors.json contient le « 94/98 » Signatera non contextualisé (vessie-spécifique) — à corriger
-- ✗ Volet marché AIMA (§8) encore squelette [À PRÉCISER]
+- ✓ Cron lundi 10h00 (`run_profils.sh`) : P0 + P3 + 7 PDF, testé de bout en bout,
+  flock partagé avec les 2 crons quotidiens de 8h00
+- ✓ Onglet AIMA : chiffres recalculés à la spécificité DE CHAQUE concurrent
+  (fenêtre 80–99 %), 5/7 comparables. Conforme au rapport Exis au sample près
+  (214/261 @ 95,1 %, seuil 0,0042)
+- ✓ Pondération : ACS + FDA sortent en tête chez Freenome ET Guardant. 206 tests
+- ✓ Seuils QC Bam2Beta instruits : Katsman 2022 (PMID 35841107) publie la même
+  règle en ONT natif à 2,5M/0,2× — nous sommes 2× plus stricts. Longueur alignée
+  médiane mesurée à 172 pb sur 1 469 échantillons
+- ✗ CLEARNOTE-HEALTH-P1 non vérifié par la 2e passe (erreur serveur) — seul
+  fichier sur 12 à ne pas avoir été relu
+- ✗ 3 concurrents (DELFI, Singlera, Geneseeq) sortent 0 fait majeur : signal de
+  couverture de collecte, leurs canaux réels ne sont pas surveillés
+- ✗ Le cron hebdo n'envoie AUCUN email : il peut signaler des tensions et des
+  évènements non versés sans que personne ne le sache
 
 ## Prochaine étape
-Décider de la Phase 6 du test Signatera : (a) générer les rapports P1/P2 + PDF, (b) diff competitors.json pour corriger le 94/98, ou (c) combler les gaps du profil AIMA (perfs MRD, volet marché).
+Câbler l'email du lundi dans `run_profils.sh` (faits majeurs nouveaux, tensions
+§4.2, dette §4.1 par dossier, + email d'échec) — sur le modèle de `competitive.py`.
+Sinon : reprendre la vérification de CLEARNOTE-HEALTH-P1.
