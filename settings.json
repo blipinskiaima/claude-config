@@ -274,5 +274,6 @@
   "effortLevel": "max",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "skipWorkflowUsageWarning": true
 }

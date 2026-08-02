@@ -1,4 +1,5 @@
-- [Reprise juillet 2026](project_reprise_2026-07.md) — LE plan actif : déficit direct 2001 dès 27/07, repas verrouillés Raptor Club + Riz Œuf, rampe sport S1/S2, skills daily-diet + weekly-muscu, bilans dominicaux
+- [Reprise juillet 2026](project_reprise_2026-07.md) — LE plan actif : déficit direct 2001 dès 27/07, repas verrouillés Raptor Club + Riz Œuf, rampe sport S1/S2, skills daily-diet + weekly-muscu, bilans dominicaux · **S1 bouclée, absence 03-09/08, décision de palier au 09/08**
+- [Vocabulaire palier](feedback_vocabulaire_palier.md) — dire « palier » jamais « étape » : maintien 2301 / palier 1 = 2001 / palier 2 = 1801, rien d'autre en P3
 - [Todo pro only](feedback_todo_pro_only.md) — todo-optimisation = strictement AIMA/Pipeline, jamais d'entrées perso ZTHapp (retirées le 27/07)
 - [Tableau programme à jour](project_programme_actuel.md) — Boris dit "tableau programme" → lire docs/programme-actuel.md (source de vérité formatée)
 - [Project overview](project_overview.md) — App suivi nutrition + sport + pas pour ZTH P3, clone DCATrack étendu

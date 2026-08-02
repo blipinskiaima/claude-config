@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: aba2a68a-e855-4413-8037-928eb06c9aae
-  modified: 2026-07-25T15:06:10.473Z
+  modified: 2026-08-02T09:30:21.103Z
 ---
 
 # Reprise ZTH — 25 juillet 2026
@@ -47,3 +47,19 @@ metadata:
 - Boris via UI /parametres : poids 64.5, offset glucides → 0
 - Chips spawnées : fix context-builder coach (phase_events→phase_history, supplements→taken, skipped flag) + export backup incomplet
 - Chantier en cours non committé : scripts/build-knowledge.mjs + 5 docs zth-*.md (base de connaissance Coach IA)
+
+## État au 2026-08-02 — semaine 1 bouclée
+
+**Nutrition — adhérence parfaite.** Raptor Club + Riz Œuf tous les jours du 27 au 31/07, zéro resto, zéro écart. Réel : 2015 kcal/j (P 107 · L 60 · G 263), déficit 286 kcal/j → ~0.26 kg de gras sur la semaine. C'est la première semaine tenue intégralement, alors que le diagnostic du 25/07 attribuait 80 % des échecs passés aux excès sociaux.
+
+**Sport — rampe S1 passée sur les 3 séances** (Upper A 27/07 · Lower 30/07 · Upper B 31/07). 6 standards montés : curl 12→14, RDL 16→18, oiseau 6→8, latérales Raptor S3 14→16, upright row Upper B 10/12/14→12/14/16. Détail et verdicts dans le skill `weekly-muscu`.
+
+**Décisions actées par Boris :**
+- Vocabulaire **« palier »** imposé — voir [[vocabulaire-palier]]
+- **Quantités figées : riz 170 g / huile 5 g** (a explicitement refusé la version optimisée 160/7). Ne pas reproposer.
+- Extensions mollets **remplacées par des dips** en Lower (3 × 10-15, repos 1'30-2') — jamais faites, et les dips servent l'objectif « arrière des bras »
+- Riz de référence = étiquette **Curti 349 kcal/100 g, L 0** ≠ générique `app/lib/foods.ts` (340 / L 1.2) → correction applicative en attente
+
+**Absence 03 → 09/08** (déplacement) : aucune séance possible, repas documentés par Boris, calories INCHANGÉES à 2001, aucune compensation au retour (règle PDF p.71).
+
+**Prochaine décision de palier : dimanche 09/08** (J14 du palier 1) — glisse au **23/08** si les données du déplacement sont inexploitables. Le passage au palier 2 n'est PAS automatique : il suppose une stagnation du poids bas ET du tour de taille, avec adhérence vérifiée.

@@ -40,6 +40,9 @@ settings.local.json
 mcp-needs-auth-cache.json
 image-cache/
 
+# User-uploaded files per session (binaires volumineux, non reproductibles)
+uploads/
+
 # Gstack vendor install (1.5GB, reinstall per machine via setup)
 skills/gstack/
 
