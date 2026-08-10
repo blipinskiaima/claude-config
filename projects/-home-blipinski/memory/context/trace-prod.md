@@ -1,33 +1,35 @@
-# Context — trace-prod — 2026-07-30T21:20:02+00:00
+# Context — trace-prod — 2026-08-10T19:18:41+00:00
 
 **Branche** : main
-**Dernier commit** : 1a8e05e — feat: export-cohort — audit d'inclusion cohorte Sens/Spé
-**Status** : clean (untracked préexistants only : backups .duckdb, CSV dev/, rapports HTML)
+**Dernier commit** : 7b75c16 — docs: n50 — corrige l'interprétation des valeurs liquid élevées
+**Status** : clean, synchronisé avec origin/main (9 commits poussés cette session)
 
 ## Où j'en suis
-Deux chantiers terminés, rien en cours. (1) Backfill du schema v20 (5 métriques mito)
-clos et vérifié. (2) Nouvelle feature `export-cohort` livrée de bout en bout : audit
-d'inclusion dans la cohorte Sens/Spé de la Tower, onglet 'Cohort' de la gsheet
-trace-prod peuplé, code commité et poussé.
+Deux chantiers terminés et poussés, rien en cours. (1) L'export cohort a quitté la gsheet
+trace-prod pour une gsheet dédiée « Trace COHORT » et s'est décliné en 4 onglets par
+indication via `export-cohort --indication`. (2) Schema v21 : colonne `n50` dans
+`qc_metrics`, backfill rétrospectif terminé (4 min 54 s, couverture 100 %) et exports
+gsheet passés.
 
 ## Ce qui marche / ce qui foire
-- ✓ Backfill mito v20 : 10/10 update-column, 0 erreur, CGFL 582/811 + HCL 513/513,
-  les 2 exports gsheet passés dès la 1re tentative.
-- ✓ `export-cohort` : 1324 lignes liquid × 17 colonnes, 485 inclus (261 cancers +
-  224 sains). Vérifié **nominativement** contre `compute_cohort_samples()` — 485
-  communs, 0 manquant, 0 en trop, 0 label divergent — et les 7 deltas de la cascade
-  reproduits exactement (242/254/25/30/134/63/91).
-- ✓ Audit adversarial (workflow 12 agents, 7 lots de prédicats) : **0 divergence
-  confirmée**. Il a tout de même fait remonter 2 vrais défauts, corrigés : 6 mVAF
-  ~1e-7 écrasés en `0` par un `.6f` naïf, et 2 imports morts.
-- ✓ Aucune règle métier dupliquée : le script importe les prédicats d'Aima-Tower.
-- ⚠ Décision laissée ouverte par Boris : les 229 Alcapone portent un motif
-  « indication hors-cible (Lung_Alc) » redondant avec « cohorte Alcapone ». Fidèle
-  à la Tower (car `get_indications()` n'expose pas `Lung_Alc`), mais trompeur à la
-  lecture. Laissé tel quel.
+- ✓ Famille `exis_*` : Exis Multi (1325×10), Exis CRC (210×20), Exis Lung (437×20,
+  Lung+Lung_Alc), Exis Pancreas (33×20), Exis Healthy (330×20). Ajouter une indication
+  = 1 ligne `EXIS_TABS` + 1 entrée JSON. Chaque onglet relu et comparé au TSV local :
+  0 divergence sur les valeurs brutes.
+- ✓ Schema v21 `n50` : 3 combos (liquid CGFL+HCL, solid CGFL), lu par nom d'en-tête dans
+  le TSV cramino. Backfill 1471/1471, médiane liquid 174 bp / solid 3804 bp.
+- ✓ Correction de doc importante : j'avais écrit qu'un n50 liquid élevé trahissait une
+  confusion de fichier — faux. Les 15 liquides ≥1000 bp sont réels (surtout Bladder_Urine,
+  matrice urinaire). Le contrôle valable est la cohérence entre réplicats.
+- ✗ `Column 43` demandée dans l'export CRC : introuvable (ni TSV_TO_DB_METADATA, ni onglet
+  ONT Sample où la 43e est `Freq (Gene 3)`, ni gsheets sources où c'est `Gene 5 mutated`).
+  Non exportée, en attente du vrai nom.
+- ✗ Question de Boris laissée sans réponse : « pourquoi Healthy_13 n'est pas dans l'export
+  trace-prod ? ». Vérifié qu'il est bien en base (HCL, v5.0.0, inclus dans la cohorte) mais
+  l'investigation sur l'onglet trace-prod a été interrompue avant conclusion.
 
 ## Prochaine étape
-Rien d'engagé. Si Boris veut nettoyer le libellé : restreindre le motif
-« indication hors-cible » aux 4 vraies indications exclues (TNE, Nuclear,
-Bladder_Blood, Bladder_Urine) dans `dev/cohort_extraction.py`, puis relancer
-`python3 database/check_samples.py export-cohort`. Ne change aucun effectif.
+Rien d'engagé. Deux reprises possibles : demander à Boris le vrai nom de `Column 43` pour
+compléter les onglets par indication, ou reprendre la question Healthy_13 en comparant la
+DB à l'onglet `HCL liquid` de la gsheet trace-prod (l'export a été relancé depuis, il se
+peut que ce soit déjà résolu).
