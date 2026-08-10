@@ -56,6 +56,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-08-10 — trace-prod : cohortes par indication + N50
+
+- [x] **Export cohort par indication** — l'audit d'inclusion quitte la gsheet trace-prod pour « Trace COHORT » et se décline en 4 onglets via `export-cohort --indication` (CRC 209, Lung 436 avec Lung_Alc, Pancreas 32, Healthy 329) + 10 metadata ONT Sample. Ajouter une indication coûte 1 ligne `EXIS_TABS` + 1 entrée JSON ; détails dans `project_cohort_export.md`.
+- [x] **trace-prod schema v21 — N50** — `qc_metrics.n50` INTEGER sur les 3 combos (liquid CGFL+HCL, solid CGFL), lu par nom d'en-tête dans le TSV cramino ; backfill 1471/1471 (100 %), médiane liquid 174 bp / solid 3804 bp. Détails dans `project_schema_v21_n50.md`.
+
 ## 2026-07-30 — trace-prod export-cohort + veille concurrentielle 4 volets + seuils QC
 
 - [x] **Export Cohort — audit d'inclusion cohorte Sens/Spé** — nouvelle commande `export-cohort` → onglet 'Cohort' : 1324 liquid, 485 inclus (261 cancers + 224 sains), une ligne par sample avec les métadonnées de la cascade et tous ses motifs d'exclusion. Prédicats importés d'Aima-Tower (aucune règle réimplémentée), fidélité prouvée nominativement + audit adversarial 12 agents 0 divergence ; commit `1a8e05e`, détails dans `project_cohort_export.md`.
