@@ -45,6 +45,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 2** : installer `gitleaks` en pre-commit hook sur les projets gittés.
 - [ ] **Sécurité secrets — étape 3** : évaluer un gestionnaire de secrets (sops, age, vault).
 - [ ] **Skills Pod2Bam** — créer test/qualif/maj analogues à Bam2Beta. Pas urgent tant que Pod2Bam n'est pas soumis à audit qualité.
+- [ ] **Bam2Beta — publier le comptage `Preprocess_28M`** — le process tourne **22×/run** sans jamais publier de comptage, dernier étage de la cascade invisible (`MAPQ<20` s'en déduit). Un `samtools view -c -q 20 -F 3844` suffirait.
 
 ---
 
