@@ -119,7 +119,9 @@ Vérifier ce point à chaque script qui indexe par nom de sample.
    pas les supplementaires (`-F 1796` par defaut), donc le seuil de rendu a 0,25x en depend.
 2. Décider si `n50_ratio.tsv` entre dans `check-run-output.sh` — ce qui le ferait basculer dans
    la qualification ISO 15189.
-4. Zone grise : seul `Lung_124` reste a instruire (vrai ADN long, 17,4 % de masse). Les 2
+4. **Grille croisee ratio x masse livree** (partie 10 du doc) : 6 cas, arbre de decision,
+   seuil de masse **22 %**, seuil de longueur maintenu a 1 kb. Aucun flag implemente.
+5. Zone grise : seul `Lung_124` reste a instruire (vrai ADN long, 17,4 % de masse). Les 2
    autres sont expliques — `Lung_Alc_93_av` = chimeres, `Lung_Alc_15_av` deja rejete.
 5. ~~Documentation analogue pour le nombre de reads alignés~~ — **FAIT** (onglet « Nb reads
    mapped », 12/08).

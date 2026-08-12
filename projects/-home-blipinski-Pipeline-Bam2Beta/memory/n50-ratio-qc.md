@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: ccc47027-333b-40a9-a728-dd1f326dc446
-  modified: 2026-08-12T15:27:49.879Z
+  modified: 2026-08-12T16:31:06.632Z
 ---
 
 # QC N50/N75 — detecteur de contamination gDNA (2026-08-12)
@@ -104,7 +104,56 @@ possible ; le double est prefere car la zone grise est une population **reelleme
 
 ⚠ **Angle mort** : le ratio filtre ne voit pas la contamination qu'il a filtree. `Breast_6`
 (57 % de masse > 1 kb) et `TNE_2` (81 %) sont classes en **zone A**. Toujours l'accompagner de
-`pct_mass_removed` (~2 % chez un plasma normal, examiner au-dela de 25 %).
+`pct_mass_removed` — voir la grille croisee ci-dessous.
+
+## Grille croisee ratio x masse (2026-08-12) — partie 10 du Google Doc
+
+Source : `qc_metrics.n50_n75_ratio` (= le ratio **filtre**, verifie identique a la mesure de
+session) et `qc_metrics.pct_mass_removed`, schema **v24**. 1 324 liquides portent les deux.
+
+**Les deux criteres ne se recouvrent qu'a moitie** — sur 1 208 plasmas : ratio > 1,26 seul
+**10**, masse > 22 % seule **16**, l'un ou l'autre **20**, les deux **6**. `corr` = 0,725 en
+lineaire mais **0,408 en log-log** : ils partagent une tendance, pas une information.
+
+### Seuil de masse : 22 % (et non 25 %)
+
+Meme methode que le ratio : **aucun plasma entre 18,07 % et 25,94 %** (vallee de 7,87 points),
+milieu = **22 %**, marge ±3,9. Le 25 % initialement propose tombait dans la meme vallee mais a
+0,94 point de son bord haut — meme classement, moins robuste. Descendre a 10 % couperait en
+pleine densite (p90 = 5,6 · p95 = 8,5 · p98 = 13,9) et ajouterait 28 samples sans motif
+structurel. Alternative conservatrice : **32 %** (vallee 28,98-35,94), 10 plasmas au lieu de 16.
+
+**Seconde bascule : 0,2 %** — les 12 EQC y sont tous, contre 1 % des plasmas et 0 % des Twist.
+
+### Les 6 cas
+
+| cas | ratio | masse | n | lecture |
+|---|---|---|---:|---|
+| Nominal | <= 1,26 | <= 22 % | 1 217 | rendu sans reserve |
+| **Contamination masquee** | <= 1,26 | > 22 % | **10 plasmas** | **signaler** — `TNE_2` 81,4 %, `Breast_6` 57,3 %, `TNE_5` 35,9 %, 4x `Colon_20` 27-29 %, `Pancreas_6` 26,3 %. ⚠ 6 prelevements distincts seulement |
+| Controle externe | 1,26-1,43 | < 0,2 % | 15 | ne pas alerter — 13 lignes EQC (12 distincts) + **2 urines** tres propres |
+| Artefact d'alignement | 1,26-1,43 | 0,2-10 % | 14 | 12 urines ; chez les plasmas = chimeres (`Lung_Alc_93_av`) |
+| Contamination averee | 1,26-1,43 | > 10 % | 3 | dont `Lung_124` (17,4 %) |
+| Non plasmatique | > 1,43 | indifferente | 65 | ne pas rendre — 89 % d'urines |
+
+⚠ **La case `ratio > 1,43` + `masse < 0,2 %` est VIDE** : un ratio franchement eleve s'accompagne
+toujours d'ADN long. Un ratio rouge n'est jamais un pur artefact de calcul.
+
+### Le seuil de 1 kb est le bon compromis — ne pas le bouger
+
+Instruit en recalculant ratio et masse a 6 seuils (500 pb -> 3 kb) :
+
+- **Descendre coupe dans le cfDNA legitime** : un plasma sain a 2 pics nucleosomaux (160 et
+  296 pb) et plus rien au-dela. A 500 pb, `Healthy_826` (sain) passerait de 2,4 % a **6,2 %** de
+  masse « retiree ».
+- **Descendre detruit la detection** : a 500 pb `Colon_22_rep1` — le plasma le plus altere —
+  tombe a **1,158**, soit en zone verte. On retire le signal de l'anomalie avec les reads.
+- **Monter fait perdre la masse** : a 3 kb l'urine la plus chargee n'a plus que 2,5 % de masse,
+  sous la mediane plasma → invisible au critere qui rattrape justement l'angle mort.
+- **Stabilites** : `Breast_28` (sain) reste a 1,0972 de 500 a 3 000 pb ; `Breast_17` (EQC) a
+  1,3333. 1 kb ≈ **6 nucleosomes** — au-dela, plus de signature apoptotique.
+
+**Aucun flag QC implemente** : c'est une recommandation de lecture, ni en base ni dans le pipeline.
 
 ## Les 12 controles qualite externes forment un mode a part
 
