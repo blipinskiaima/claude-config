@@ -1,13 +1,13 @@
-# Context — Bam2Beta — 2026-08-12 (soir, fusion de 3 sessions)
+# Context — Bam2Beta — 2026-08-12 (fusion de 4 sessions)
 
 **Branche** : main
-**Dernier commit** : a22974f — docs(QC): instruction du palier 1 (MAD et coverage_percent écartés, N50 retenu)
-**Status** : ⚠️ snapshot **fusionné**. 4 fichiers restent non commités, tous issus de la session
-« distribution de longueur », **aucun de la session seuils/doc**.
+**Dernier commit** : c5e3765 — feat(qc): publie samtools idxstats dans BAM_Count
+**Status** : ⚠️ snapshot **fusionné**. 5 fichiers restent non commités, tous issus de la session
+« distribution de longueur » ou antérieurs — **aucun des sessions seuils/doc/cascade**.
 
 ## Où j'en suis
 
-Trois chantiers sur le même sujet, tous à un point d'arrêt propre.
+Quatre chantiers sur le même sujet, tous à un point d'arrêt propre.
 
 **Palier 1 du doc QC-seuils — instruit en entier.** Les 5 candidats calculables sont tranchés
 et portés dans `docs/QC-seuils-biopsie-liquide.md` (`a22974f`) : MAD **écarté**, N50 **retenu**,
@@ -16,36 +16,54 @@ et portés dans `docs/QC-seuils-biopsie-liquide.md` (`a22974f`) : MAD **écarté
 **N50/N75 — livré et poussé** (`a95a36b`) : câblé dans `Extract_read`, 1 324 TSV rétrospectifs
 sur S3, sortie identique octet par octet au rétrospectif.
 
-**SEUILS DÉTERMINÉS (soir) — `1,26` / `1,43`.** Zones A/B/C = 92,7 % / 2,4 % / 4,9 %. Méthode :
+**SEUILS DÉTERMINÉS — `1,26` / `1,43`.** Zones A/B/C = 92,7 % / 2,4 % / 4,9 %. Méthode :
 chaque seuil au **milieu d'un intervalle vide** de la distribution (1,2463-1,2752 et
 1,3976-1,4530), donc ±0,013 / ±0,023 ne reclassent personne. **Aucun label de matrice** n'a servi
 à les fixer — la validation par matrice n'est venue qu'après. Voir [[n50-ratio-qc]].
 
-**Google Doc QC** ([[gdoc-qc-ratio-n50]]) : figures 1-2 refaites en logique autosomes chr1-22
-(matin), puis **document entièrement réécrit** (soir) — 9 sections, 5 figures, 5 tableaux,
-3 listes nominatives, ~16 400 car. Ouvre sur `Breast_6`, paragraphes courts + puces.
+**CASCADE DE COMPTAGE DES READS — bouclée de bout en bout.** Les 12 comptages sont définis,
+mesurés sur les 1 332 liquides, exportés en gsheet et documentés. Voir [[read-counting-cascade]].
+- Pipeline : `idxstats` publié par `BAM_Count` (`c5e3765`) — la strate des reads non alignées
+  n'était mesurable nulle part, elle vaut 9,2 % sur Lung_9 et jusqu'à 18 % ailleurs
+- Rétrospectif : les 1 471 samples calculés et déposés sur S3 (créations pures, zéro écrasement)
+- Base : table `qc` trace-prod, schema v23, 25 colonnes — commitée par une autre session (`dce1d45`)
+- Doc : Google Doc QC, onglet « Nb reads mapped » — 3 parties, 13 titres, 5 figures, 2 tableaux
+
+**Google Doc QC ratio** ([[gdoc-qc-ratio-n50]]) : 9 sections, 5 figures, 5 tableaux,
+3 listes nominatives. Ouvre sur `Breast_6`, paragraphes courts + puces.
 
 ## Ce qui marche / ce qui foire
 
 - ✓ `a22974f` poussé — 3 verdicts de la session palier 1 (MAD, N50, `coverage_percent`)
-- ✓ Mémoire : [[qc-palier1-candidats-ecartes]] et [[gdoc-qc-ratio-n50]] créés, [[n50-ratio-qc]]
-  enrichi des seuils, des EQC et de l'application Imagenome
+- ✓ Mémoire : [[qc-palier1-candidats-ecartes]], [[gdoc-qc-ratio-n50]], [[read-counting-cascade]]
+  créés ; [[n50-ratio-qc]] enrichi des seuils, des EQC et de l'application Imagenome
 - ✓ **Validation a posteriori des seuils** : plasmas 98,1 % en zone A · urines 71,6 % en C et
   19,8 % en B · les 22 contrôles synthétiques **Twist 100 % en A**
 - ✓ **Les 12 contrôles qualité externes** (Breast/Prostate CGFL) tombent **tous en zone grise**,
   1,3289-1,3649 (0,036 d'amplitude), masse > 1 kb < 0,2 %. Explique 12 des 32 de la zone grise
 - ✓ **10 patients Imagenome Labosud en aveugle** (hors des 1 324) : tous zone A
+- ✓ **Cascade validée deux fois** : A+B+C+D = Total sur 1 332/1 332 samples, et concordance
+  exacte avec `samtools flagstat` sur 10 samples couvrant tous les profils
+- ✓ **`flagstat` n'apporte rien** : duplicates et QC-failed à 0 sur 10/10 (le pipeline ne marque
+  pas les duplicats) → toute la cascade se reconstitue depuis les fichiers publiés + `idxstats`
 - ✗ **Angle mort du ratio** : il ne voit pas la contamination qu'il a filtrée. `Breast_6` (57 %
   de masse > 1 kb) et `TNE_2` (81 %) sont classés zone A → toujours l'accompagner de
   `pct_mass_removed` (~2 % chez un plasma normal, examiner au-delà de 25 %)
 - ✗ **4 plasmas** en zone grise restent inexpliqués (`Lung_Alc_93_av`, `Lung_Alc_15_av`,
   `Lung_124`) — et non 16 comme écrit avant l'identification des EQC
+- ✗ **`28M` et `MAPQ<20` NULL partout** dans la table `qc` : `Preprocess_28M` s'exécute 22 fois
+  par run sans publier aucun comptage (todo posée, basse priorité)
+- ✗ **8 Bladder_Urine sans `idxstats`** (1 324/1 332) : ajoutés en base pendant la session,
+  postérieurs au rétrospectif
+- ✗ **Mécanisme des 4 plasmas HCL NON tranché** (`Colon_49/51/58`, `Lung_122`) : 17-24 % de
+  lignes supplémentaires. Mesures exploratoires sur 2 Mb de chr2 seulement → **session dédiée
+  demandée par Boris**, ne pas conclure sur cet échantillonnage
 - ✗ **`docs/QC-seuils` porte 2 sections dont aucune session ne se déclare auteure**
   (« taux de mapping », « méthylation globale CpG »). Commitées par solidarité de fichier,
   contenu **non vérifié** — signalé dans le message de `a22974f`
 - ✗ **Non commités, session « distribution de longueur »** : `workflow/frag.nf` (+29,
-  `Length_Distribution_Plot`), `workflow/beta.nf` (+7, idxstats), `bin/length_distribution/`,
-  `NOTE_READ.txt`. Décision **laissée à Boris**
+  `Length_Distribution_Plot`), `bin/length_distribution/`, `NOTE_READ.txt`,
+  `conf/{prod,solid}.config` (MITO=true). Décision **laissée à Boris**
 - ✗ `dev/SCW/*.sh`, `note.txt`, `prompt_generator.pdf` : modifiés **avant** ces sessions
 - ✗ Écart non tranché : la section 4 du doc dit « longueur moins soft-clips », les figures 1-2
   utilisent `length(SEQ)` brut. Préexistant, non corrigé
@@ -58,10 +76,20 @@ labos et désignent des prélèvements **différents**. Toute jointure doit se f
 `(nom, type, labo)` — sans quoi les effectifs gonflent (1 393 lignes pour 1 243 plasmas) et les
 conclusions inter-labo sont fausses. Corrigé dans le Google Doc.
 
+**Le piège a resservi le 12/08** : le rétrospectif `idxstats` nommait ses sorties
+`out/{ID}.tsv`, donc les 75 homonymes CGFL/HCL s'écrasaient — et l'idempotence faisait hériter
+le second du résultat du premier, soit **75 fichiers faux**. Corrigé en `out/{type}/{labo}/{ID}`.
+Vérifier ce point à chaque script qui indexe par nom de sample.
+
 ## Prochaine étape
 
-1. Trancher le sort des 4 fichiers non commités de la session « distribution de longueur ».
-2. Décider si `n50_ratio.tsv` entre dans `check-run-output.sh` — ce qui le ferait basculer dans
+1. **Investigation dédiée sur les 4 plasmas HCL** (`Colon_49/51/58`, `Lung_122`) : établir sur
+   le génome entier si leurs alignements supplémentaires se superposent (double comptage de
+   profondeur) ou sont disjoints (couverture légitime). Enjeu : `mosdepth` ne filtre pas les
+   supplémentaires (`-F 1796` par défaut), donc le seuil de rendu à 0,25× en dépend.
+2. Trancher le sort des fichiers non commités de la session « distribution de longueur ».
+3. Décider si `n50_ratio.tsv` entre dans `check-run-output.sh` — ce qui le ferait basculer dans
    la qualification ISO 15189.
-3. Instruire les 4 plasmas restants de la zone grise.
-4. Documentation analogue pour le **nombre de reads alignés** (prompt déjà préparé par Boris).
+4. Instruire les 4 plasmas restants de la zone grise.
+5. ~~Documentation analogue pour le nombre de reads alignés~~ — **FAIT** (onglet « Nb reads
+   mapped », 12/08).
