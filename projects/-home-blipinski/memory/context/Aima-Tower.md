@@ -1,28 +1,41 @@
-# Context — Aima-Tower — 2026-07-24 (clôture session)
+# Context — Aima-Tower — 2026-08-12 (clôture session)
 
-**Branche** : main (poussé, origin/main = 960ee8e)
-**Dernier commit** : 960ee8e — docs: README v5.1.0 + CLAUDE.md (alignement Exis + skill QARA)
-**Status** : clean (hors untracked .claude/worktrees/ et "Exis 1.1.pdf", hors scope)
+**Branche** : main (poussé, origin/main = f591749)
+**Dernier commit** : f591749 — docs: README + CLAUDE.md v5.2.0, versions réalignées
+**Status** : clean (hors untracked `.claude/worktrees/` et `Exis 1.1.pdf`, hors scope
+depuis le 24/07)
 
 ## Où j'en suis
-Session close via /end-session. Deux livrables majeurs, tous deux déployés/poussés :
-(1) page /exploration alignée sur le rapport réglementaire Exis 1.1 (mVAF v1.4),
-(2) skill /qara-tower de traçabilité QARA temporelle avec baseline T0 posée.
+Session close via /end-session. Deux features livrées et déployées : le bloc
+« Performance des produits » sur le Tableau de bord, et le passage de mVAF v1.4 au
+seuil Exis 0,0042 sur /reproductibilite. La prod a été rebuildée en dernier, elle est
+alignée sur main (API en 5.2.0).
+
+En début de session, ~740 lignes de ton travail des 29-31/07 traînaient non commitées
+(page /profil-aima, compute_mrd_postop, plafonnement de comparabilité, slider 0,999) —
+commitées en 32c91bc avant de commencer, tag pre-bloc-synthese-dashboard.
 
 ## Ce qui marche / ce qui foire
-- ✓ /exploration reproduit le PDF Exis 1.1 **au chiffre près** : seuil quantile type 1
-  (0,0042), exclusion CGFL_26BM01841, sélecteur Cohorte Avancés/Précoce (§2.2/§2.3),
-  cohort_mode threadé partout. Prod rebuild + validée live.
-- ✓ Skill /qara-tower opérationnel, **double** (local + ~/.claude, même journal), T0
-  écrit dans le Google Doc (append non destructif) + qara/qara_snapshots.jsonl (versionné).
-- ✓ 5 commits poussés, tests 10 passed/4 skipped, typecheck front OK.
-- ✗ Rupture **assumée** de l'équivalence cell-by-cell vs pipeline R *main* (type 1 vs
-  type 6) → TestRegressionVsR désactivé (skip). Choix Boris.
-- ℹ Seul écart accepté Tower↔PDF = Prostate_21 (donnée passée cancer le 23/07, après le PDF).
-- ℹ Copie globale du skill ~/.claude/skills/qara-tower/ pas encore commitée dans claude-config.
+- ✓ Bloc Tableau de bord : 5 lignes (Exis global + CRC/Lung/Pancreas + THEMELIO),
+  décompte 485/1471. Aucun recalcul — même endpoint et même pct() que le Profil AIMA.
+  Rendu vérifié en 1440 px et 800 px.
+- ✓ Seuil 0,0042 sur /reproductibilite. 100 tests passés / 4 skipped, tsc exit 0.
+- ⚠ Le seuil déplace AUSSI le taux d'accord : cohorte pure 93,8 % → 85,4 %. Colon_22
+  perd son unanimité à cause d'un run à 0,0041. Assumé, mais à savoir si quelqu'un
+  s'étonne de la baisse.
+- ⚠ Piège consigné : la ligne Exis GLOBALE du Tableau de bord affiche 82,0 % là où
+  /exploration montre 76,2 % (exclusion vessie/TNE/Nuclear) ; les 3 lignes par
+  indication, elles, correspondent exactement.
+- ✗ tests/test_dilution.py échoue à la COLLECTE : `ImportError: cannot import name
+  'mvaf_threshold' from 'dilution_service'`. Panne PRÉ-EXISTANTE (déjà là sur 159633a),
+  non traitée — elle masque tout le module de tests dilution.
+- ℹ Non fait faute de demande : ligne de seuil + mention « > 0,0042 » dans la légende
+  de /reproductibilite (à l'échelle linéaire le seuil est invisible) ; lien « voir le
+  Profil AIMA » depuis le bloc du Tableau de bord ; préchauffage du cache comparaison
+  (5,5 s au premier chargement de la Home après redémarrage).
 
 ## Prochaine étape
-Rien en cours. Au prochain point temporel (semaines/mois, après ajout de samples dans
-trace-prod) : lancer /qara-tower pour enregistrer T1 vs T0. Optionnel : corriger 2 libellés
-obsolètes de la cascade (« trace-prod brut liquid+solid » affiche 1324 liquid seuls ;
-« Score mVAF v1 disponible » alors qu'en mode v1.4 c'est v1.4 qui est testé).
+Réparer tests/test_dilution.py — c'est la seule chose cassée du repo, et elle masque
+un module entier. Vérifier ce qu'est devenu `mvaf_threshold` dans dilution_service.py
+(renommé ou supprimé lors de l'ajout de l'onglet Suspects ?) et remettre le test en
+phase, ou le retirer s'il n'a plus d'objet.
