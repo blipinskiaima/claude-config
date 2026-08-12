@@ -1,9 +1,10 @@
 # Context — Bam2Beta — 2026-08-12 (fusion de 4 sessions)
 
 **Branche** : main
-**Dernier commit** : c5e3765 — feat(qc): publie samtools idxstats dans BAM_Count
-**Status** : ⚠️ snapshot **fusionné**. 5 fichiers restent non commités, tous issus de la session
-« distribution de longueur » ou antérieurs — **aucun des sessions seuils/doc/cascade**.
+**Dernier commit** : fca2844 — feat(mito): active MITO sur les profils prod et solid
+**Status** : ⚠️ snapshot **fusionné**. La session « distribution de longueur » est desormais
+**commitee et poussee** (e8eac18 + fca2844). Restent 4 fichiers non commites, tous **anterieurs**
+a ces sessions : `dev/SCW/*.sh`, `note.txt`, `NOTE_READ.txt`, `prompt_generator.pdf`.
 
 ## Où j'en suis
 
@@ -29,6 +30,18 @@ mesurés sur les 1 332 liquides, exportés en gsheet et documentés. Voir [[read
 - Base : table `qc` trace-prod, schema v23, 25 colonnes — commitée par une autre session (`dce1d45`)
 - Doc : Google Doc QC, onglet « Nb reads mapped » — 3 parties, 13 titres, 5 figures, 2 tableaux
 
+**DISTRIBUTION DE LONGUEUR — livree et poussee** (`e8eac18`). Process
+`Length_Distribution_Plot` dans `frag.nf` : un PNG par sample, 4 courbes (sample courant + 3
+references embarquees), ligne de seuil a 1 kb, publie dans `Fragmentomics/filtered_softclipped`.
+References calculees avec la **methode exacte d'`Extract_read`** (`-F 3840` + BED chr1_22 +
+soft clips retires) : Breast_28 0,31 % / Bladder_Urine_02_041 23,08 % / Breast_6 57,26 % de masse
+au-dela de 1 kb. ggplot2 3.5.2 deja dans `bam2beta:latest`, binning awk en streaming (3,8 s pour
+9,2 M de reads). Verifie sur 3 samples reels.
+
+**MITO active prod + solid** (`fca2844`) : corrige le KO systematique de l'etape 2 de
+`/test_bam2beta`, qui exigeait `mito_qc.tsv` des que le sample est liquid alors que le profil
+`prod` desactivait le module. ⚠ Jamais execute sur du solid a ce jour.
+
 **Google Doc QC ratio** ([[gdoc-qc-ratio-n50]]) : 9 sections, 5 figures, 5 tableaux,
 3 listes nominatives. Ouvre sur `Breast_6`, paragraphes courts + puces.
 
@@ -46,6 +59,18 @@ mesurés sur les 1 332 liquides, exportés en gsheet et documentés. Voir [[read
   exacte avec `samtools flagstat` sur 10 samples couvrant tous les profils
 - ✓ **`flagstat` n'apporte rien** : duplicates et QC-failed à 0 sur 10/10 (le pipeline ne marque
   pas les duplicats) → toute la cascade se reconstitue depuis les fichiers publiés + `idxstats`
+- ✓ **Validation croisee forte** : sur `Bladder_Urine_02_041`, le `pct_mass_removed` calcule
+  par le run (23,08 %) est **identique** a la masse > 1 kb de la reference embarquee, par deux
+  chemins de calcul entierement independants (BAM re-merge depuis 144 BAM horaires vs BAM RetD)
+- ✓ **Non-regression** : `check-conformity` vs QUALIF V2.2.0 conforme **41/41**
+- ✓ **Mecanisme des chimeres qualifie** (2 mecanismes distincts, pas un) : CGFL `Lung_Alc` =
+  **concatemeres de ligation** (90,9 % des morceaux sur un autre chromosome, dispersion conforme
+  au hasard genomique, aucun adaptateur interne alors que le test le detecte chez le temoin) ;
+  HCL `Colon`/`Lung_12x` = **reads palindromiques** (95 % meme locus brin oppose < 1 kb,
+  exactement 2 morceaux) → **double comptage de profondeur** cote HCL
+- ✗ **`/test_bam2beta` etape 1 KO** : echec d'upload S3 du BAM de **16,8 Go** de `Lung_9`
+  (+ `read_start_time.tsv` de 2,5 Go). `Healthy_826` exit 0. Incident reseau, pas un bug — mais
+  Nextflow ne reessaie pas et tout le test tombe
 - ✗ **Angle mort du ratio** : il ne voit pas la contamination qu'il a filtrée. `Breast_6` (57 %
   de masse > 1 kb) et `TNE_2` (81 %) sont classés zone A → toujours l'accompagner de
   `pct_mass_removed` (~2 % chez un plasma normal, examiner au-delà de 25 %)
@@ -83,12 +108,13 @@ Vérifier ce point à chaque script qui indexe par nom de sample.
 
 ## Prochaine étape
 
-1. **Investigation dédiée sur les 4 plasmas HCL** (`Colon_49/51/58`, `Lung_122`) : établir sur
-   le génome entier si leurs alignements supplémentaires se superposent (double comptage de
-   profondeur) ou sont disjoints (couverture légitime). Enjeu : `mosdepth` ne filtre pas les
-   supplémentaires (`-F 1796` par défaut), donc le seuil de rendu à 0,25× en dépend.
-2. Trancher le sort des fichiers non commités de la session « distribution de longueur ».
-3. Décider si `n50_ratio.tsv` entre dans `check-run-output.sh` — ce qui le ferait basculer dans
+1. **Investigation dédiée sur les 4 plasmas HCL** (`Colon_49/51/58`, `Lung_122`) : le
+   **mecanisme est desormais identifie** — ce sont des reads **palindromiques** (95 % des
+   morceaux au meme locus, brin oppose, < 1 kb), donc bien un **double comptage** et non une
+   couverture legitime. Mais la mesure porte toujours sur **2 Mb de chr2 uniquement**. Reste a
+   confirmer sur le genome entier et a chiffrer l'impact reel sur `depth` : `mosdepth` ne filtre
+   pas les supplementaires (`-F 1796` par defaut), donc le seuil de rendu a 0,25x en depend.
+2. Décider si `n50_ratio.tsv` entre dans `check-run-output.sh` — ce qui le ferait basculer dans
    la qualification ISO 15189.
 4. Instruire les 4 plasmas restants de la zone grise.
 5. ~~Documentation analogue pour le nombre de reads alignés~~ — **FAIT** (onglet « Nb reads
