@@ -1,24 +1,27 @@
-# Context — trace-platform — 2026-06-24T14:35:00+0000
+# Context — trace-platform — 2026-08-12T15:19:18+00:00
 
 **Branche** : main
-**Dernier commit** : 8a5c75d — feat(case): compte non déclaré → PROD par défaut
-**Status** : clean (tout commité/poussé ; untracked = logs/backups/copie DB seulement)
+**Dernier commit** : 4656147 — feat(db): score Themelio en base et dans l'export gsheet (schema v14)
+**Status** : clean (untracked = logs cron, backups DB, captures uniquement)
 
 ## Où j'en suis
-Grosse session terminée et déployée. trace-platform : scan migré 100% S3 (plus de
-/mnt), nouvelles commandes delete/prune/daemon, colonne creation_date (v12), nouveau
-compte → PROD. Aima-Tower aligné (PROD défaut) + rebuild OK. Rien en cours.
+Feature Themelio livrée de bout en bout et publiée : colonne themelio_score en
+base (schema v14) + colonne "Themelio" dans le gsheet onglet Platform. 3 commits
+poussés, dont les 2 chantiers qui traînaient non commités (metadata.json/mVAF
+v1.4, et v13 annotations manuelles). Rien en cours.
 
 ## Ce qui marche / ce qui foire
-- ✓ Scan 100% S3 : découverte (list_objects_v2) + staging tmpdir (petits TSV, mtime préservé) + BAM via URL présignée (samtools header, pas les 8Go). Testé bout-en-bout (~3s/sample).
-- ✓ Schema v12 : creation_date (1er objet S3 LastModified), tri export par creation_date DESC. Backfill S3 fait (252/252).
-- ✓ Commandes : delete (unitaire), prune (purge samples absents S3, backup auto), daemon (check --new + re-scan 3j + export). Daemon ARRÊTÉ (Boris teste via cron).
-- ✓ Occultation gsheet : 168 Bladder blood/urine figés (data/export_hidden_samples.tsv), futurs visibles.
-- ✓ Fix bioit : rapport_pdf plus requis (v11) → faux FAILED corrigés.
-- ✓ Nouveau compte non déclaré → PROD (COALESCE ..., 'PROD') dans trace-platform ET Aima-Tower (services.py), tower rebuildé healthy.
-- ✓ Cron actif : check (full) + export --gsheet toutes les 30 min.
-- ⚠ data/export_hidden_samples.tsv + export_labs_users.tsv gitignorés (*.tsv) → locaux, non versionnés.
+- ✓ themelio_score DECIMAL(10,6) : 12 samples sur 327, le reste NA. Valeurs vérifiées dans le sheet publié (0,002698 → 0,994504), colonne #20 après mVAF, catégorie QC.
+- ✓ extract_themelio_score : 6 cas de test passés (CSV réel, ancien header sans themelio_version, colonne absente, header seul, fichier vide, fichier absent).
+- ✓ Staging S3 : suffixe complet `.themelio_predictions.csv` déclaré, PAS `.csv` — sinon 5,7 Go de read_lengths.csv téléchargés à chaque scan.
+- ✓ Annotations manuelles intactes après publication (Commentaire 25 / Cancer type 20), backup TSV du sheet dans data/backup_manual_annotations_2026-08-10_11-10-21.tsv.
+- ✗ Backfill via `check <UUID>` = erreur de méthode : recalcule les 3 statuts, a fait basculer 13 samples dna-methyl* de SUCCESSED à FAILED. Rollback fait, 0 changement de statut vérifié. Utiliser un UPDATE ciblé (3,6 s vs plusieurs minutes).
+- ✗ Rollback DuckDB : le `cp` du seul .duckdb ne suffit pas, le WAL non checkpointé est rejoué à la réouverture (2 checked_at résiduels sur TESTV202/TESTV220, cosmétique).
+- ⚠ Décalage base/S3 non tranché : 13 samples dna-methyl* SUCCESSED en base alors que leur .merged.bam a été supprimé de S3. Gelé car statut terminal jamais re-scanné.
+- ⚠ Régression probable dans Bam2Beta (hors scope, tâche spawnée) : main.nf:217 référence assets/themelio_absent.csv, supprimé au commit c1bd572. Profil solid (THEMELIO=false + RAPPORT=true) emprunte ce chemin → run échouerait. Vérifié en lecture de code, PAS par exécution.
 
 ## Prochaine étape
-Aucune tâche en attente. Surveiller le cron 30 min (cron_check.log / cron_export.log).
-Option : déclarer les nouveaux comptes dans data/export_labs_users.tsv au fil de l'eau.
+Deux décisions en attente, aucune urgente :
+1. Arbitrer « amont nettoyé mais rapport livré » → les 13 dna-methyl* doivent-ils rester SUCCESSED ?
+2. Confirmer par un run la régression Bam2Beta themelio_absent.csv (tâche déjà préparée).
+Nettoyage possible : platform.duckdb.rollback-discarded-11-39-11 (534 Mo, inutile).
