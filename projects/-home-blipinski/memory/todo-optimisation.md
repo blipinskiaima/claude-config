@@ -25,6 +25,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## Moyenne priorité
 
 - [ ] **Rotation secrets Aima-Tower compromis** — `.env` était tracked dans git jusqu'au 2026-04-21 (historique pushé sur `aima-dx/Aima-Tower`, repo privé). Révoquer `ANTHROPIC_API_KEY` (console.anthropic.com > API Keys) + `accessToken` Seqera (cloud.seqera.io > Tokens), regénérer les 2 et mettre à jour `.env` local + `docker compose restart`. Voir `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/project_env_leak.md`.
+- [ ] **Aima-Tower — `tests/test_dilution.py` échoue à la collecte** — `ImportError: cannot import name 'mvaf_threshold' from 'dilution_service'` (`test_dilution.py:83`). Panne présente au moins depuis `159633a`, probablement introduite par la refonte qui a ajouté l'onglet Suspects. Elle **interrompt la collecte pytest**, donc tout le module dilution est muet et un `pytest -q` sans `--ignore` s'arrête net. Vérifier ce qu'est devenu `mvaf_threshold` dans `src/dilution_service.py` (renommé ? absorbé par `quantile_type1` ?) et remettre le test en phase, ou le retirer s'il n'a plus d'objet.
+
 ### Skills bioinformatiques
 - [ ] **Améliorer skills v1 avec /meta-skills-creator** — sample, debug-nf, check-consistency sont fonctionnels mais créés sans le processus rigoureux. Raffiner après usage.
 
@@ -58,7 +60,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-08-12 — Bam2Beta : QC N50/N75 + seuils + cascade de comptage · trace-prod : v22/v23/v24 · trace-platform : v14 Themelio
+## 2026-08-12 — Bam2Beta : QC N50/N75 + seuils + cascade de comptage · trace-prod : v22/v23/v24 · trace-platform : v14 Themelio · Aima-Tower : bloc produits Tableau de bord + seuil Exis /reproductibilite
 
 - [x] **Seuils du ratio N50/N75 déterminés — 1,26 / 1,43** — établis sur 1 324 échantillons *sans aucun label de matrice*, à partir de la seule géométrie de la distribution : elle est multimodale, et chaque seuil est placé **au milieu d'un intervalle où aucun échantillon n'existe** (1,2463-1,2752 et 1,3976-1,4530), donc le déplacer de ±0,013 ou ±0,023 ne reclasse personne — c'est précisément ce qui manque aux seuils 5 M/0,25×, qui coupent en pleine densité. Zones : 92,7 % analysable / 2,4 % gris / 4,9 % non interprétable. Validation *a posteriori* : plasmas 98,1 % en zone verte, urines 71,6 % en rouge, contrôles Twist 100 % en verte.
 - [x] **Les 12 contrôles qualité externes forment un mode à part** — tous en zone grise, entre 1,3289 et 1,3649 (0,036 d'amplitude, le groupe le plus resserré de la cohorte) avec moins de 0,2 % de masse au-delà de 1 kb. Matériel de référence industriel, pas du plasma natif : leur position est attendue, ce n'est pas une alerte. Résout l'anomalie des « 13 plasmas de cause inconnue » — la zone grise se décompose en 16 urines + 12 EQC + **4 plasmas** réellement inexpliqués.
@@ -84,6 +86,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [x] **trace-platform schema v14 — themelio_score** — colonne `DECIMAL(10,6)` lisant `THEMELIO/{s}.themelio_predictions.csv` (colonne localisée par le **header**, pas par index — contrairement à trace-prod v18 qui lit « col 2 » du même fichier), + colonne `Themelio` dans l'export gsheet juste après mVAF, 6 décimales virgule via `SCORE_6_DECIMALS_COLS` (`NUMERIC_COLS` aurait arrondi 0,176535 à 0,18). 12 samples sur 327 (10 Imagenome Labosud + 2 TESTV220), le reste NA. Staging S3 déclaré sur le suffixe **complet** `.themelio_predictions.csv` et non `.csv` — les `read_lengths.csv` pèsent jusqu'à 1 Go pièce, 5,7 Go sur le bucket. Commit `4656147`.
 - [x] **Backfill d'une colonne : jamais via `check <UUID>`** — la commande re-stage les ~54 objets S3 du sample et recalcule les 3 statuts : sur des samples terminaux jamais re-scannés, l'état S3 a bougé entre-temps et 13 `dna-methyl*` sont passés SUCCESSED → FAILED (`.merged.bam` supprimé de S3, seul le `.bai` reste). Rollback complet, 0 changement de statut vérifié ; un `UPDATE` ciblé fait les 12 samples en 3,6 s. ⚠ Le `cp` d'un `.duckdb` ne suffit pas au rollback — le WAL non checkpointé est rejoué à la réouverture. Arbitrage en attente : « amont nettoyé mais rapport livré » doit-il rester SUCCESSED ?
+
+- [x] **Aima-Tower — bloc « Performance des produits » sur le Tableau de bord** — 5 lignes (Exis global + CRC/Lung/Pancreas + THEMELIO) et décompte 485/1471, **sans aucun recalcul** : même endpoint `/api/competitive/comparaison` et même `pct()` que le Profil AIMA, `pct()` ayant été sorti dans `lib/comparaison.ts` pour qu'aucune des deux pages n'ait sa propre copie. ⚠ La ligne Exis **globale** affiche 82,0 % là où `/exploration` montre 76,2 % (exclusion vessie/TNE/Nuclear du référentiel) ; les 3 lignes par indication, elles, correspondent exactement. Détails dans `dashboard_bloc_produits.md`.
+- [x] **Aima-Tower — seuil Exis 0,0042 pour mVAF v1.4 dans `/reproductibilite`** — le verdict n'est plus binaire (`> 0,0042` = positif), et le seuil reste **propre à v1.4** : v1.0 sort de `qc_metrics`, autre échelle, aucun seuil calibré. Effet de bord assumé — `_category()` alimentant aussi `_pairwise_agreement`, l'accord de la cohorte pure passe de 93,8 % à 85,4 % et `Colon_22` perd son unanimité pour un run à 0,0041. Détails dans `reproductibilite_seuil_exis.md`.
+- [x] **Aima-Tower — versions réalignées à 5.2.0** — README (5.1.0), `Footer.tsx` (`v4.2.0`, celle affichée dans l'UI), `frontend/package.json` (`0.1.0-planG`) et `backend/main.py` (`3.0.0`) donnaient quatre valeurs différentes. Section « Page Tableau de bord » créée au passage dans le README et le CLAUDE.md : elle n'existait dans aucun des deux.
 
 ## 2026-08-10 — trace-prod : cohortes par indication + N50
 
