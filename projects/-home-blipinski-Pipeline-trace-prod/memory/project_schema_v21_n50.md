@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 8f2da004-5cea-4687-be3c-4471f9c51ada
-  modified: 2026-08-10T19:18:07.134Z
+  modified: 2026-08-12T10:56:39.511Z
 ---
 
 # Schema v21 — n50 (qc_metrics, août 2026)
@@ -59,15 +59,21 @@ num_reads · yield_gb · mean_coverage · yield_gb_long · n50 · n75 · median_
 - **`ALTER TABLE ADD COLUMN` place `n50` en position physique 17**, alors que le DDL le déclare
   en 8ᵉ. Sans conséquence : l'export, l'UPSERT et `compact()` accèdent aux colonnes **par nom**
   (`compact()` construit `INSERT INTO t (cols) SELECT cols`, **jamais `SELECT *`** — vérifié).
-- **Ordres de grandeur mesurés** (backfill complet, 10/08/2026, couverture **100 %** sur les 3
-  combos — le cas `NA` reste théorique) : liquid n=1324, médiane **174** bp (min 131, max 6010) ;
-  solid n=147, médiane **3804** bp (min 381, max 9727).
-- ⚠ **Un n50 liquid élevé n'est PAS une erreur d'extraction** (j'avais d'abord écrit l'inverse).
+- ⚠⚠ **CE FICHIER DÉCRIT L'ÉTAT v21 (10/08/2026). La source du LIQUID a basculé le 11/08**
+  vers `QC/Samtools/{s}.n50_ratio.tsv` bloc `*_filtered` — voir [[project-schema-v24-pct-mass-removed]].
+  Tout ce qui suit reste vrai **pour le solid**, et vaut comme historique pour le liquid.
+- **Ordres de grandeur au 10/08/2026** (cramino, avant bascule) : liquid n=1324, médiane **174** bp
+  (min 131, **max 6010**) ; solid n=147, médiane **3804** bp (min 381, max 9727).
+  → **Valeurs liquid actuelles** (filtrées) : médiane **174** (inchangée), **max 574**.
+- ⚠ **Un n50 liquid élevé n'était PAS une erreur d'extraction** (j'avais d'abord écrit l'inverse).
   15 liquides ≥ 1000 bp sur 1324 (1257 sont < 250 bp) : surtout des `Bladder_Urine_*` — matrice
   **urinaire**, dont la fragmentation ne suit pas le profil mononucléosomal du plasma — plus
   `TNE_2` (6010) et `Breast_6` (3808). **Le contrôle pertinent est la cohérence entre réplicats** :
   `Breast_6` 3808 vs son rebasecalled 3647, `Colon_22_rep1` 1608 vs `rep2` 1491. Une confusion de
   fichier source (raréfié, EPIC) ne produirait pas cette corrélation.
+  → **Confirmé quantitativement depuis** : ces samples sont exactement ceux qui ont le plus de
+  masse au-delà de 1 kb (`pct_mass_removed` : `TNE_2` **81,40 %**, `Colon_22_rep1/rep2` 64,91/62,62 %).
+  Le filtre ≤ 1 kb supprime cette queue de reads longs.
 - **Blocs liquid et solid textuellement identiques** dans `checkers.py` (les 3 lignes
   `"Depth"/"Coverage"/"mVAF v1"` et la liste de fallback) → un `Edit` sur ces zones doit élargir
   le contexte (ligne discriminante : `"Ratio %"` en liquid, `"Nb read alignés"` en solid).

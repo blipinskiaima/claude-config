@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: ccc47027-333b-40a9-a728-dd1f326dc446
-  modified: 2026-08-12T10:36:28.117Z
+  modified: 2026-08-12T10:56:54.250Z
 ---
 
 # QC N50/N75 — detecteur de contamination gDNA (2026-08-12)
@@ -78,10 +78,53 @@ recursif. Le pipeline produit un fichier **identique octet par octet** (verifie 
 - `conformity/check-run-output.sh` ne verifie **aucun** fichier de `QC/Samtools/`. Ajouter
   `n50_ratio.tsv` au contrat verifie le ferait entrer dans la qualification ISO — decision
   non prise.
-- Aucun seuil de rendu n'est fixe : la valeur devra etre calibree sur nos donnees, **par
-  matrice** (plasma / urine), et **dans le sens haut uniquement** — la sur-fragmentation est
-  sans objet (plancher biologique du nucleosome a ~147 pb, le plasma le plus court fait
-  136 pb, soit x0,82 de la mediane).
+- ~~Aucun seuil de rendu n'est fixe~~ → **SEUILS DETERMINES le 2026-08-12, voir ci-dessous.**
+  Reste vrai : le sens **haut uniquement** — la sur-fragmentation est sans objet (plancher
+  biologique du nucleosome a ~147 pb, le plasma le plus court fait 136 pb, soit x0,82 de la
+  mediane).
+
+## Seuils (2026-08-12) — sur `ratio_n50_n75_filtered`, reads <= 1 kb
+
+Determines **sans aucun label de matrice**, par la seule geometrie de la distribution : elle est
+multimodale, et chaque seuil est place **au milieu d'un intervalle ou aucun echantillon n'existe**
+(1,2463-1,2752 et 1,3976-1,4530). Deplacer un seuil de +/-0,013 (bas) ou +/-0,023 (haut) ne
+reclasse donc **personne** — c'est ce qui manque aux seuils 5M/0,25x, qui coupent en pleine densite.
+
+| zone | condition | n | % |
+|---|---|---:|---:|
+| A — analysable | ratio <= **1,26** | 1 227 | 92,7 |
+| B — zone grise | 1,26 < ratio <= **1,43** | 32 | 2,4 |
+| C — non interpretable | ratio > **1,43** | 65 | 4,9 |
+
+Distribution plasma : mediane **1,10** · p95 1,19 · p99 1,89. Le seuil unique (1,26 seul) reste
+possible ; le double est prefere car la zone grise est une population **reellement ambigue**.
+
+**Validation a posteriori** (labels utilises seulement APRES) : plasmas 98,1 % en A · urines
+71,6 % en C et 19,8 % en B · les 22 controles synthetiques **Twist 100 % en A**.
+
+⚠ **Angle mort** : le ratio filtre ne voit pas la contamination qu'il a filtree. `Breast_6`
+(57 % de masse > 1 kb) et `TNE_2` (81 %) sont classes en **zone A**. Toujours l'accompagner de
+`pct_mass_removed` (~2 % chez un plasma normal, examiner au-dela de 25 %).
+
+## Les 12 controles qualite externes forment un mode a part
+
+Les 12 EQC de CGFL (`Breast_17/32/47/49/50/52`, `Prostate_2/3/23/37/38/39`) tombent **tous les 12
+en zone grise**, entre **1,3289 et 1,3649** — 0,036 d'amplitude, le groupe le plus resserre de
+toute la cohorte — avec une masse > 1 kb de **0,00 a 0,19 %** (les plus propres du jeu).
+
+Materiel de reference industriel : distribution plus etalee qu'un cfDNA natif, mais identique
+d'un flacon a l'autre. **Leur position en zone grise est attendue, ce n'est pas une alerte.**
+
+Consequence : la zone grise se decompose en **16 urines + 12 EQC + 4 plasmas** reellement
+inexpliques (et non 16 plasmas « de cause inconnue » comme ecrit avant cette identification).
+A l'inverse les controles **Twist**, concus pour mimer un profil de cfDNA, sont tous en zone A —
+l'indicateur distingue les deux types de controle.
+
+## Application en aveugle — 10 patients Imagenome Labosud (s3://aima-platform)
+
+Hors des 1 324 ayant servi aux seuils, nature inconnue a l'avance. **Les 10 en zone A**, ratio
+1,0764 a 1,1481 (tous sous le p95 de 1,19), masse > 1 kb de 0,22 a 9,95 %. Premiere application
+reelle de l'indicateur.
 
 Voir [[softclip-fragmentomics-length]] pour la convention de longueur, et
 [[covdepth-qc-valorization]] pour le chantier QC dont ce travail est issu.

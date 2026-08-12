@@ -4,7 +4,7 @@ description: "Google Doc 'QC' onglet Ratio N50/N75 — document de restitution d
 metadata: 
   node_type: memory
   type: reference
-  modified: 2026-08-12T10:51:02.761Z
+  modified: 2026-08-12T10:57:05.569Z
   originSessionId: b56b0f4a-9a7a-4318-bb95-549d981af39e
 ---
 
@@ -13,8 +13,20 @@ metadata:
 <https://docs.google.com/document/d/1X1KxOCR-eHRU04R3eSfyTlxa_C47R114pCw_BkoUHwQ/edit?tab=t.w79cz9osn5oa>
 
 Document de restitution du travail QC. 4 onglets : **Ratio N50/N75** (`t.w79cz9osn5oa`),
-Nb reads mapped, List_Of_Features, Figure du pipeline. L'onglet Ratio compte 6 sections et
-**5 figures** legendees `[Figure N — …]`.
+Nb reads mapped, List_Of_Features, Figure du pipeline.
+
+**Etat au 2026-08-12 fin de journee** : l'onglet Ratio a ete **entierement reecrit** — il compte
+**9 sections, 5 figures, 5 tableaux et 3 listes nominatives**, ~16 400 caracteres. La section
+« Pourquoi chercher un nouvel indicateur » a ete supprimee : le document ouvre directement sur
+le constat factuel `Breast_6`. Redaction en paragraphes courts **+ puces**.
+
+Plan : 1 constat `Breast_6` · 2 mediane vs N50 · 3 definitions et passage au ratio · 4 donnees
+et filtres FRAG · 5 les trois cas (sain / rattrape / degrade) · 6 les seuils · 7 verification a
+posteriori · 8 **qui tombe hors zone verte** (4 tableaux : zone rouge, grise, verte, + les
+10 patients Imagenome en aveugle, + les 12 controles qualite externes) · 9 lecture et limites.
+
+⚠ Sous les tableaux des 3 zones : **liste nominative complete** des echantillons (nom + ratio),
+en corps 8 pt gris. 65 / 32 / 7 entrees.
 
 ## Acces
 
