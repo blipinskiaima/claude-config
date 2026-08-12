@@ -1,35 +1,37 @@
-# Context — trace-prod — 2026-08-10T19:18:41+00:00
+# Context — trace-prod — 2026-08-12T11:22:10+00:00
 
 **Branche** : main
-**Dernier commit** : 7b75c16 — docs: n50 — corrige l'interprétation des valeurs liquid élevées
-**Status** : clean, synchronisé avec origin/main (9 commits poussés cette session)
+**Dernier commit** : dce1d45 — feat: métriques de longueur de reads filtrées (v24) + table qc (v23)
+**Status** : propre, synchronisé avec origin/main (untracked préexistants only : backups
+.duckdb, CSV dev/, rapports HTML)
 
 ## Où j'en suis
-Deux chantiers terminés et poussés, rien en cours. (1) L'export cohort a quitté la gsheet
-trace-prod pour une gsheet dédiée « Trace COHORT » et s'est décliné en 4 onglets par
-indication via `export-cohort --indication`. (2) Schema v21 : colonne `n50` dans
-`qc_metrics`, backfill rétrospectif terminé (4 min 54 s, couverture 100 %) et exports
-gsheet passés.
+Session close, tout est commité et poussé. Chantiers livrés de bout en bout : export-cohort
+redirigé vers la gsheet « Trace COHORT » avec 5 onglets par indication ; schemas v21 (n50),
+v22 (n75 + ratio) ; bascule de la source liquid vers le bloc filtré (reads ≤ 1 kb) ;
+schema v24 (pct_mass_removed). Rien n'est en cours.
 
 ## Ce qui marche / ce qui foire
-- ✓ Famille `exis_*` : Exis Multi (1325×10), Exis CRC (210×20), Exis Lung (437×20,
-  Lung+Lung_Alc), Exis Pancreas (33×20), Exis Healthy (330×20). Ajouter une indication
-  = 1 ligne `EXIS_TABS` + 1 entrée JSON. Chaque onglet relu et comparé au TSV local :
-  0 divergence sur les valeurs brutes.
-- ✓ Schema v21 `n50` : 3 combos (liquid CGFL+HCL, solid CGFL), lu par nom d'en-tête dans
-  le TSV cramino. Backfill 1471/1471, médiane liquid 174 bp / solid 3804 bp.
-- ✓ Correction de doc importante : j'avais écrit qu'un n50 liquid élevé trahissait une
-  confusion de fichier — faux. Les 15 liquides ≥1000 bp sont réels (surtout Bladder_Urine,
-  matrice urinaire). Le contrôle valable est la cohérence entre réplicats.
-- ✗ `Column 43` demandée dans l'export CRC : introuvable (ni TSV_TO_DB_METADATA, ni onglet
-  ONT Sample où la 43e est `Freq (Gene 3)`, ni gsheets sources où c'est `Gene 5 mutated`).
-  Non exportée, en attente du vrai nom.
-- ✗ Question de Boris laissée sans réponse : « pourquoi Healthy_13 n'est pas dans l'export
-  trace-prod ? ». Vérifié qu'il est bien en base (HCL, v5.0.0, inclus dans la cohorte) mais
-  l'investigation sur l'onglet trace-prod a été interrompue avant conclusion.
+- ✓ Backfills complets et vérifiés : n50/n75/ratio 1471/1471, pct_mass_removed 1324/1332.
+  Exports gsheet systématiquement relus (valeurs brutes) plutôt que crus sur parole.
+- ✓ Contrôle d'intégrité SQL sur le ratio : 0 incohérence sur 1324, 0 cas de n75 > n50.
+- ✓ **Question Healthy_13 résolue** (elle était restée ouverte dans le snapshot du 10/08) :
+  il est bien présent dans l'onglet `HCL liquid`, relu trois fois pendant les vérifications
+  d'export (N50=170, Ratio=1,1039, % Masse > 1kb=1,46). Les exports relancés depuis ont réglé
+  le problème — c'était vraisemblablement un décalage d'export, pas une absence en base.
+- ⚠ 8 `Bladder_Urine_02_*` arrivés pendant la session (CGFL 811 → 819) n'ont ni n50, ni n75,
+  ni ratio, ni pct : leur pipeline n'a pas encore produit les fichiers. Ils partent en gsheet
+  avec NA sur ces colonnes.
+- ⚠ `N50` a désormais **deux définitions** : samtools filtré ≤ 1 kb en liquid, cramino non
+  filtré en solid. Le solid a été laissé de côté sur décision explicite.
+- ⚠ Le chantier `check-qc` d'une session parallèle (table `qc`, v23) a été commité avec le
+  mien — code que je n'ai ni écrit ni testé, volontairement non documenté dans README/CLAUDE.md.
+- ✗ `Column 43` demandée pour l'export cohort reste introuvable (absente de TSV_TO_DB_METADATA,
+  de l'onglet ONT Sample où la 43ᵉ est `Freq (Gene 3)`, et des gsheets sources où c'est
+  `Gene 5 mutated`) — jamais exportée, en attente du vrai nom.
 
 ## Prochaine étape
-Rien d'engagé. Deux reprises possibles : demander à Boris le vrai nom de `Column 43` pour
-compléter les onglets par indication, ou reprendre la question Healthy_13 en comparant la
-DB à l'onglet `HCL liquid` de la gsheet trace-prod (l'export a été relancé depuis, il se
-peut que ce soit déjà résolu).
+Quand le pipeline aura produit les fichiers des 8 nouveaux Bladder_Urine :
+`update-column n50|n75|n50_n75_ratio|pct_mass_removed liquid CGFL` puis
+`export liquid CGFL --gsheet`. Sinon, trancher le sort du solid (rester sur cramino
+ou basculer quand n50_ratio.tsv y sera disponible).
