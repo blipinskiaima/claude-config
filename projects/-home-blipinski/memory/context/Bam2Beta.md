@@ -109,6 +109,21 @@ conclusions inter-labo sont fausses. Corrigé dans le Google Doc.
 le second du résultat du premier, soit **75 fichiers faux**. Corrigé en `out/{type}/{labo}/{ID}`.
 Vérifier ce point à chaque script qui indexe par nom de sample.
 
+## ⚠️ 2e erreur — une mesure régionale présentée comme globale
+
+Les chiffres d'ouverture du Google Doc sur `Breast_6` venaient d'un échantillonnage sur
+**`chr2:50-56 Mb` seulement**, alors que tout le reste du document raisonne sur `chr1-22`.
+Trois valeurs fausses en ont découlé : 3,5 % de reads > 1 kb (réel **3,02 %**), 63 % de masse
+(réel **57,26 %**), 57 105 pb de read maximale (réel **109 561 pb**). Boris a corrigé les deux
+pourcentages, la longueur max a dû être recalculée.
+
+**Règle** : ne jamais faire figurer une mesure régionale dans un document dont les autres
+chiffres portent sur le génome entier — recalculer sur le périmètre complet, ou écrire la
+région explicitement. Les mesures exploratoires sur `chr2` (chimères, palindromes, continuité
+d'alignement) sont légitimes pour **qualifier un mécanisme**, jamais pour **chiffrer une
+proportion** publiée. Le même travers guette encore l'investigation des 4 plasmas HCL, mesurée
+elle aussi sur 2 Mb de `chr2`.
+
 ## Prochaine étape
 
 1. **Investigation dédiée sur les 4 plasmas HCL** (`Colon_49/51/58`, `Lung_122`) : le

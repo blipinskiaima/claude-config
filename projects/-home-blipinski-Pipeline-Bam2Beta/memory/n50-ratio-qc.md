@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: ccc47027-333b-40a9-a728-dd1f326dc446
-  modified: 2026-08-12T16:31:06.632Z
+  modified: 2026-08-12T16:37:04.162Z
 ---
 
 # QC N50/N75 — detecteur de contamination gDNA (2026-08-12)
@@ -154,6 +154,20 @@ Instruit en recalculant ratio et masse a 6 seuils (500 pb -> 3 kb) :
   1,3333. 1 kb ≈ **6 nucleosomes** — au-dela, plus de signature apoptotique.
 
 **Aucun flag QC implemente** : c'est une recommandation de lecture, ni en base ni dans le pipeline.
+
+⚠ **Perimetre de mesure — piege confirme le 12/08.** Les valeurs de reference de `Breast_6`
+doivent etre lues sur **tout** `read_lengths.csv` (perimetre BED chr1-22), pas sur un
+echantillonnage regional :
+
+| | `chr2:50-56 Mb` | **tout le fichier** |
+|---|---:|---:|
+| reads > 1 kb | 3,5 % | **3,02 %** |
+| masse portee | 63 % | **57,26 %** |
+| read la plus longue | 57 105 pb | **109 561 pb** |
+
+Les 2 premieres sont dans `n50_ratio.tsv` ; la longueur max **n'existe nulle part**, il faut
+relire le CSV. Les mesures sur `chr2` restent legitimes pour **qualifier un mecanisme**
+(chimeres, palindromes, continuite d'alignement) mais jamais pour **chiffrer une proportion**.
 
 ## Les 12 controles qualite externes forment un mode a part
 
