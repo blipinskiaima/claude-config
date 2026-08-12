@@ -74,8 +74,11 @@ au-dela de 1 kb. ggplot2 3.5.2 deja dans `bam2beta:latest`, binning awk en strea
 - ✗ **Angle mort du ratio** : il ne voit pas la contamination qu'il a filtrée. `Breast_6` (57 %
   de masse > 1 kb) et `TNE_2` (81 %) sont classés zone A → toujours l'accompagner de
   `pct_mass_removed` (~2 % chez un plasma normal, examiner au-delà de 25 %)
-- ✗ **4 plasmas** en zone grise restent inexpliqués (`Lung_Alc_93_av`, `Lung_Alc_15_av`,
-  `Lung_124`) — et non 16 comme écrit avant l'identification des EQC
+- ✓ **3 plasmas** en zone grise (et non 4 : le 4e etait `Breast_17_rebasecalled`, un EQC).
+  Mecanismes **tranches par mesure directe** sur les reads >= 1 kb : `Lung_Alc_93_av` =
+  chimeres (91,5 % splittees, 48 % continu), `Lung_124` = vrai ADN long (2,7 % splittees,
+  99,3 % continu, jusqu'a 29 kb, meme signature que `Breast_6`), `Lung_Alc_15_av` =
+  indecidable (16 reads seulement) et **deja rejete** par les seuils actuels
 - ✗ **`28M` et `MAPQ<20` NULL partout** dans la table `qc` : `Preprocess_28M` s'exécute 22 fois
   par run sans publier aucun comptage (todo posée, basse priorité)
 - ✗ **8 Bladder_Urine sans `idxstats`** (1 324/1 332) : ajoutés en base pendant la session,
@@ -116,6 +119,7 @@ Vérifier ce point à chaque script qui indexe par nom de sample.
    pas les supplementaires (`-F 1796` par defaut), donc le seuil de rendu a 0,25x en depend.
 2. Décider si `n50_ratio.tsv` entre dans `check-run-output.sh` — ce qui le ferait basculer dans
    la qualification ISO 15189.
-4. Instruire les 4 plasmas restants de la zone grise.
+4. Zone grise : seul `Lung_124` reste a instruire (vrai ADN long, 17,4 % de masse). Les 2
+   autres sont expliques — `Lung_Alc_93_av` = chimeres, `Lung_Alc_15_av` deja rejete.
 5. ~~Documentation analogue pour le nombre de reads alignés~~ — **FAIT** (onglet « Nb reads
    mapped », 12/08).

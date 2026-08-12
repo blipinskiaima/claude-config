@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: ccc47027-333b-40a9-a728-dd1f326dc446
-  modified: 2026-08-12T10:56:54.250Z
+  modified: 2026-08-12T15:27:49.879Z
 ---
 
 # QC N50/N75 — detecteur de contamination gDNA (2026-08-12)
@@ -115,10 +115,38 @@ toute la cohorte — avec une masse > 1 kb de **0,00 a 0,19 %** (les plus propre
 Materiel de reference industriel : distribution plus etalee qu'un cfDNA natif, mais identique
 d'un flacon a l'autre. **Leur position en zone grise est attendue, ce n'est pas une alerte.**
 
-Consequence : la zone grise se decompose en **16 urines + 12 EQC + 4 plasmas** reellement
+Consequence : la zone grise se decompose en **16 urines + 12 EQC + 3 plasmas** reellement
 inexpliques (et non 16 plasmas « de cause inconnue » comme ecrit avant cette identification).
 A l'inverse les controles **Twist**, concus pour mimer un profil de cfDNA, sont tous en zone A —
 l'indicateur distingue les deux types de controle.
+
+## Les 3 plasmas de la zone grise — mecanismes tranches par la mesure
+
+Une fois urines et EQC retires, il reste **3 plasmas** (et non 4 : le 4e etait
+`Breast_17_rebasecalled`, donc un EQC). **Causes distinctes, pas de mecanisme commun.**
+
+Critere discriminant = sur les reads **>= 1 kb**, part **splittee** et part de sequence
+**alignee en continu** (le meme test qui avait etabli que `Breast_6` portait du vrai gDNA) :
+
+| sample | ratio | masse >1kb | align/read | reads >=1kb splittees | continu | len max |
+|---|---:|---:|---:|---:|---:|---:|
+| `Lung_Alc_93_av` CGFL | 1,3976 | 6,4 % | **1,453** (rang 3/1229) | **91,5 %** | **48 %** | 5 201 |
+| `Lung_124` HCL | 1,3081 | **17,4 %** | 1,008 (rang 1159) | **2,7 %** | **99,3 %** | **29 255** |
+| `Lung_Alc_15_av` CGFL | 1,3014 | 1,9 % | 1,115 (rang 28) | 62,5 % | 71,9 % | 4 026 |
+| *(ref)* `Breast_6` | — | 57,3 % | — | 1,8 % | 98,8 % | 65 204 |
+
+- **`Lung_Alc_93_av` = chimeres.** 31,6 % de reads chimeriques, et 91,5 % de ses molecules
+  longues sont **decoupees** avec moins de la moitie de sequence alignee d'un tenant : ce sont
+  des assemblages, pas des molecules.
+- **`Lung_124` = vraie contamination par ADN long.** Meme signature que `Breast_6` (99,3 %
+  continu, jusqu'a 29 kb) mais plus modeste : 2 379 pb de moyenne contre 8 926 pb. D'ou une
+  traine qui s'eteint vers 3 kb sur la figure.
+- **`Lung_Alc_15_av` : indecidable** — seulement **16 reads >= 1 kb**, effectif trop faible.
+  Son ratio vient plutot de ses 14,7 % de chimeres. Il est de toute facon **deja rejete** par
+  les seuils actuels (0,11x, 2,19 M reads).
+
+⚠ Ne pas conclure sur le seul `align/read` : c'est un proxy. Le test direct (splittees + continu)
+est ce qui separe un artefact d'alignement d'une vraie molecule longue.
 
 ## Application en aveugle — 10 patients Imagenome Labosud (s3://aima-platform)
 
