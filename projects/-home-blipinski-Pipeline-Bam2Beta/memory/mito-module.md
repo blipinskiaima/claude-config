@@ -1,6 +1,6 @@
 ---
 name: mito-module
-description: "Module MITO — QC mitochondrien (mosdepth merged + BAM, liquid only, mode rétro, 11 colonnes, pas metadata.json)"
+description: "Module MITO — QC mitochondrien (mosdepth merged + BAM, actif liquid+solid+prod depuis 2026-08-12, mode rétro, 11 colonnes, pas metadata.json)"
 metadata:
   node_type: memory
   type: project
@@ -12,8 +12,11 @@ metadata:
 
 QC d’abondance mitochondrienne uniquement (pas de score diagnostique). Parse les sorties
 **Mosdepth merged déjà publiées** + calcule longueurs chrM depuis le BAM (convention FRAG).
-**Actif liquid only** (`params.MITO=true` dans `conf/liquid.config`) ; `false` par défaut /
-prod / solid ; override CLI `--MITO`. Aucun re-run mosdepth, aucun modkit.
+**Actif liquid + solid + prod** depuis le 2026-08-12 (`fca2844`) ; `false` seulement hors profil ;
+override CLI `--MITO`. L'activation en prod corrige le KO systématique de l'étape 2 de
+`/test_bam2beta` : `check-run-output.sh` exige `mito_qc.tsv` dès que le sample est liquid, alors
+que le profil `prod` désactivait le module. ⚠ **Jamais exécuté sur du solid à ce jour.**
+Aucun re-run mosdepth, aucun modkit.
 
 Workflow : `workflow/mito.nf` (process `Mito_qc`, bash **inline** dans `script:` — préférence
 Boris). Câblé dans `main.nf` derrière `if (params.MITO)`.
