@@ -57,6 +57,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-08-12 — Bam2Beta : QC N50/N75 + instruction du palier 1 des seuils
+
+- [x] **QC N50/N75 câblé dans Bam2Beta** — détecteur de contamination gDNA du plasma ajouté à `Extract_read` (`a95a36b`), sortie `QC/Samtools/{ID}.n50_ratio.tsv` (12 colonnes, avant/après filtre 1 kb) + 1 324 TSV rétrospectifs uploadés sur S3. Plasma médiane 1,10 · `Breast_6` 24,44 → 1,11 après filtre. Détails dans `n50-ratio-qc.md`.
+- [x] **Palier 1 des seuils QC instruit (3 candidats sur 5)** — MAD ichorCNA **écarté** (ne rejette aucun échantillon que 5 M/0,25× ne rejette déjà, et corrélé à la longueur de read contrairement à ce qu'annonçait le doc), N50 **retenu** (9 plasmas portent > 50 % de leur ADN dans des reads > 1 kb, dont 5 rendus sans signalement), `coverage_percent` **écarté** (corr 0,97 avec `depth` en log, aucune hétérogénéité détectable). Verdicts portés dans `docs/QC-seuils-biopsie-liquide.md`.
+- [x] **Deux artefacts d'alignements multiples distingués** — le « taux de mapping » du doc n'en est pas un (plafond structurel à 87,3 %) : il mesure les alignements par read. Vrai taux de mapping 95,7 %. CGFL `Lung_Alc` = concatémères de ligation (90,9 % des morceaux sur un autre chromosome, aucun adaptateur interne), HCL `Colon` = reads palindromiques (95 % même locus, brin opposé, < 1 kb).
+
 ## 2026-08-10 — trace-prod : cohortes par indication + N50
 
 - [x] **Export cohort par indication** — l'audit d'inclusion quitte la gsheet trace-prod pour « Trace COHORT » et se décline en 4 onglets via `export-cohort --indication` (CRC 209, Lung 436 avec Lung_Alc, Pancreas 32, Healthy 329) + 10 metadata ONT Sample. Ajouter une indication coûte 1 ligne `EXIS_TABS` + 1 entrée JSON ; détails dans `project_cohort_export.md`.
