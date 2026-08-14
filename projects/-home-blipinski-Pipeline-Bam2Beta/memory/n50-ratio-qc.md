@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: ccc47027-333b-40a9-a728-dd1f326dc446
-  modified: 2026-08-12T16:37:04.162Z
+  modified: 2026-08-14T10:11:34.002Z
 ---
 
 # QC N50/N75 — detecteur de contamination gDNA (2026-08-12)
@@ -125,6 +125,24 @@ structurel. Alternative conservatrice : **32 %** (vallee 28,98-35,94), 10 plasma
 
 **Seconde bascule : 0,2 %** — les 12 EQC y sont tous, contre 1 % des plasmas et 0 % des Twist.
 
+### Matrice croisee complete — VERIFIEE en base le 2026-08-14
+
+Les 6 cas ci-dessous sont une lecture de cette grille (1 324 liquides) :
+
+| ratio \ masse | < 0,2 % | 0,2-10 % | 10-22 % | > 22 % | total |
+|---|---:|---:|---:|---:|---:|
+| **A** <= 1,26 | 13 | 1 176 | 28 | **10** | **1 227** |
+| **B** 1,26-1,43 | **15** | **14** | 2 | 1 | **32** |
+| **C** > 1,43 | **0** | 14 | 16 | 35 | **65** |
+| total | 28 | 1 204 | 46 | 46 | **1 324** |
+
+Tous les effectifs publies dans le Google Doc tombent exactement (1217 / 10 / 15 / 14 / 3 / 65),
+**case vide `C x <0,2 %` comprise**. La vallee de masse est confirmee vide entre `Prostate_31`
+(18,07 %) et `Pancreas_6_rebasecalled` (25,94 %).
+
+⚠ Le « 10 / 16 / 20 / 6 » de la partie 10 suppose une definition de « plasma » **plus stricte**
+qu'un simple hors-urines : ce proxy donne 23 / 16 / 33 / 6. Seul le « les deux = 6 » est invariant.
+
 ### Les 6 cas
 
 | cas | ratio | masse | n | lecture |
@@ -216,6 +234,39 @@ est ce qui separe un artefact d'alignement d'une vraie molecule longue.
 Hors des 1 324 ayant servi aux seuils, nature inconnue a l'avance. **Les 10 en zone A**, ratio
 1,0764 a 1,1481 (tous sous le p95 de 1,19), masse > 1 kb de 0,22 a 9,95 %. Premiere application
 reelle de l'indicateur.
+
+## Cablage trace-prod (schema v22 + v24)
+
+Table `qc_metrics`, override des getters dans `LiquidChecker` (`lib/checkers.py:703-733`) ;
+`BaseChecker` reste sur cramino et demeure la voie du **solid**.
+
+| colonne DB | type | source liquid |
+|---|---|---|
+| `n50` | INTEGER | `n50_filtered` |
+| `n75` | INTEGER | `n75_filtered` — **stocke, JAMAIS exporte** en gsheet |
+| `n50_n75_ratio` | DECIMAL(10,4) | `ratio_n50_n75_filtered` — **lu, pas recalcule** |
+| `pct_mass_removed` | DECIMAL(5,2) | `pct_mass_removed` — **liquid uniquement** |
+
+Export gsheet `Trace PROD` (onglets liquid), colonnes **9-11** : `N50` · `Ratio N50/N75` ·
+`% Masse > 1kb`. 4 decimales obligatoires sur le ratio (toute la plage tient entre 1,06 et 2,20).
+
+⚠ **`N50` a DEUX definitions selon l'onglet** : samtools filtre en liquid (mediane 174 bp,
+max 574), cramino **non filtre** en solid (mediane 3 804 bp, max 9 727). Non comparables.
+Consequence assumee de la bascule v24 — `n50_ratio.tsv` n'existe pas en solid (0/40 sondes).
+
+⚠ **Gotcha `NaN`/`inf`** : `float('NaN')`/`float('inf')` ne levent pas `ValueError`, et
+`n50/inf = 0.0` est *fini* — une garde `isfinite(resultat)` laisse passer un `0,0000` faux.
+**Valider les deux OPERANDES, jamais le resultat.**
+
+## Manuel d'utilisation
+
+`docs/QC-manuel-ratio-n50-masse.md` (2026-08-14) — 5 definitions d'une phrase + les 6 cas de
+l'arbre, vulgarise, **sans methodologie de determination des seuils**. Destine a une lecture en un
+coup d'oeil ; l'instruction detaillee reste dans `docs/QC-seuils-biopsie-liquide.md` et le
+[[gdoc-qc-ratio-n50]].
+
+⚠ **Le nom de la metrique est `% Masse > 1kb`** (`pct_mass_removed` = masse **au-dessus** du
+seuil). L'inverser changerait le sens de lecture des seuils : 2 % deviendrait 98 %.
 
 Voir [[softclip-fragmentomics-length]] pour la convention de longueur, et
 [[covdepth-qc-valorization]] pour le chantier QC dont ce travail est issu.

@@ -5,6 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 8e8e90f0-c16f-492a-a113-8f8efe10ea84
+  modified: 2026-08-14T07:24:29.278Z
 ---
 
 # Schema v16 — rarefaction (juillet 2026)
@@ -29,6 +30,34 @@ Nouvelle table `rarefaction` (68 colonnes), **lot autonome de pseudo-samples** `
 **État final (15/07/2026, pipeline de raréfaction TERMINÉ)** — re-`check-rarefaction CGFL`+`HCL` + `export-rarefaction` : **1355 lignes** (435 CGFL = 87 bases × 5 niveaux, 920 HCL = 184 bases × 5 niveaux), **0 erreur**. `prod_status_rarefaction` **OK 100%** (1355/1355). **Toutes les métriques remplies 1355/1355** — y compris `mvaf_v13` (le `V1.3.tsv` existe désormais partout) et ichorcna/frag_mode1_sc/frag_score_v2_sc, `bootstrap_props` OK partout. Le gotcha « mvaf_v13 toujours NA » ne vaut donc plus. Cohérence niveau ↔ `nb_reads_total_rarefaction` vérifiée sur les 5 paliers : médiane == niveau exact (1,00/2,00/5,00/10,00/20,00), amplitude ±0,01 = aléa d'échantillonnage de la raréfaction (samtools probabiliste), **jamais** un défaut d'extraction. Export gsheet passé sans APIError 503.
 
 **Sémantique du niveau (07/07/2026) :** une fois le pipeline de raréfaction Bam2Beta **terminé**, `nb_reads_total_rarefaction` == le niveau (1M→1,00 / 5M→5,00 / 20M→20,00). ⚠ **Piège** : si `check-rarefaction` est lancé pendant que Bam2Beta tourne encore, les dossiers contiennent des sorties **intermédiaires** → totaux incohérents (ex 1M→5M vu le matin, corrigé le soir). trace-prod extrait fidèlement le fichier `QC/Samtools/{s}.nb_reads_total.tsv` (vérifié au read près) — donc si les nombres semblent faux, c'est la donnée upstream en cours, pas l'extraction. Remède : `DELETE FROM rarefaction` + re-`check-rarefaction CGFL/HCL` une fois le pipeline fini.
+
+**Signature d'un lot en cours de production (14/08/2026, lot Bladder_Blood CGFL) —** comment
+*reconnaître avant de checker* que Bam2Beta n'a pas fini, sans attendre de voir des chiffres faux :
+
+- **Bam2Beta écrit les sous-dossiers en 2 vagues.** Un pseudo-sample terminé en a **10** ; un
+  pseudo-sample en cours n'a que les **5 premiers** :
+  `BAM · BETA · BETA_28M · BOOTSTRAP · EXTRACT_FULL_28M` — puis arrivent, **en fin de course**,
+  `QC · CNV · Fragmentomics · IV · ichorCNA`. Un simple `aws s3 ls {pseudo}/` tranche en 1 appel.
+- Conséquence si on checke quand même : `prod_status_rarefaction` = **KO** partout
+  (`_CORE_DIRS` exige `QC`), et **tout ce qui dérive de `QC/`** (nb_reads_*, ratio, depth,
+  coverage) + ichorcna + Mode1/2 + frag_score tombent à NULL. Restent exploitables :
+  **mVAF (BETA), `bootstrap_props` (BOOTSTRAP), probs Loyfer (EXTRACT_FULL_28M)** — sur ce lot,
+  `mvaf_v14` était rempli **279/279** alors que `depth` n'était rempli que 10/279.
+- ⚠⚠ **`nb_reads_total_rarefaction` vaut `0.00` et NON `NULL`** quand `QC/` est absent → l'export
+  affiche **`0,00`**, pas `NA`. C'est le cas « silencieusement faux » : les autres colonnes
+  manquantes s'affichent honnêtement `NA`, celle-ci ressemble à une mesure. Ne jamais lire un
+  `0,00` de cette colonne comme un vrai comptage sans vérifier `PROD`.
+- **Le lot reste ré-entrant** : l'UPSERT étant idempotent, re-`check-rarefaction CGFL` sur les
+  mêmes pseudo-samples une fois le pipeline fini écrase les valeurs partielles. **Pas besoin de
+  `DELETE FROM rarefaction`** (remède plus violent proposé en 07/2026). Cibler la relance :
+  `SELECT sample_name FROM rarefaction WHERE labo='CGFL' AND prod_status_rarefaction='KO'`.
+
+**Le nombre de niveaux dépend de la profondeur du parent —** une base n'a PAS toujours ses 5
+niveaux, et ce n'est pas un défaut : le pipeline ne produit que les niveaux **≤ `nb_reads_total`
+du sample parent** (`qc_metrics`). Sur les 58 Bladder_Blood : `02_098` (4,60 M reads) → 1M+2M
+seulement ; `01_101` (9,71 M) → 1M+2M+5M ; six bases entre 12,8 et 19,4 M → pas de 20M.
+**Cible réelle = 279 et non 58×5=290.** À calculer avant de conclure qu'il « manque » des
+dossiers — sinon on attend indéfiniment une production qui n'aura jamais lieu.
 
 **Vérifié (07/07/2026) :** `Breast_45_10M` PROD OK / mvaf_v1 0,8018 / v1.3 NA ; `Colon_8_10M` ichor 0,3457 + Mode1 144,82 ; `Prostate_45_1M` PROD KO. Export 20 col, probs absentes. Checkpoint `checkpoint-pre-rarefaction` (sur b9abd0c). Commits `9680010`→`e080252`. Spec/plan : `docs/superpowers/{specs,plans}/2026-07-07-rarefaction-tracking*.md`.
 
