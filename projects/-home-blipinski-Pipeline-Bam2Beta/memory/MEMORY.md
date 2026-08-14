@@ -37,7 +37,8 @@
 - [Batch effect CGFL vs HCL](batch-effect-investigation.md) — 17 % FP Healthy HCL (V1), CNV biaisé, pas d'effet taille de fragments ; ComBat-met **rejeté**
 - [Soft clipping & longueur FRAG](softclip-fragmentomics-length.md) — FRAG = `length(SEQ)`, soft clips inclus ; ne pas migrer vers span référence
 - [Coverage CGFL vs HCL](coverage-analysis-cgfl-hcl.md) — couverture autosomale équivalente, trous = non-mappable ; `Healthy_780` per-base corrompu
-- [covdepth QC valorization](covdepth-qc-valorization.md) — étape 1 livrée (Fig.1 cumulative + Fig.2 positionnelle) ; finding `067` : 34 M reads alignés pour depth = 0
+- [covdepth QC valorization](covdepth-qc-valorization.md) — étape 1 livrée (Fig.1 cumulative + Fig.2 positionnelle) ; finding `067` : 34 M reads alignés pour depth = 0 — ⚠️ **requalifié le 2026-08-14** : ce n'étaient pas des reads alignés mais `num_reads` de cramino, dont 99,82 % **non alignées**. Voir [unmapped-reads-urines.md](unmapped-reads-urines.md)
+- [Reads non alignés des urines](unmapped-reads-urines.md) — **les 16 urines à > 30 % de non-alignement, toutes traitées** (2026-08-14). **2 populations sans recouvrement**, clivage sur le **volume séquencé** (3,31 M / 9,09 M) et non sur le taux : 8 à forte charge portent **6 espèces bactériennes différentes** (*Proteus*, *E. coli* UPEC, *Citrobacter*, *Providencia*, *Alcaligenes*, *L. crispatus*), 8 à faible volume n'ont **aucun organisme dominant** — ce ne sont pas des contaminations. ⚠️ **2 patients avec *P. mirabilis* de souches distinctes** → exclut une contamination de labo. ⚠️ Kraken2 seul sous-estime (15-35 %) : **reads courts + mauvaise souche de référence** (K-12 → UTI89 = **+19,4 pts**). L'origine du portage (infection / colonisation / souillure / prolifération avant congélation) **n'est pas déterminable** par le séquençage
 
 ## Debugging Insights
 
@@ -48,9 +49,12 @@
 - **`Channel.fromPath` = queue channel à 1 item** (2026-07-16) : limite le process à **une exécution par invocation**. Sans effet en prod (1 sample/run), mais droppe des samples en batch. Fix `.first()`. Posé sur RAIMA_LOYFER + RAIMA_V1_WL ; **subsiste sur RAIMA_MODEL1/2, ANCESTRY_MODEL, BED, FASTA, FAI**. Voir [too-module.md](too-module.md)
 - **`checkIfExists: true` dans un `.map` de mode rétro tue TOUT le run batch** (2026-07-22) : exception levée à la construction du channel. Fix : `.filter { … .exists() }` + `log.warn` → skip silencieux. Posé sur THEMELIO_RETRO + TOO_RETRO. ⚠️ **`--bootstrap` et `--METHYL_FEATURES` le gardent encore**
 - **Code mort confirmé (2026-08-11)** : `Samtools_qc` et `Nanoplot_qc` (`qc.nf`, bloc commentaire Groovy), `Raima_score_v1_3` et `bootstrap_transfo` (`beta_28M.nf`, plus d'appelant)
+- **`samtools view <bam> '*'`** cible les reads non placés **via l'index** — 7 min sur un BAM de 10,7 Gio au lieu d'une passe complète (débit s3fs ~26 000 reads/s). ⚠️ **`The index file is older than the data file` sur TOUS les BAM de `RetD/`** : le `.bai` est systématiquement antérieur au `.bam`. Comptages exacts sur 16/16 vs table `qc`, donc index exploitables — mais l'anomalie est générale
+- **Outils de métagénomique (2026-08-14)** : le `master` de `kraken2` **ne compile pas** (`compare_header` manquant dans `classify.cc`) → `git checkout v2.17.1` avant `install_kraken2.sh`. Les URLs d'index de Ben Langmead sont passées de `k2_standard_16gb_<date>` (**404**) à `k2_standard_16_GB_<date>` → extraire les liens de la page, ne pas les deviner. Sortie `kraken2 --output` : la **longueur est en colonne 4**, la 3 est le taxID
 
 ## Architecture Notes
 
+- **L'alignement n'est PAS fait par Bam2Beta** : il est produit **live par MinKNOW 6.5.14** (GPU) pendant le run, en preset `map-ont`, sur **`GCA_000001405.15_GRCh38_no_alt_analysis_set.fa`** — 195 contigs, 3,100 Gb, `chrEBV` présent, **sans decoy `hs38d1` ni contigs HLA**. Vérifié par comparaison en-tête BAM ↔ `.fai` : 0 contig d'écart. ⚠️ **Ce n'est pas le hg38 UCSC de `params.fasta`** (455 contigs), qui ne sert qu'aux modules. Conséquence : un read non humain n'a structurellement aucune cible, et les reads humains courts (~100 pb) sont mal servis par `map-ont`. Voir [unmapped-reads-urines.md](unmapped-reads-urines.md)
 - `main.nf` orchestre les modules via conditionals (`params.BETA`, `params.FRAG`, …)
 - Channels : `BAM_METADATA` fournit `[sample_id, bam, bai]` à tous les modules
 - BED en `/scratch/dependencies/bed/` — ciblent chr1-22+X+Y uniquement
