@@ -60,6 +60,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-08-14 — Bam2Beta : manuel d'utilisation du duo QC ratio N50/N75 × masse
+
+- [x] **Manuel d'utilisation ratio N50/N75 × masse > 1 kb** — restitution vulgarisée en une phrase par métrique (N50, N75, ratio, % masse, combinaison) puis les 6 cas de l'arbre avec leur verdict PASS/WARNING/FAILED ; seuils donnés, méthodologie exclue. Commité dans `docs/QC-manuel-ratio-n50-masse.md` (`b2d5401`).
+- [x] **Effectifs du Google Doc QC vérifiés en base** — la matrice croisée 3×4 tombe exactement (1217/10/15/14/3/65), case `ratio > 1,43 × masse < 0,2 %` vide comprise, et la vallée de masse est bien vide entre 18,07 et 25,94 %. Deux incohérences internes relevées : §9 dit « au-delà de 25 % » là où §10 fixe 22 %, et §7 annonce 16 plasmas en zone grise là où §8.3 en établit 3.
+
 ## 2026-08-12 — Bam2Beta : QC N50/N75 + seuils + cascade de comptage · trace-prod : v22/v23/v24 · trace-platform : v14 Themelio · Aima-Tower : bloc produits Tableau de bord + seuil Exis /reproductibilite
 
 - [x] **Grille d'interprétation croisée ratio × masse — partie 10 du Google Doc** — les deux critères ne se recouvrent qu'à **6 sur 20** chez les plasmas (ratio seul 10, masse seule 16) : la corrélation apparente de 0,725 tombe à **0,408 en log-log**, ils partagent une tendance et non une information. Grille de 6 cas avec arbre de décision, dont la case *contamination masquée* (ratio vert mais masse > 22 %) qui contient les 10 plasmas les plus contaminés du jeu, aujourd'hui rendus sans réserve. La case *ratio > 1,43 avec masse < 0,2 %* est **vide** : un ratio rouge n'est jamais un artefact pur.
