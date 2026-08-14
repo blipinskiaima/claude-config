@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 4c6971ef-9e62-46ae-935a-5026efb56aa3
-  modified: 2026-08-11T12:40:06.669Z
+  modified: 2026-08-14T14:34:43.705Z
 ---
 
 # Cascade de comptage des reads (Bam2Beta V2.2.0)
@@ -114,7 +114,44 @@ num_alignments / num_reads   ->  alignements multiples seuls
 C'est ce second ratio qui a servi a identifier les concatemeres de ligation et les reads
 palindromiques — voir [[covdepth-qc-valorization]] et `docs/QC-seuils-biopsie-liquide.md`.
 
+## La cascade est materialisee en base — table `qc` (2026-08-14)
+
+trace-prod schema **v23** : table `qc`, **12 comptages + 11 pourcentages**, 1 332 liquides.
+Alimentee par `QCChecker` (`lib/checkers_qc.py`, 140 l.) qui lit **4 fichiers deja publies** et
+deduit le reste par soustraction — aucune lecture de BAM. CLI `check-qc liquid {labo}`.
+
+- Verifie : `A + B + C + D = reads_total` sur **1324/1324**, sans une exception.
+- `reads_28m` et `reads_mapq_lt20` sont **NULL 1332/1332** — Preprocess_28M ne publie rien.
+- ⚠ **`QCChecker` lit cramino par NOM d'en-tete**, alors que `BaseChecker.get_cramino_reads`
+  (colonnes historiques) lit une **position fixe** (`cut -f 6`). Deux conventions dans le meme
+  fichier. Le pipeline lui aussi lit par position ([rapport.nf:45]).
+- Export : gsheet **`Trace QC`** (`1kUk5Shk…`), onglet « QC read », 15 colonnes = 3 d'identite
+  + `Total` brut + **11 pourcentages**. Les valeurs brutes ne sont qu'en base.
+- 14 liquides hors perimetre, tous `Bladder_Urine_02_1xx` : 6 sans ligne `qc`, 8 sans idxstats.
+
+## Distribution du Primary mapped % (D / total) — 1 324 liquides
+
+Mediane **73,25** · Q1-Q3 71,47-74,62 (**IQR 3,15**) · ecart-type **7,39** · asymetrie **-6,6**
+· min 0,14 · max 79,83. Tukey : **112 valeurs aberrantes basses, aucune haute**.
+
+- **Le plafond a ~80 % est structurel** : le BAM porte toujours ~14 % de secondaires et ~11 %
+  de non alignees. La borne haute utile est 80, pas 100.
+- **L'ecart moyenne-mediane mesure la contamination par les aberrants** : -2,04 pt chez CGFL
+  contre -0,22 chez HCL. Consequence : l'ecart inter-labo vaut **+3,44 pt sur les moyennes**
+  mais **+1,62 sur les medianes**, et +1,31 apres retrait des aberrants. Toujours comparer sur
+  les medianes.
+- Trois profils parmi les 112 : **non alignees > 30 %** (16, tous CGFL, toutes urines) ·
+  **supplementaires > 10 %** (28) · **mixte** (68, les deux en exces modere — ce qu'un critere
+  mono-metrique laisse passer). Le seuil de 30 % tombe dans une vallee vide de 4,2 pt
+  (28,50-32,74) ; celui de 10 % dans une vallee de 1,0 pt seulement, moins robuste.
+- ⚠ **Le taux de mapping publie (> 97 % en ONT natif, PMID 37442577) est REFUTE chez nous** :
+  maximum cohorte **96,42 %**, il rejetterait **1324/1324**. La litterature mesure des runs
+  bruts, nous un BAM aligne et merge dont ~14 % des lignes sont des secondaires. Le doc de
+  palier 1 le pressentait sur **1** echantillon ; c'est desormais mesure sur 1 324.
+
 ## Materiel
 
 Comparateur reconstitution vs flagstat : `/scratch/boris/flagstat/compare.sh`, sorties brutes
 conservees dans `/scratch/boris/flagstat/raw/` (relancer ne relit plus les BAM).
+
+Voir [[qc-deux-niveaux]] pour l'architecture de controle qualite batie sur cette cascade.
