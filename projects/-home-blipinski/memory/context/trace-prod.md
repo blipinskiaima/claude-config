@@ -1,37 +1,30 @@
-# Context — trace-prod — 2026-08-14T14:26:35+00:00
+# Context — trace-prod — 2026-08-19T13:26:56+00:00
 
 **Branche** : main
-**Dernier commit** : e7ff4e6 — docs: rarefaction — reconnaître un lot en cours de production
-**Status** : propre, synchronisé avec origin/main (20 untracked : backups .duckdb, CSV dev/, rapports HTML)
+**Dernier commit** : 151e4ff — feat: schema v25 — qc.reads_with_cpg + alimentation ponctuelle 28M/CpG
+**Status** : propre, synchronisé avec origin/main (untracked : backups .duckdb, CSV dev/, rapports HTML, .claude/skills-worktrees — inchangés depuis avant la session)
 
 ## Où j'en suis
-Session d'exploitation, pas de développement. Lot **Bladder_Blood CGFL** intégré à la table
-`rarefaction` : 269 pseudo-samples insérés (2 passages de `check-rarefaction`), onglet
-`Rarefaction` réexporté à chaque fois. **En attente de la 2ᵉ vague Bam2Beta** — le pipeline
-écrivait encore à 12h16.
+Tâche terminée de bout en bout : ajout de `qc.reads_with_cpg`/`reads_with_cpg_pct` (schema v25) +
+alimentation ponctuelle des 4 champs 28M/CpG depuis un backfill TSV rétrospectif
+(`/scratch/boris/nb_read_28M/nb_reads_28M.tsv`). Export gsheet fait, doc (README Table 11 + CLAUDE.md)
+et mémoire à jour, commit pushé.
 
 ## Ce qui marche / ce qui foire
-- ✓ 279 lignes Bladder_Blood en base = 58 bases × niveaux applicables (0 manquant vérifié
-  sample par sample). Export **2962 lignes × 20 col** relu depuis la gsheet en valeurs brutes.
-- ✓ 2ᵉ passage (12h26) : **84 valeurs gagnées** — `mVAF v1.4` et `Props Bootstrap` désormais
-  **279/279**, exclusivement sur 10M (23) et 20M (19). Boris avait raison sur l'avancement.
-- ✗ `PROD` reste **KO sur 269** : aucun dossier `QC/CNV/Fragmentomics/IV/ichorCNA` produit,
-  10M et 20M compris. Donc `Depth`, `Coverage`, `Ratio %`, `IchorCNA`, `Mode1/2`,
-  `Frag Score v2`, `mVAF v1/v2/v1.3` à `NA`.
-- ⚠ `Nb reads total` affiche **`0,00`** (pas `NA`) sur ces 269 — faux zéro à ne pas lire
-  comme un comptage.
-- ⚠ Piège de contrôle : `COUNT(colonne)` ne détecte pas les changements sur les VARCHAR où
-  `'NA'`/`'KO'` comptent comme valeurs. Le bon contrôle est le **diff contre le backup**
-  (`ATTACH ... AS old (READ_ONLY)`), qui seul a révélé les 84 modifications.
-- ⚠ Les 41 `mVAF v1.4 = 0,0000` sont **légitimes** (vrais négatifs + convergence) : sur les 21
-  pseudo-samples à parent nul, 2/21 sont à zéro à 1M contre 11/19 à 20M. Une mVAF non nulle
-  à 1M/2M ne prouve pas une détection.
-- ○ Ouvert, non traité : **12 `Bladder_Urine` sur 95** sans `mvaf_v14` dans `retd_suivis`
-  (proposé à Boris, pas de réponse).
+- ✓ 1332/1506 lignes du TSV alimentées (819 CGFL + 513 HCL liquid) — vérifié sample par sample
+  (Bladder_Blood_01_101, Healthy_826, Lung_9 CGFL/HCL homonyme, Lung_1_rebasecalled) : brut et %
+  identiques au TSV/formule attendue
+- ✓ Export `export-qc` → onglet 'QC read' : 1362 lignes, 16 colonnes, contrôle croisé TSV local OK
+- ○ Exclus volontairement, sans écriture : 147 solid CGFL (table `qc` structurellement liquid-only)
+  + 27 liquid CGFL `Bladder_Urine_02_*` (jamais passés par `check-qc`, donc pas de `reads_total`)
+- ○ `checkers_qc.py`/`check-qc`/`update-column` volontairement PAS câblés sur ces 2 champs — décision
+  explicite de Boris (pas de procédure automatisée tant que Bam2Beta ne publie pas ces comptages)
 
 ## Prochaine étape
-Attendre que `QC/` apparaisse — repère :
-`aws s3 ls s3://aima-bam-data/processed/MRD/RetD/liquid/CGFL_rarefaction/Bladder_Blood_02_094_20M/ --profile scw`
-Dès que `QC/`, `CNV/`, `Fragmentomics/`, `IV/`, `ichorCNA/` s'y ajoutent : relancer
-`check-rarefaction CGFL` ciblé sur `WHERE prod_status_rarefaction='KO'` (269, ~20 min, tmux)
-puis `export-rarefaction`. C'est le passage qui bascule les 269 en `PROD OK`.
+Aucune action immédiate requise — tâche fermée. Si Boris veut compléter les 27 `Bladder_Urine_02_*` :
+lancer `check-qc liquid CGFL` dessus (remplit `reads_total`), puis rejouer une alimentation ciblée
+depuis `nb_reads_28M.tsv` pour ces 27 seulement. Câblage du vrai checker (`QCChecker`) = tâche séparée,
+à faire quand Bam2Beta publiera nativement `Preprocess_28M`/CpG.
+
+⚠ Ce snapshot remplace celui du 14/08 (rarefaction Bladder_Blood, 2ᵉ vague Bam2Beta) — sujet non
+retraité dans cette session, statut inconnu à ce jour si toujours pertinent.
