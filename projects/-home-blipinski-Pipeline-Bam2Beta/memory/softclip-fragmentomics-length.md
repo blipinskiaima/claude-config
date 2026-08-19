@@ -9,6 +9,13 @@ metadata:
 
 # Soft clipping & calcul de longueur fragmentomique (module FRAG)
 
+> ⚠ **CETTE FICHE DECRIT L'ETAT v1 (2026-06-01). LE CODE A MIGRE 4 JOURS PLUS TARD.**
+> `frag.nf` retire desormais les soft clips (`q - ls - ts`, CIGAR parse dans l'awk) ; la ligne
+> `cut -f10 | awk '{print length($0)}'` est **commentee** dans le code actuel. La recommandation
+> « NE PAS migrer » ci-dessous a donc ete **renversee** par la V1.3.2 du 2026-06-05
+> (fragmentomics v2 softclip-removed, `Fragmentomics/filtered_softclipped/`) — voir
+> [[mvaf-v1-3-frag-v2]]. L'analyse empirique du soft clipping qui suit reste valable telle quelle.
+
 **Fait** : `workflow/frag.nf:50-51` extrait la longueur des fragments via
 `samtools view -F 3840 -L bed_fragmentomics | cut -f10 | awk '{print length($0)}'`
 = **`length(SEQ)`** (longueur du read brut, **soft clips INCLUS**). Pas le span de

@@ -90,4 +90,10 @@ soft-clips », alors que les figures 1-2 utilisent `length(SEQ)` **brut**. Cet e
 preexistait ; il explique aussi pourquoi les donnees de `bin/length_distribution/` ne
 correspondent a aucune de ces extractions — elles viennent de `read_lengths.csv`.
 
-Voir [[qc-palier1-candidats-ecartes]] et [[n50-ratio-qc]].
+## Onglet « Nb reads mapped » — partie 3 remplie le 2026-08-19
+
+La partie 3, restee un placeholder « investigation en cours » depuis l'origine, a ete **remplie** : distribution des populations 28M et CpG, tableau recapitulatif 7x8, 2 figures matplotlib, bloc « Ce que cette partie etablit ». Titre renomme `Partie 3 — Distribution des populations 28M et CpG sur la cohorte` (calque sur la partie 5). L'onglet passe de **16 986 a 20 991 caracteres**, 12 -> 14 images.
+
+⚠ **Le texte insere herite du style du paragraphe d'ancrage** : insere avant un `HEADING_2`, tout le corps est sorti en titre. Corriger apres coup par `updateParagraphStyle` (`NORMAL_TEXT` sur toute la plage, puis `HEADING_3` sur les titres).
+
+Voir [[reads-28m-cpg-counting]], [[qc-palier1-candidats-ecartes]] et [[n50-ratio-qc]].

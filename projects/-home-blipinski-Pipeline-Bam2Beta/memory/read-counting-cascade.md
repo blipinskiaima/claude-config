@@ -73,7 +73,7 @@ relie les deux — c'est pourquoi `mapped` ne peut pas s'inserer dans la cascade
 | `nb_reads_total` | `QC/Samtools/{ID}.nb_reads_total.tsv` → `metadata.json` |
 | `num_alignments` / `num_reads` | `QC/Cramino/{ID}.merged.cramino.tsv` (col 4 / col 6) |
 | FRAG | `QC/Samtools/{ID}.nb_reads_total_filtered_softclipped.tsv` — doublon strict de `wc -l` sur `Fragmentomics/filtered_softclipped/{ID}.read_lengths.csv` |
-| `Preprocess_28M` | **nulle part** — 22 executions (1/chromosome), jamais publie. ⚠ Le F du schema (29 270 700 pour Lung_9) a ete **calcule a la main** (`samtools view -c -q 20 -F 3844` sur chr1-22), ce n'est PAS une sortie du pipeline. **TODO** : publier ce comptage (todo-optimisation, basse prio) |
+| `Preprocess_28M` | **nulle part directement**, mais **reconstituable a +-0,002 %** depuis `EXTRACT_FULL_28M` : `uniq(read_id) + skipped` du log modkit — voir [[reads-28m-cpg-counting]]. 22 executions (1/chromosome), jamais publie. ⚠ Le F du schema (29 270 700 pour Lung_9) a ete **calcule a la main** (`samtools view -c -q 20 -F 3844` sur chr1-22), ce n'est PAS une sortie du pipeline. **TODO** : publier ce comptage (todo-optimisation, basse prio) |
 | **A** non alignees | `QC/Samtools/{ID}.idxstats.tsv` — **ajoute le 2026-08-11**, retrospectif sur les 1471 samples + `BAM_Count` modifie pour les runs futurs |
 
 ⚠ Ancien nommage sur les runs anciens : `{ID}.cramino.tsv` sans le `.merged`.
@@ -121,7 +121,7 @@ Alimentee par `QCChecker` (`lib/checkers_qc.py`, 140 l.) qui lit **4 fichiers de
 deduit le reste par soustraction — aucune lecture de BAM. CLI `check-qc liquid {labo}`.
 
 - Verifie : `A + B + C + D = reads_total` sur **1324/1324**, sans une exception.
-- `reads_28m` et `reads_mapq_lt20` sont **NULL 1332/1332** — Preprocess_28M ne publie rien.
+- `reads_28m` est **rempli 1332/1332 depuis le 2026-08-19** (backfill retrospectif, [[reads-28m-cpg-counting]]) ; `reads_mapq_lt20` reste NULL. Schema **v25** : ajout de `reads_with_cpg` + `reads_with_cpg_pct`.
 - ⚠ **`QCChecker` lit cramino par NOM d'en-tete**, alors que `BaseChecker.get_cramino_reads`
   (colonnes historiques) lit une **position fixe** (`cut -f 6`). Deux conventions dans le meme
   fichier. Le pipeline lui aussi lit par position ([rapport.nf:45]).

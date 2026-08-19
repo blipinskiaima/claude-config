@@ -1,45 +1,62 @@
-# Context — Bam2Beta — 2026-08-19T08:06:32+00:00
+# Context — Bam2Beta — 2026-08-19T17:18:00+00:00
 
 **Branche** : main
 **Dernier commit** : b2d5401 — docs(QC): manuel d'utilisation du duo ratio N50/N75 x masse > 1 kb
-**Status** : 7 fichiers modifiés/non suivis, aucun de cette session (lanceurs dev/SCW édités à la main, PDF, notes)
+**Status** : 8 fichiers non commités — tous PRÉEXISTANTS (dev/SCW/*.sh modifiés + 6 non trackés),
+aucun n'est de ces sessions
 
 ## Où j'en suis
-Onglet **`On site`** du Google Doc QC rempli avec **deux parties complètes** : *Nombre de reads*
-(définitions, état des lieux 1 324 liquides, synthèse, ouverture) et *Ratio N50/N75 et masse
-d'ADN long* (mêmes 3 sections, recensement au format `Lung_Alc`). 5 figures en place.
-Aucune modification de code : la session a porté sur l'analyse trace-prod et la rédaction.
+
+**Deux chantiers du QC palier 1 menés en parallèle, aucun code pipeline modifié.**
+
+**(A) Comptage `Preprocess_28M`** — la population, jusque-là absente de toute sortie, est
+désormais **reconstituable à ±0,002 %** depuis `EXTRACT_FULL_28M` (`uniq(read_id) + skipped` du
+log modkit). Backfill des 1 506 samples terminé, 100 % OK. La partie 3 du Google Doc (onglet
+`Nb read mapped`), placeholder depuis l'origine, est remplie et publiée.
+
+**(B) Fano (indice de dispersion)** comme critère QC, dans le prolongement de
+`docs/QC-seuils-biopsie-liquide.md`. Run cohorte **terminé** : 1 344/1 346 liquides mesurés sur
+le périmètre EPIC. Matériel dans `/scratch/boris/depth_fano/`, findings dans
+[[fano-couverture-qc]].
 
 ## Ce qui marche / ce qui foire
-- ✓ **Backfill 28M TERMINÉ** — 1 506/1 506 samples, tous `OK`, 38,3 G reads. `/scratch/boris/nb_read_28M/nb_reads_28M.tsv`
-- ✓ Méthode validée : `uniq(read_id extract_full) + skipped(log modkit)` = comptage exact à **0,002 %** (vérifié Healthy_826 et Lung_9)
-- ✓ **Second critère QC refondu** : le seuil `reads_primary_mapped ≥ 4 M` est remplacé par `% reads non alignées > 70 %` (intervalle vide de 33 pts, 10 samples, tous urines)
-- ✓ Outillage Google Doc réutilisable dans `/scratch/boris/qc_onsite/` (lecture par onglet, insertion, remplacement de chaînes exactes, remplacement d'images)
-- ✓ **Chargé en base par une session parallèle** — trace-prod **schema v25** (19/08 08:36) : `qc.reads_28m` et le nouveau `qc.reads_with_cpg` sont **1332/1332 non-NULL** (étaient 0)
-- ✗ Le tableau de recensement redit l'axe Comptages déjà traité dans la partie 1 (choix assumé, format `Lung_Alc`)
-- ✗ Aucune figure sur la partie Ratio (croisement ratio × masse et arbre de décision non régénérés)
+
+**(A) Comptage 28M**
+- ✓ Méthode validée sur 2 samples contre `samtools` (Healthy_826 +5, Lung_9 −649 sur 29,3 M)
+- ✓ `uniq` sans tri suffit (22/22 chromosomes) → backfill en streaming, `bgzip -@4` −31 %
+- ✓ `nb_reads_28M.tsv` : 1 506 samples, 100 % OK, dans `/scratch/boris/nb_read_28M/`
+- ✓ Partie 3 publiée : texte + tableau 7×8 + 2 figures, onglet 16 986 → 20 991 car.
+- ✗ `Preprocess_28M` ne publie toujours rien dans le pipeline — la reconstitution est un
+  contournement, pas un correctif
+
+**(B) Fano**
+- ✓ **1re métrique du palier 1 à passer le critère de succès** : 48 outliers Tukey (seuil 1,320)
+  sur le périmètre EPIC, dont **47 invisibles** aux seuils 5 M reads / 0,25× — 35 plasmas, 13 urines
+- ✓ Confondants **écartés** : CNV (r = −0,020, outliers à `score_cnv` médian 0,00 contre 4,28),
+  longueur/N50 (+0,050), reads (+0,065)
+- ✓ Reproductibilité vérifiée : `Breast_8` et `Breast_8_rebasecalled_V5` à 0,008 près
+- ✗ **Fano génomique brut inutilisable** — les satellites à 23 130× écrasent la variance, il
+  classe `Lung_9` (propre) pire que l'urine aberrante
+- ✗ `corr(EPIC, génomique) = +0,811` : le proxy gratuit dit presque la même chose →
+  **l'apport réel du run EPIC n'est pas démontré**
+- ✗ `corr(EPIC, depth) = +0,445` subsiste → travailler sur un résidu, pas la valeur brute
+- ✗ `--use-median` écarté (7 valeurs distinctes à 2×) · 2 samples manquants
+  (`HCL__Colon_14`, `CGFL__Lung_Alc_74_av`, per-base absents sur S3)
+
+**Transverse — 3 items du palier 1 restent ouverts**
+- ✗ Les 4 plasmas HCL (mécanisme non établi, impacte la `depth` publiée donc le seuil 0,25×)
+- ✗ Le seuil 4 M du contributif « à creuser »
+- ✗ Le renommage `nb_reads_aligned` → `nb_reads_primary` (breaking change trace-platform / Tower)
 
 ## Prochaine étape
-Écrire la **partie 3 de l'onglet `Nb reads mapped`**, restée vide : « proportion de reads
-utilisés pour la mVAF 1.4 vs nombre total ». Les données sont désormais en base (v25), le
-verrou est levé — restent aussi à lever les deux mentions « NON MESURÉ » des parties 4 et 5.
-Repère mesuré sur Lung_9 : 29,3 M reads dans le BAM 28M dont **19,2 M portent au moins un CpG**
-(65,4 %), soit **43,2 %** des 44,4 M lignes du BAM d'origine.
 
-## Session intermédiaire (17/08)
-Recensement QC de la cohorte **Lung_Alc CGFL** (226 échantillons) croisant trace-prod
-(`qc_metrics`+`qc`) et les grilles déjà écrites dans les onglets QC — publié dans un nouvel
-onglet dédié **`Lung_Alc`** (`t.zdeivtsmvstg`) du même Google Doc. 94,2 % conformes sur les deux
-axes. Détail : [[lung-alc-qc-recensement]] (mémoire projet Bam2Beta).
+**Priorité** : les **4 plasmas HCL** — seul point ouvert capable d'invalider un rendu existant.
 
-## Chantiers ouverts hérités (snapshot du 14/08)
-- **4 plasmas HCL** `Colon_49/51/58`, `Lung_122` : 17-24 % de lignes supplémentaires mesurées
-  sur génome entier, non-alignement normal 6-7 %. Non tranché : palindromes vs concatémères —
-  `reads_supplementary` dit qu'elles sont en excès, pas **où** les morceaux retombent. Enjeu :
-  `mosdepth` ne filtre pas les supplémentaires, le seuil de rendu 0,25× en dépend.
-- **ECBU + délai avant congélation** des 8 urines à forte charge bactérienne — trancherait
-  infection vs prolifération post-prélèvement. À demander au biologiste.
-- **Renommage `nb_reads_aligned` → `nb_reads_primary`** dans `metadata.json` : breaking change
-  pour `trace-platform/check_platform.py` et Aima-Tower. Documenté, jamais engagé.
-
-Matériel du chantier reads non alignés : `/scratch/boris/unmapped` (29 Go, index Kraken2 inclus).
+Sinon, au choix :
+- **(A)** publier le comptage dans `Preprocess_28M` (`samtools idxstats` sur le BAM déjà indexé
+  + `collectFile()`, addition pure mais re-run complet du 28M en qualification) ;
+- **(B)** comparer les **listes d'outliers** Fano EPIC et génomique : si elles se recouvrent
+  entièrement, garder le proxy génomique (gratuit, déjà calculé) et clore la piste. Piste
+  secondaire : les outliers sont **×2,1 enrichis en `score_cnv` = 0** (55,9 % contre 26,9 %) —
+  tester si les samples à CNV nul ont un Fano supérieur à profondeur comparable, le sens de la
+  flèche n'étant pas établi.
