@@ -4,7 +4,7 @@ description: "Google Doc 'QC' onglet Ratio N50/N75 — document de restitution d
 metadata: 
   node_type: memory
   type: reference
-  modified: 2026-08-12T10:57:05.569Z
+  modified: 2026-08-17T14:13:54.269Z
   originSessionId: b56b0f4a-9a7a-4318-bb95-549d981af39e
 ---
 
@@ -12,8 +12,10 @@ metadata:
 
 <https://docs.google.com/document/d/1X1KxOCR-eHRU04R3eSfyTlxa_C47R114pCw_BkoUHwQ/edit?tab=t.w79cz9osn5oa>
 
-Document de restitution du travail QC. 4 onglets : **Ratio N50/N75** (`t.w79cz9osn5oa`),
-Nb reads mapped, List_Of_Features, Figure du pipeline.
+Document de restitution du travail QC. **5 onglets depuis le 2026-08-17** : **Ratio N50/N75**
+(`t.w79cz9osn5oa`), Nb reads mapped (`t.8yj4pfggwlai`), List_Of_Features (`t.0`), Figure du
+pipeline (`t.8zlmqz7ccpjt`), **Lung_Alc** (`t.zdeivtsmvstg`, cree par Boris le 2026-08-17 —
+voir [[lung-alc-qc-recensement]]).
 
 **Etat au 2026-08-12 fin de journee** : l'onglet Ratio a ete **entierement reecrit** — il compte
 **10 sections, 10 figures, 7 tableaux et 3 listes nominatives**, ~24 900 caracteres.
@@ -30,11 +32,29 @@ posteriori · 8 **qui tombe hors zone verte** (4 tableaux : zone rouge, grise, v
 ⚠ Sous les tableaux des 3 zones : **liste nominative complete** des echantillons (nom + ratio),
 en corps 8 pt gris. 65 / 32 / 7 entrees.
 
-## Acces
+## Acces — corrige le 2026-08-17
 
-API Google Docs v1 avec les credentials **gspread** (`~/.config/gspread/authorized_user.json`,
-via `~/.claude/skills/qara-tower/scripts/qara_lib.py`). **`includeTabsContent=true` est
-obligatoire** — sans ce parametre l'API ne renvoie aucun onglet.
+API Google Docs v1 avec les credentials **gspread** (`~/.config/gspread/authorized_user.json`).
+**`includeTabsContent=true` est obligatoire** — sans ce parametre l'API ne renvoie aucun onglet.
+
+⚠ **`googleapiclient` (`google-api-python-client`) n'est PAS installe** — verifie par `find /`,
+zero resultat, et il n'existe aucun venv dans `~/Pipeline/*/`. `from googleapiclient.discovery
+import build` echoue donc toujours. **Ne pas installer** : `gspread` 6.2.1 est dans
+`~/.local/lib/python3.12/site-packages/` et apporte `google.oauth2.credentials` +
+`google.auth.transport.requests`, ce qui suffit a rafraichir le token et a appeler l'API REST
+directement avec `requests` (`https://docs.googleapis.com/v1/documents/{id}` et `:batchUpdate`).
+
+⚠ **`qara_lib.py` ne porte AUCUNE logique Docs** — seulement la constante `GSPREAD_CREDS`.
+L'ancienne formulation de cette fiche (« via qara_lib.py ») etait trompeuse.
+
+⚠ **Scopes du token : `spreadsheets` + `drive` uniquement, PAS `documents`.** Le scope `drive`
+suffit neanmoins a l'API Docs, en lecture **comme en ecriture** (verifie le 2026-08-17).
+
+⚠⚠ **`tabId` est OBLIGATOIRE dans chaque `Location` et chaque `Range` d'un `batchUpdate`** sur ce
+document multi-onglets. Omis, l'ecriture part dans le **premier onglet** (`Ratio N50/N75`, 27 084
+caracteres) — risque de corruption silencieuse du plus gros onglet. Garde-fou a reproduire : une
+fonction `batch_update` qui **leve une exception** si une requete contient `deleteContentRange`,
+`replaceAllText`, `deleteTableRow`… (cf. [[feedback_gdoc_no_overwrite]]).
 
 Outillage python (scratchpad de session, a recreer si besoin) : `read_gdoc.py` (lecture),
 `locate_images.py` (position des images inline + legende suivante), `make_figs.py` (les 5

@@ -1,0 +1,1 @@
+- [cfdnalab install & gotchas](cfdnalab_install.md) — Miniforge+cargo install done; ONT BAMs need --reads-are-fragments or silent 0-fragment output

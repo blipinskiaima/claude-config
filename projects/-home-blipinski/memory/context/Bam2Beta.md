@@ -15,11 +15,25 @@ Aucune modification de code : la session a porté sur l'analyse trace-prod et la
 - ✓ Méthode validée : `uniq(read_id extract_full) + skipped(log modkit)` = comptage exact à **0,002 %** (vérifié Healthy_826 et Lung_9)
 - ✓ **Second critère QC refondu** : le seuil `reads_primary_mapped ≥ 4 M` est remplacé par `% reads non alignées > 70 %` (intervalle vide de 33 pts, 10 samples, tous urines)
 - ✓ Outillage Google Doc réutilisable dans `/scratch/boris/qc_onsite/` (lecture par onglet, insertion, remplacement de chaînes exactes, remplacement d'images)
-- ✗ **`reads_28m` toujours NULL 1332/1332 en base** — le TSV du backfill n'a pas encore été chargé dans trace-prod
+- ✓ **Chargé en base par une session parallèle** — trace-prod **schema v25** (19/08 08:36) : `qc.reads_28m` et le nouveau `qc.reads_with_cpg` sont **1332/1332 non-NULL** (étaient 0)
 - ✗ Le tableau de recensement redit l'axe Comptages déjà traité dans la partie 1 (choix assumé, format `Lung_Alc`)
 - ✗ Aucune figure sur la partie Ratio (croisement ratio × masse et arbre de décision non régénérés)
 
 ## Prochaine étape
-Charger `nb_reads_28M.tsv` dans la colonne `qc.reads_28m` de trace-prod, ce qui débloque la
-partie 3 vide de l'onglet `Nb reads mapped` (proportion de reads utilisés pour la mVAF 1.4) et
-les deux mentions « NON MESURÉ » des parties 4 et 5.
+Écrire la **partie 3 de l'onglet `Nb reads mapped`**, restée vide : « proportion de reads
+utilisés pour la mVAF 1.4 vs nombre total ». Les données sont désormais en base (v25), le
+verrou est levé — restent aussi à lever les deux mentions « NON MESURÉ » des parties 4 et 5.
+Repère mesuré sur Lung_9 : 29,3 M reads dans le BAM 28M dont **19,2 M portent au moins un CpG**
+(65,4 %), soit **43,2 %** des 44,4 M lignes du BAM d'origine.
+
+## Chantiers ouverts hérités (snapshot du 14/08)
+- **4 plasmas HCL** `Colon_49/51/58`, `Lung_122` : 17-24 % de lignes supplémentaires mesurées
+  sur génome entier, non-alignement normal 6-7 %. Non tranché : palindromes vs concatémères —
+  `reads_supplementary` dit qu'elles sont en excès, pas **où** les morceaux retombent. Enjeu :
+  `mosdepth` ne filtre pas les supplémentaires, le seuil de rendu 0,25× en dépend.
+- **ECBU + délai avant congélation** des 8 urines à forte charge bactérienne — trancherait
+  infection vs prolifération post-prélèvement. À demander au biologiste.
+- **Renommage `nb_reads_aligned` → `nb_reads_primary`** dans `metadata.json` : breaking change
+  pour `trace-platform/check_platform.py` et Aima-Tower. Documenté, jamais engagé.
+
+Matériel du chantier reads non alignés : `/scratch/boris/unmapped` (29 Go, index Kraken2 inclus).
