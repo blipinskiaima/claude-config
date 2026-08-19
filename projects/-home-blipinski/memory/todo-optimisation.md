@@ -48,7 +48,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Sécurité secrets — étape 2** : installer `gitleaks` en pre-commit hook sur les projets gittés.
 - [ ] **Sécurité secrets — étape 3** : évaluer un gestionnaire de secrets (sops, age, vault).
 - [ ] **Skills Pod2Bam** — créer test/qualif/maj analogues à Bam2Beta. Pas urgent tant que Pod2Bam n'est pas soumis à audit qualité.
-- [ ] **Bam2Beta — publier le comptage `Preprocess_28M`** — le process tourne **22×/run** sans jamais publier de comptage, dernier étage de la cascade invisible (`MAPQ<20` s'en déduit). Un `samtools view -c -q 20 -F 3844` suffirait.
+- [ ] **Bam2Beta — publier le comptage `Preprocess_28M`** — le process tourne **22×/run** sans jamais publier de comptage, dernier étage de la cascade invisible (`MAPQ<20` s'en déduit). Un `samtools view -c -q 20 -F 3844` suffirait. **Contourné le 2026-08-19** par un backfill rétrospectif (`/scratch/boris/nb_read_28M/`, 1 506 samples chargés en base v25), mais le pipeline reste muet à chaque run — la tâche porte sur la publication, pas sur la valeur.
 
 ---
 
@@ -59,6 +59,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-08-19 — Bam2Beta : onglet On site du Google Doc QC · comptage rétrospectif Preprocess_28M
+
+- [x] **Onglet On site — partie Nombre de reads** — 4 sections + 5 figures publiées : les 5 comptages définis, état des lieux sur 1 324 liquides, synthèse. Second critère QC refondu : le seuil `reads_primary_mapped ≥ 4 M` est remplacé par `% de reads non alignées > 70 %` (intervalle vide de 33 pts, 10 samples, tous urines).
+- [x] **Onglet On site — partie Ratio N50/N75** — 3 sections, recensement au format `Lung_Alc` (6 cas × cohorte / statut / matrice) + les 10 prélèvements hors nominal. La matrice sépare (97,3 % des plasmas nominaux contre 8,6 % des urines), le statut non (329/329 healthy nominaux).
+- [x] **Comptage rétrospectif `Preprocess_28M`** — méthode `uniq(read_id extract_full) + skipped(log modkit)`, exacte à **0,002 %** vs `samtools` (Healthy_826 et Lung_9). Backfill des 1 506 samples, chargé en base par session parallèle (trace-prod v25). ⚠ Le pipeline ne publie toujours rien.
 
 ## 2026-08-14 — Bam2Beta : manuel QC ratio N50/N75 × masse · origine des reads non alignés des urines · trace-prod : lot Bladder_Blood en rarefaction
 
