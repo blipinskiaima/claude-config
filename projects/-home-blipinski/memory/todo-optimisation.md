@@ -66,6 +66,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Onglet On site — partie Ratio N50/N75** — 3 sections, recensement au format `Lung_Alc` (6 cas × cohorte / statut / matrice) + les 10 prélèvements hors nominal. La matrice sépare (97,3 % des plasmas nominaux contre 8,6 % des urines), le statut non (329/329 healthy nominaux).
 - [x] **Comptage rétrospectif `Preprocess_28M`** — méthode `uniq(read_id extract_full) + skipped(log modkit)`, exacte à **0,002 %** vs `samtools` (Healthy_826 et Lung_9). Backfill des 1 506 samples, chargé en base par session parallèle (trace-prod v25). ⚠ Le pipeline ne publie toujours rien.
 - [x] **Recensement QC — cohorte Lung_Alc CGFL** — 226 échantillons croisés (trace-prod × onglets QC), publiés dans un nouvel onglet dédié `Lung_Alc` du Google Doc QC. 94,2 % conformes sur les deux axes ; 3 des 6 cas de la grille croisée ratio × masse vides. Détail : `lung-alc-qc-recensement.md`.
+- [x] **trace-prod schema v25 — qc.reads_with_cpg** — 2 colonnes ajoutées (`reads_with_cpg`/`_pct`) + alimentation ponctuelle des 4 champs 28M/CpG sur 1332/1506 samples liquid (exclus : 147 solid + 27 sans `check-qc`), export gsheet 'QC read' (1362×16). Doc : nouvelle section README (table `qc` jamais documentée depuis v23) + CLAUDE.md v25 ; pas de checker permanent câblé (décision explicite).
 
 ## 2026-08-14 — Bam2Beta : manuel QC ratio N50/N75 × masse · origine des reads non alignés des urines · trace-prod : lot Bladder_Blood en rarefaction
 
