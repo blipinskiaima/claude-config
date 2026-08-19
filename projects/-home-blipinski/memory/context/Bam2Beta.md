@@ -26,6 +26,12 @@ verrou est levé — restent aussi à lever les deux mentions « NON MESURÉ » 
 Repère mesuré sur Lung_9 : 29,3 M reads dans le BAM 28M dont **19,2 M portent au moins un CpG**
 (65,4 %), soit **43,2 %** des 44,4 M lignes du BAM d'origine.
 
+## Session intermédiaire (17/08)
+Recensement QC de la cohorte **Lung_Alc CGFL** (226 échantillons) croisant trace-prod
+(`qc_metrics`+`qc`) et les grilles déjà écrites dans les onglets QC — publié dans un nouvel
+onglet dédié **`Lung_Alc`** (`t.zdeivtsmvstg`) du même Google Doc. 94,2 % conformes sur les deux
+axes. Détail : [[lung-alc-qc-recensement]] (mémoire projet Bam2Beta).
+
 ## Chantiers ouverts hérités (snapshot du 14/08)
 - **4 plasmas HCL** `Colon_49/51/58`, `Lung_122` : 17-24 % de lignes supplémentaires mesurées
   sur génome entier, non-alignement normal 6-7 %. Non tranché : palindromes vs concatémères —
