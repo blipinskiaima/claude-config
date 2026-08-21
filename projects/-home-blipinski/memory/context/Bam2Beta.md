@@ -1,33 +1,41 @@
-# Context — Bam2Beta — 2026-08-21T08:40:17+00:00
+# Context — Bam2Beta — 2026-08-21T09:15:00+00:00
 
 **Branche** : main
-**Dernier commit** : b2d5401 — docs(QC): manuel d'utilisation du duo ratio N50/N75 x masse > 1 kb
-**Status** : 16 fichiers non propres — dont une feature `--MVAF15_RETRO` (mVAF v1.5)
-écrite le 20/08 dans une AUTRE session, non commitée. Rien de cette session dans le dépôt.
+**Dernier commit** : 983af28 — feat(mvaf): mVAF v1.5 — correction par la couverture EPIC
+**Status** : 7 fichiers non propres, tous PRÉEXISTANTS (2 dev/SCW/*.sh + 5 non trackés)
 
 ## Où j'en suis
-Onglet **Synthèse** du Google Doc QC (`t.bw3qo6n8aizg`) construit de bout en bout :
-5 QC liquid chiffrés sur 1 324 échantillons, 5 sous-onglets, arbres de décision en
-figures matplotlib, tableaux croisés matrice/statut. Le doc est dans un état livrable.
+
+**Deux chantiers ouverts, sans rapport entre eux.**
+
+**(A) mVAF v1.5 — COMMITÉE** (`983af28`). Nouveau score = v1.4 corrigée par la couverture
+EPIC (`raima::transfo_mvaf_by_cov`, raima 0.5.4). Voie standard + voie rétro
+`--MVAF15_RETRO`, validées identiques sur `Healthy_826`. Boris a lancé un batch CGFL liquid.
+
+**(B) Google Doc QC — onglet Synthèse livrable** (session parallèle du 21/08 au matin) :
+5 QC liquid chiffrés sur 1 324 échantillons, 5 sous-onglets, arbres de décision.
 
 ## Ce qui marche / ce qui foire
-- ✓ Onglet Synthèse **en paysage** (seul des 14), 2 flowcharts : version **Exis** puis
-  version **Thémélio** — elles ne diffèrent que par `NON PLASMATIQUE` (jaune / rouge)
-- ✓ 5 sous-onglets alignés sur l'arbre principal : libellés, code couleur, QC3 simplifié
-  en une question à 3 sorties
-- ✓ Tableaux croisés **plasma/urine** et **healthy/cancer**, % avec dénominateur explicite
-  en **prélèvements** (981 / 81 / 232 / 830 — pas en lignes)
-- ✓ Cascade d'exclusion en fin d'onglet : 72 / 7 / 48 / 6 / 1 = **134 lignes écartées**,
-  + tableau nominatif des 104 prélèvements
-- ✓ Outillage Docs dans le scratchpad : garde-fous `tabId` obligatoire, refus des requêtes
-  destructrices sauf opt-in, vérification d'intégrité avant toute suppression
-- ✗ **Aucun QC n'est implémenté** — ni en base, ni dans le pipeline, ni dans
-  `check-run-output.sh`. Le doc est une recommandation de lecture
-- ✗ « Zone grise » subsiste **15× dans le Deep Dive**, 1× dans Lung_Alc, 1× dans On site —
-  Boris a explicitement dit d'y toucher plus tard
-- ✗ Les 2 figures de l'onglet Synthèse **n'ont aucun titre** dans l'image ; seuls les
-  libellés « Exis : » / « Thémélio : » du texte les distinguent
+
+**(A) mVAF v1.5**
+- ✓ V1.5 standard vs rétro : `cmp` identiques · V1.4 vs QUALIF V2.2.0 : `cmp` identiques
+- ✓ 200 scores bootstrap du jour == ceux de juillet → bootstrap déterministe confirmé
+- ✓ Triple garde anti-écrasement testée (2e passage → `WARN`, aucun écrasement)
+- ✗ **`raima:0.5.4` est LOCALE, non poussée** — le pipeline commité ne tourne que sur
+  cette machine. Boris s'en occupe plus tard
+- ✗ **Jamais testé en régime normal** : `Healthy_826` n'a que 6 561 reads EPIC et sature
+  la correction (0,58 → 1,1e-06). Chercher un sample à 2-5 M reads EPIC
+- ✗ Le nombre de samples ayant un `/BOOTSTRAP` sur S3 n'a **pas été compté**
+
+**(B) Google Doc QC**
+- ✓ Onglet Synthèse en paysage, 2 flowcharts (Exis / Thémélio), tableaux croisés
+- ✗ Aucun QC implémenté — ni en base, ni dans le pipeline, ni dans `check-run-output.sh`
+- ✗ « Zone grise » subsiste 15× dans le Deep Dive, 1× Lung_Alc, 1× On site
 
 ## Prochaine étape
-Aligner « zone grise » → « suspicion d'artefact » dans l'onglet Deep Dive (15 occurrences),
-en `replaceAllText` avec `tabsCriteria` et phrases entières.
+
+Au choix :
+- **(A)** vérifier le batch `--MVAF15_RETRO` CGFL liquid, puis tester la chaîne sur un
+  sample à 2-5 M reads EPIC ; pousser `raima:0.5.4` avant toute qualification
+- **(B)** aligner « zone grise » → « suspicion d'artefact » dans le Deep Dive
+  (15 occurrences), en `replaceAllText` avec `tabsCriteria` et phrases entières
