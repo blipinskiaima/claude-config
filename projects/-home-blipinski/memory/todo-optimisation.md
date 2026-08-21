@@ -60,6 +60,17 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-08-21 — Bam2Beta : onglet Synthèse du Google Doc QC — 5 QC liquid, arbres de décision en figures
+
+- [x] **Onglet Synthèse du Google Doc QC** — les 5 QC liquid chiffrés sur 1 324 échantillons, un sous-onglet par QC (définition, seuil, tableau des cas, arbre, listes nominatives). Périmètre 1 324 = liquid ∩ idxstats ; les 38 écartés sont **tous des urines CGFL**. 1 168 samples passent les 5 QC (88,2 %). Détail : `gdoc-synthese-qc.md`.
+- [x] **Seuil de non-alignement redéfini** — dénominateur passé à A+D (`reads_unmapped/reads_primary`, médiane 10,96 → 13,00 %) et seuil abaissé de 70 % à **30 %** : 20 samples au lieu de 10, dont **3 que ni le 5 M ni le 0,25× n'interceptent**. Le 30 % tombe dans un intervalle vide de 2,7 pts (28,97–31,65).
+- [x] **Trois métriques QC écartées pour apport net nul** — `reads_primary_mapped ≥ 4 M` (73 KO, **0 apport net**, le « 6 » de `qc-deux-niveaux` était mesuré sans la profondeur), non-alignement à 70 % (0 apport), MAD/Fano/28M/MITO. La cascade d'exclusion le confirme : profondeur + les 2 contaminations n'ajoutent que **14 exclusions sur 134**.
+- [x] **Six arbres de décision passés en figures** — ASCII remplacé par des PNG matplotlib 300 dpi. Aucun outil de diagramme n'était installable sans root (graphviz absent, D2 et Mermaid tirent un Chromium de 150-400 Mo pour du PNG). Arbre principal en 2 versions **Exis / Thémélio**, onglet passé en paysage — seul des 14 du document.
+
+## 2026-08-20 — trace-prod : schema v26 (mVAF v1.5)
+
+- [x] **trace-prod schema v26 — mVAF v1.5** — colonne `mvaf_v15` (retd_suivis, liquid), calque exact de `mvaf_v14` qu'elle **complète sans la remplacer** (v1.3/v1.4/v1.5 coexistent, gsheet col 14/15/16). Backfill **1 362 samples à 100 %**, 0 écart au contrôle croisé gsheet↔base ; v1.4 ≠ v1.5 sur 537 samples. Détails dans `~/.claude/projects/-home-blipinski-Pipeline-trace-prod/memory/project_schema_v26_mvaf_v15.md`.
+
 ## 2026-08-19 — Bam2Beta : onglet On site du Google Doc QC · comptage rétrospectif Preprocess_28M
 
 - [x] **Onglet On site — partie Nombre de reads** — 4 sections + 5 figures publiées : les 5 comptages définis, état des lieux sur 1 324 liquides, synthèse. Second critère QC refondu : le seuil `reads_primary_mapped ≥ 4 M` est remplacé par `% de reads non alignées > 70 %` (intervalle vide de 33 pts, 10 samples, tous urines).
