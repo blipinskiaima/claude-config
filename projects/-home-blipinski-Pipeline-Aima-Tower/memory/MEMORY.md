@@ -1,5 +1,11 @@
 # Aima Tower — Auto Memory
 
+## Docs externes read-only + réponses courtes (2026-08-21)
+Ne jamais modifier un Google Doc/document externe, même mineur, sans demande explicite pour ce doc précis (contexte : doc réglementaire QARA). Réponses courtes/simples par défaut, pas de synthèse à sections multiples sauf demande. Détails : [feedback_docs_readonly_and_brevity.md](feedback_docs_readonly_and_brevity.md)
+
+## Lecture Google Docs — API, pas navigateur (2026-08-21)
+Pour lire un Google Doc (y compris ses onglets internes) sans risque d'édition : API REST `docs.googleapis.com` + credentials OAuth `~/.config/gspread/authorized_user.json`, même pattern que `qara-tower/scripts/append_gdoc.py`. `includeTabsContent=true` + `tabProperties.tabId` garde son préfixe `t.` (ne pas stripper). Préférer ce chemin à claude-in-chrome pour tout service authentifié ayant déjà un script API dans le repo. Détails : [google_docs_api_read_access.md](google_docs_api_read_access.md) + [feedback_check_existing_access_patterns.md](feedback_check_existing_access_patterns.md)
+
 ## Bloc « Performance des produits » — Tableau de bord (2026-08-12)
 5 lignes entre les cartes système et le bento de `Home.tsx` : Exis global, Exis CRC/Lung/Pancreas, THEMELIO. **Aucun recalcul** — même endpoint `/api/competitive/comparaison` et même `pct()` (sorti de `AimaComparaison.tsx` vers `lib/comparaison.ts`) que le Profil AIMA. Seul ajout backend : `n_trace_prod` (via `database_service.get_stats()`), placé à la **racine** du payload car `_perfs_exis` est caché par (cible, cohorte). ⚠ **Piège** : la ligne Exis **globale** exclut vessie/TNE/Nuclear → 82,0 % contre 76,2 % sur `/exploration` aux mêmes réglages ; les 3 lignes par indication correspondent **exactement**. ⚠ La spécificité 95,1 % se répète sur les 4 lignes Exis : seuil unique sur les mêmes 224 sains, une « spécificité du CRC » n'existe pas. ⚠ Premier appel après redémarrage = ~5,5 s (skeleton, ne bloque pas la page) ; `compute.cache_clear()` ne simule PAS un démarrage à froid. Détails : [dashboard_bloc_produits.md](dashboard_bloc_produits.md)
 

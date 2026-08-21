@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: ccc47027-333b-40a9-a728-dd1f326dc446
-  modified: 2026-08-14T10:11:34.002Z
+  modified: 2026-08-21T16:57:05.990Z
 ---
 
 # QC N50/N75 — detecteur de contamination gDNA (2026-08-12)
@@ -72,6 +72,29 @@ Le passage a `sort` externe donne **2,7 s**, resultat identique.
 **1 324 TSV uploades sur S3** (811 CGFL + 513 HCL) dans `QC/Samtools/`, verifies par scan
 recursif. Le pipeline produit un fichier **identique octet par octet** (verifie sur
 `Healthy_826` et `Breast_6`). Aucun recalcul retrospectif necessaire.
+
+### Script de backfill — `dev/backfill_n50_ratio.sh` (2026-08-21)
+
+Le backfill d'origine etait un script jetable ecrit dans le scratchpad de session, **perdu a la
+purge de `/tmp`**. Reecrit et cette fois **dans le depot**. Usage :
+`bash dev/backfill_n50_ratio.sh <fichier_liste_ids> [LABO] [TYPE] [PARALLELISME]`.
+
+- Recalcule depuis `Fragmentomics/filtered_softclipped/{ID}.read_lengths.csv` deja sur S3 :
+  **le BAM n'est jamais stage** (le awk ne lit que le CSV). ~10 s/sample en serie, quelques
+  dizaines de Mo par CSV — donc parallelisable sans le risque disque des runs Nextflow.
+- Le bloc awk est la **copie exacte** de `Extract_read` ; commentaire en tete imposant de
+  reporter ici toute evolution de `frag.nf`. Validation avant usage : `cmp` identique aux TSV
+  du pipeline sur `Healthy_826` **et** `Breast_6`.
+- 3 gardes : skip si le TSV existe (jamais d'ecrasement), skip si le CSV manque, rejet si le
+  TSV ne fait pas exactement 2 lignes. `mktemp -d` nettoye par `trap`.
+- ⚠ En mode `xargs -P`, les compteurs OK/SKIP/KO doivent etre **derives de la sortie**
+  (`tee` + `grep -c`) : des variables incrementees dans les sous-shells sont perdues.
+
+**38 `Bladder_Urine_*` CGFL backfilles** (128 a 184) — vraisemblablement les 38 ecartes du
+perimetre des 1 324 de [[gdoc-synthese-qc]]. 38/38 OK, 0 KO. Repartition **3 A / 5 B / 30 C** :
+79 % en zone C, au-dela meme des 71,6 % attendus pour de l'urine. Cas extreme `..._172`
+(ratio 2,10 -> 1,77 filtre, **43,8 % de masse > 1 kb**), en defaut sur les deux axes de la
+grille croisee. Leur entree en base deplacera les statistiques de la cohorte urinaire.
 
 ## Non traite
 

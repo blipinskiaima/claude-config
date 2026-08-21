@@ -1,13 +1,19 @@
 ---
-name: mvaf-v1.5
+name: mvaf-v1-5
 description: "mVAF v1.5 = v1.4 corrigee par la couverture EPIC (raima 0.5.4) — process standard + MVAF15_RETRO, unite en millions, non-regression V1.4 prouvee"
-metadata:
+metadata: 
   node_type: memory
   type: project
-  modified: 2026-08-20T15:00:00.000Z
+  modified: 2026-08-21T16:57:12.520Z
+  originSessionId: 3b0833c6-9419-4e70-83e7-99e89241db93
 ---
 
 # mVAF v1.5 — correction par la couverture EPIC (2026-08-20)
+
+**Commite le 2026-08-21 (`983af28`).** Le batch retro a couvert **tout le liquide** : scan S3 du
+2026-08-21 -> **1 362/1 362** samples liquid (849 CGFL + 513 HCL) portent `raima_score.V1.4` ET
+`V1.5`, aucun ecart de perimetre entre les deux. Les **147 solid CGFL** n'en ont ni l'un ni
+l'autre — attendu, `BETA_28M` n'y tourne pas. `raima:0.5.4` reste **locale, non poussee**.
 
 Nouveau score, **derive** de la v1.4 : `raima::transfo_mvaf_by_cov(x, nb_read_epic)`, fonction
 ajoutee en **raima 0.5.4** (seul ajout vs 0.5.3). Compense l'exces de faux positifs a basse

@@ -1,12 +1,14 @@
 # trace-prod Memory
 
 ## Feedback / règles de travail
+- [Réponses courtes](feedback_reponses_courtes.md) — Boris se perd dans les réponses longues : 1-3 phrases, pas de récap final, pas de proposition non sollicitée en fin de message
 - [Scratch workspace + BAM read-only](feedback_scratch_workspace.md) — analyses ad-hoc dans /scratch/boris/<topic>/, source BAM/POD5 strictement en lecture seule
 - [Rebasecalled POD5 — ne pas propager](feedback_rebasecalled_pod5.md) — laisser NULL après update-column stockage_pod5, ne pas copier depuis l'original
 - [STATUS_COLUMNS = OK/KO/WARNING strict](feedback_status_columns.md) — y mettre une VARCHAR libre (ichorcna_score) → _parse_status() écrase tout en KO
 - [Probs loyfer manquantes = décalage extraction](feedback_probs_loyfer_lag.md) — loyfer NULL + epic OK → props_loyfer généré après la dernière passe loyfer (pas un bug). Fix `probs -P`. `-s` mono-sample → boucler
 
 ## Schemas & features
+- [Retraits d'export + fallback Indication](project_export_retraits_et_fallback_indication.md) — masquer une colonne = retirer de `_LIQUID_QC`/`_SOLID_QC` **en gardant le mapping** (N50, mVAF v1.3 ; comme n75). ⚠ `clear()` sans `resize()` laisse une colonne vide à droite et les formats de cellule ne suivent pas le décalage. `Indication` de 'QC read' vient de `metadata.class` + fallback par nom (Lung_Alc/Bladder_Urine/Colon), le COALESCE protège Rectum/Sigmoïde
 - [Schema v6 — colonnes IV/QC](project_schema_v6_iv_qc.md) — 4 colonnes retd_suivis (read_start_time, ancestry, sex_proba, sex_predicted), path IV/ sœur de QC/
 - [Schema v7 — short_read](project_schema_v7_short_read.md) — retd_suivis.short_read, 6 dossiers S3 dans le mirror {labo}_short_read (liquid only). Gotcha `s3 ls --recursive` = clés complètes
 - [Schema v8 — short_read_metrics](project_schema_v8_short_read_metrics.md) — table 28 colonnes (FK sample_id), CLI check-short-read indépendante + export-short-read-like
@@ -28,6 +30,7 @@
 - [Colonnes v2-v7 — index](project_columns_index.md) — colonnes v2-v7 + patterns transversaux (collision mapping TSV_TO_DB, gene1_vaf raima, rebasecalled propagation, NFS-first, export ONT)
 - [Schema v26 — mvaf_v15](project_schema_v26_mvaf_v15.md) — calque EXACT de mvaf_v14, seul `V1.4`→`V1.5` change (structure fichier **identique**, 3 col, `cols[1]` + `format_mvaf4` — vérifiée sur fichier réel avant codage, car v1.3→v1.4 avait déplacé la colonne). ⚠ **s'AJOUTE à mvaf_v14, ne la remplace pas** : v1.3/v1.4/v1.5 coexistent (gsheet col 14/15/16). Backfill 100 % (1362 samples, 0 NA) ; v1.4≠v1.5 sur 537 samples. ⚠ homonyme `Lung_120` (dossier CGFL orphelin, sample en base HCL seulement) ; ⚠ relecture gsheet = 2 faux écarts à 100 % (nombre vs chaîne à virgule, `None` vs `'NA'`)
 - [Schema v25 — qc.reads_with_cpg + alimentation ponctuelle 28M/CpG](project_schema_v25_qc_28m_cpg.md) — table `qc` (v23, ≠ qc_metrics) : 2 colonnes ajoutées + reads_28m/reads_with_cpg peuplés depuis un backfill TSV rétrospectif (/scratch/boris/nb_read_28M/), scope 1332/1506 (exclut solid + samples sans check-qc), PAS de checker permanent — QCChecker volontairement pas touché
+- [Schema v27 — renommage short_read → small_fragments](project_schema_v27_small_fragments.md) — **aucune colonne ajoutée** : alignement sur le bucket S3 renommé `{labo}_small_fragments/`, sans quoi la colonne serait passée **KO à 100 %** au prochain check. ⚠ **PRÉ-migration AVANT les `CREATE TABLE`** (à l'inverse de v2→v26) : sinon `CREATE IF NOT EXISTS` fabrique une table vide et le `RENAME TO` échoue → 1199 lignes invisibles. ⚠ `ALTER RENAME COLUMN/TO` **préserve PK/FK/NOT NULL** — la règle d'or ne vise que `CREATE TABLE AS SELECT`. ⚠ un `sed` sur `short-read` casse les noms de commandes Click (espace). ⚠ onglet cible = `'Small Fragments'` ; `'Short read'` est un tableau manuel à ne pas écraser
 
 ## Données & infra
 - [Infra POD5/BAM/export](reference_infra_pod5_bam_export.md) — extraction barcode (+ workaround logs Pod2Bam), POD5 storage 6 colonnes, structure S3 AWS/SCW, BETA_28M, ordre export, IchorCNA, date_done, gsheet config, CLI defaults
