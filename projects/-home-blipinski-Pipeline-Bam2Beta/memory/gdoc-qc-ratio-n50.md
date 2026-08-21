@@ -12,7 +12,7 @@ metadata:
 
 <https://docs.google.com/document/d/1X1KxOCR-eHRU04R3eSfyTlxa_C47R114pCw_BkoUHwQ/edit?tab=t.w79cz9osn5oa>
 
-Document de restitution du travail QC. **5 onglets depuis le 2026-08-17** : **Ratio N50/N75**
+Document de restitution du travail QC. **7 onglets depuis le 2026-08-19** (ajout de `On site` et `Synthèse`, voir [[gdoc-synthese-qc]]). **5 onglets depuis le 2026-08-17** : **Ratio N50/N75**
 (`t.w79cz9osn5oa`), Nb reads mapped (`t.8yj4pfggwlai`), List_Of_Features (`t.0`), Figure du
 pipeline (`t.8zlmqz7ccpjt`), **Lung_Alc** (`t.zdeivtsmvstg`, cree par Boris le 2026-08-17 —
 voir [[lung-alc-qc-recensement]]).
