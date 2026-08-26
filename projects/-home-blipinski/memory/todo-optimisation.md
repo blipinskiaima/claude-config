@@ -60,7 +60,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-08-26 — Aima-Tower : page QARA et réparation de la couche IA · short-read : protocole mVAF v1.4
+## 2026-08-26 — Aima-Tower : page QARA et réparation de la couche IA · short-read : protocole mVAF v1.4 · Aima-Survey : Biodesix et correctif du collecteur
 
 - [x] **Aima-Tower — page QARA `/qara`** — 3 onglets restituant les sections de performance du Doc `Aima_QARA` (Exis §2.1/§2.2/§2.5, Themelio §3/§3.1/§6.2/§6.3/§8.1/§12, CUP §4/§5 + matrices de confusion). Première page 100 % statique du projet : zéro backend, valeurs recopiées dans `lib/qara-data.ts` et vérifiées par script contre la source (42 contrôles). Commit `35caa2f`, déployée. Détails : `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/qara_page.md`.
 - [x] **Doc CUP 1.0 — effectifs à corriger** — les tableaux §4 et §5 donnent medium = 94 / high = 95, la figure et la phrase de conclusion du §5 l'inverse. Les matrices somment à 95/95/94 et seuls ces effectifs reproduisent les % publiés (45/95 = 47,4 % ; 85/94 = 90,4 %). Le tableau §4 inverse en plus les libellés (ii)/(iii). **Correction à faire côté Google Doc** — la page Tower affiche le verbatim + un encart de constat.
