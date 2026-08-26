@@ -1,34 +1,32 @@
-# Context — Aima-Survey — 2026-07-30T21:20:36+00:00
+# Context — Aima-Survey — 2026-08-26 (clôture session)
 
-**Branche** : main
-**Dernier commit** : a144944 — merge: dossiers concurrent en 4 volets, pondération par importance, taxonomie à 3 niveaux
-**Status** : clean (1 fichier non suivi : SYNTHESE-42285091-fragmentia-ai.md)
+**Branche** : main (poussé, origin/main = 3d9effa)
+**Dernier commit** : 3d9effa — feat(concurrence): Biodesix en 8e concurrent + crédibilité
+des sources jugée valeur par valeur
+**Status** : clean
 
 ## Où j'en suis
-Veille concurrentielle complète et déployée : 7 dossiers en 4 volets (P0 faits
-majeurs, P1 technique, P2 marché, P3 trajectoire), onglet AIMA de comparaison
-chiffrée, pondération des évènements par importance. Tout est poussé sur main
-dans les 3 dépôts. Dernière tâche de la session : synthèse QC sur les seuils
-Bam2Beta (5M reads / 0,25×), livrée en analyse — aucun code modifié.
+Session terminée, feuille de route en 6 étapes menée au bout. Biodesix est le 8e concurrent
+surveillé : dossier complet en 4 volets dans `concurency/profils/`, visible dans l'onglet
+Deep dive concurrent de la Tower, PDF de 19 pages généré. Et le garde-fou `_source_credible`
+du collecteur a été corrigé — c'est le vrai apport technique de la session.
 
 ## Ce qui marche / ce qui foire
-- ✓ Cron lundi 10h00 (`run_profils.sh`) : P0 + P3 + 7 PDF, testé de bout en bout,
-  flock partagé avec les 2 crons quotidiens de 8h00
-- ✓ Onglet AIMA : chiffres recalculés à la spécificité DE CHAQUE concurrent
-  (fenêtre 80–99 %), 5/7 comparables. Conforme au rapport Exis au sample près
-  (214/261 @ 95,1 %, seuil 0,0042)
-- ✓ Pondération : ACS + FDA sortent en tête chez Freenome ET Guardant. 206 tests
-- ✓ Seuils QC Bam2Beta instruits : Katsman 2022 (PMID 35841107) publie la même
-  règle en ONT natif à 2,5M/0,2× — nous sommes 2× plus stricts. Longueur alignée
-  médiane mesurée à 172 pb sur 1 469 échantillons
-- ✗ CLEARNOTE-HEALTH-P1 non vérifié par la 2e passe (erreur serveur) — seul
-  fichier sur 12 à ne pas avoir été relu
-- ✗ 3 concurrents (DELFI, Singlera, Geneseeq) sortent 0 fait majeur : signal de
-  couverture de collecte, leurs canaux réels ne sont pas surveillés
-- ✗ Le cron hebdo n'envoie AUCUN email : il peut signaler des tensions et des
-  évènements non versés sans que personne ne le sache
+- ✓ Collecte Biodesix : 44 évènements, 3 sources actives, **0 source en échec**. Les 44 ont
+  été marqués notifiés sans envoi (demande de Boris) — la file est vide, seuls les vrais
+  deltas partiront désormais.
+- ✓ ClearNote réparé : la crédibilité se juge valeur par valeur, `publication-sitemap` retiré.
+  Simulation du cron quotidien sur les 8 concurrents → **0 source en échec**.
+- ✓ 255 tests passent (+3 dont un test de non-régression sur le jugement par valeur).
+- ✓ Skill `/deep-dive-concurency` réaligné sur la pratique — 7 dérives corrigées, dont les
+  chemins (`profils/` et non `rapports/`), les 4 volets, et les marqueurs de preuve.
+- ⚠ Profondeur du canal Biodesix limitée à ~20 communiqués (~10 mois) : leur newsroom ne
+  pagine pas. Le début d'une fenêtre à 12 mois n'est couvert que par la SEC.
+- ⚠ Le cron tourne à 8h00 Paris alors que ClinicalTrials.gov reconstruit son snapshot vers
+  09:00 UTC → on lit J-1 sur cette source. Assumé par défaut, jamais tranché.
+- ⚠ Aucune alerte d'échec de cron dans l'écosystème : un job mort reste invisible.
 
 ## Prochaine étape
-Câbler l'email du lundi dans `run_profils.sh` (faits majeurs nouveaux, tensions
-§4.2, dette §4.1 par dossier, + email d'échec) — sur le modèle de `competitive.py`.
-Sinon : reprendre la vérification de CLEARNOTE-HEALTH-P1.
+Rien de bloquant. Deux candidats si on reprend ce sujet : trancher l'horaire du cron
+concurrentiel (8h00 Paris vs snapshot CT.gov à 09:00 UTC), ou porter une alerte d'échec de
+cron — c'est le trou le plus large du dispositif, identifié dès le 28/07 et jamais comblé.
