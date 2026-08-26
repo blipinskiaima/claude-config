@@ -25,7 +25,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## Moyenne priorité
 
 - [ ] **Rotation secrets Aima-Tower compromis** — `.env` était tracked dans git jusqu'au 2026-04-21 (historique pushé sur `aima-dx/Aima-Tower`, repo privé). Révoquer `ANTHROPIC_API_KEY` (console.anthropic.com > API Keys) + `accessToken` Seqera (cloud.seqera.io > Tokens), regénérer les 2 et mettre à jour `.env` local + `docker compose restart`. Voir `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/project_env_leak.md`.
-- [ ] **Aima-Tower — `tests/test_dilution.py` échoue à la collecte** — `ImportError: cannot import name 'mvaf_threshold' from 'dilution_service'` (`test_dilution.py:83`). Panne présente au moins depuis `159633a`, probablement introduite par la refonte qui a ajouté l'onglet Suspects. Elle **interrompt la collecte pytest**, donc tout le module dilution est muet et un `pytest -q` sans `--ignore` s'arrête net. Vérifier ce qu'est devenu `mvaf_threshold` dans `src/dilution_service.py` (renommé ? absorbé par `quantile_type1` ?) et remettre le test en phase, ou le retirer s'il n'a plus d'objet.
 
 ### Skills bioinformatiques
 - [ ] **Améliorer skills v1 avec /meta-skills-creator** — sample, debug-nf, check-consistency sont fonctionnels mais créés sans le processus rigoureux. Raffiner après usage.
@@ -60,10 +59,14 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-08-26 — Aima-Tower : page QARA (Exis 1.1, Themelio 1.0, CUP 1.0)
+## 2026-08-26 — Aima-Tower : page QARA, puis réparation de la couche IA
 
 - [x] **Aima-Tower — page QARA `/qara`** — 3 onglets restituant les sections de performance du Doc `Aima_QARA` (Exis §2.1/§2.2/§2.5, Themelio §3/§3.1/§6.2/§6.3/§8.1/§12, CUP §4/§5 + matrices de confusion). Première page 100 % statique du projet : zéro backend, valeurs recopiées dans `lib/qara-data.ts` et vérifiées par script contre la source (42 contrôles). Commit `35caa2f`, déployée. Détails : `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/qara_page.md`.
 - [x] **Doc CUP 1.0 — effectifs à corriger** — les tableaux §4 et §5 donnent medium = 94 / high = 95, la figure et la phrase de conclusion du §5 l'inverse. Les matrices somment à 95/95/94 et seuls ces effectifs reproduisent les % publiés (45/95 = 47,4 % ; 85/94 = 90,4 %). Le tableau §4 inverse en plus les libellés (ii)/(iii). **Correction à faire côté Google Doc** — la page Tower affiche le verbatim + un encart de constat.
+- [x] **Aima-Tower — couche IA entièrement hors service (E2BIG)** — `PIPELINE_CONTEXT` (les 14 `CLAUDE.md` du Pipeline, 164 Ko) était passé dans **un argument unique** de `claude -p`, au-delà de `MAX_ARG_STRLEN` (128 Ko) : `execve` échouait, le binaire n'était jamais lancé. Les 2 cartes d'`/analytics` **et** la synthèse de `/survey` renvoyaient un 500. Aucun code n'avait changé — c'est la doc des projets qui a franchi le seuil. Fix `--system-prompt-file`. Commit `1017ff0`, détails : `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/analytics_ia_hardening.md`.
+- [x] **Aima-Tower — `/overview` › Database en 500 depuis le cutover v3** — l'endpoint importait `pages.py`, qui exige `dash`, retiré de l'image v3 ; jamais remarqué. Basculé sur `filters_view.py` (copie identique sans dépendance Dash) → 118 colonnes / 4 sections. Chemin mort vers le worktree `Aima-Tower-g` supprimé au passage.
+- [x] **Aima-Tower — durcissement `/analytics`** — code généré par le LLM exécuté dans un **sous-processus tuable** (un `exec()` dans le thread de requête n'est pas interruptible), **boucle d'auto-réparation** (l'erreur exacte repart au modèle, ce qui rend la page générique), `claude-opus-5` là où le modèle écrit du code ou du SQL, `statsmodels` ajouté et allowlist alignée sur `requirements.txt`. 18 tests dans `tests/test_analytics.py`.
+- [x] **Aima-Tower — `tests/test_dilution.py` échouait à la collecte** — `mvaf_threshold` avait été supprimée en juin par `80f6330` (passage de l'onglet Dilution à l'archi α) ; 4 des 5 classes testaient l'API disparue (`get_series`, `mvaf_threshold`, `backend.routers.dilution`). Retirées, la 5ᵉ conservée verbatim. Collecte pytest débloquée : **120 tests passent**. ⚠ Restent 2 échecs `exploratory` **préexistants** (snapshots 383 vs 416 samples cancer) qui demandent une validation métier.
 
 ## 2026-08-21 — Bam2Beta : onglet Synthèse du Google Doc QC + intégration de la mVAF v1.5
 
