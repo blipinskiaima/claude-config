@@ -1,5 +1,8 @@
 # Aima Tower — Auto Memory
 
+## Page `/qara` — Exis / Themelio / CUP (2026-08-21)
+**Première page 100 % statique du projet** : zéro backend, zéro requête, valeurs **recopiées** du Google Doc `Aima_QARA` dans `lib/qara-data.ts` (régime `FEATURE_NAMES`). **Ne jamais y dériver une valeur** — un numérateur reconstitué depuis un % est un chiffre inventé (piège corrigé sur CUP §5, qui ne publie que des %). Libellés anglais mot pour mot → ⚠ **pas de `uppercase` CSS** sur les en-têtes, ça réécrit `CV (mVAF v1.4)` en `CV (MVAF V1.4)`. ⚠ **Divergence prouvée dans le doc CUP** : tableaux §4/§5 donnent medium=94/high=95, la figure et la phrase §5 l'inverse ; les matrices somment à 95/95/94 et seuls ces effectifs reproduisent les % publiés (45/95=47,4 % ; 85/94=90,4 %). Rendu **verbatim + encart**, ne pas corriger. Forme finale après 3 itérations = **tableau à colonne barre** partagé par les 3 onglets (le waffle 224 points et les barres de CV ont été supprimés comme décoratifs). Détails : [qara_page.md](qara_page.md)
+
 ## Docs externes read-only + réponses courtes (2026-08-21)
 Ne jamais modifier un Google Doc/document externe, même mineur, sans demande explicite pour ce doc précis (contexte : doc réglementaire QARA). Réponses courtes/simples par défaut, pas de synthèse à sections multiples sauf demande. Détails : [feedback_docs_readonly_and_brevity.md](feedback_docs_readonly_and_brevity.md)
 
