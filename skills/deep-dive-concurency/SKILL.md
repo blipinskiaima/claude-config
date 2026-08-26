@@ -13,17 +13,36 @@ positionnement AIMA, en trois parties bien séparées.
 PARTIE 1 — PROFIL AIMA          référentiel vivant, base de comparaison, maintenu à part
     │                            concurency/AIMA-POSITIONING.md  (source : rapport Exis 1.1)
     ▼
-PARTIE 2 — EXTRACTION CONCURRENT procédure d'extraction vérifiée → fiche {NOM}-PROFIL.md
-    │                            cadrage → sources → corpus → fan-out → fact-check ⛔
-    │                            sortie = fiche structurée, miroir des axes du profil AIMA
+PARTIE 2 — EXTRACTION CONCURRENT cadrage → sources → corpus → fan-out → fact-check ⛔
+    │                            reconstitution vérifiée, aucune comparaison à ce stade
     ▼
-PARTIE 3 — COMPARAISON           confronte {NOM}-PROFIL.md ↔ profil AIMA, axe par axe
-                                 → rapports P1/P2 dérivés → intégration veille
+PARTIE 3 — COMPARAISON           confronte le concurrent vérifié ↔ profil AIMA, axe par axe
+                                 → rédaction de P1 et P2 → intégration veille
 ```
 
-Sortie : 2 markdown (P1 technique, P2 marché) + 1 PDF combiné + une proposition de mise à jour
-du référentiel de veille — et, si de nouvelles données AIMA sont apparues, une mise à jour du
-profil (Partie 1).
+**Ce que ce skill produit, et ce qu'il ne produit pas.** Un dossier concurrent complet compte
+**quatre volets**, mais deux seulement sont de la rédaction :
+
+```
+concurency/profils/{SLUG}-P0-MAJEURS.md      ← AUTO, cli.py competitive-profil (cron lundi 10h)
+concurency/profils/{SLUG}-P1-TECHNIQUE.md    ← CE SKILL, écrit à la main, puis fact-check
+concurency/profils/{SLUG}-P2-MARCHE.md       ← CE SKILL, écrit à la main, puis fact-check
+concurency/profils/{SLUG}-P3-TRAJECTOIRE.md  ← AUTO, cli.py competitive-profil (cron lundi 10h)
+concurency/pdf/profils/{SLUG}.pdf            ← AUTO, run_profils.sh, SI P1 existe
+```
+
+P0 et P3 sont **dérivées de la table `competitive_events`**, déterministes, régénérées chaque
+semaine : ne jamais les écrire à la main, elles seraient écrasées au prochain lundi. P1 et P2
+ne sont **jamais** régénérées : ce sont elles, et elles seules, que ce skill rédige.
+
+⚠ **`concurency/profils/`, pas `concurency/rapports/`.** `rapports/` et `pdf/` (racine) tiennent
+encore la génération du 22-23/07/2026, d'avant la vérification adversariale du 29/07 (117
+corrections) — ils sont gelés, on n'y écrit plus. Et c'est `profils/` que la page « Deep dive
+concurrent » d'Aima Tower lit : un dossier écrit ailleurs n'apparaîtra jamais dans l'onglet.
+
+Sortie de bout en bout : P1 + P2 rédigés et vérifiés, une proposition de mise à jour du
+référentiel de veille (§ Partie 3, phase 6) — et, si de nouvelles données AIMA sont apparues,
+une mise à jour du profil (Partie 1).
 
 **Principe fondateur** : une plaquette commerciale ne dit jamais comment le produit marche, et
 ses chiffres ne sont presque jamais ceux des publications. Le travail consiste à reconstituer la
@@ -59,21 +78,34 @@ d'analyse concurrente.
 Procédure d'extraction **vérifiée** de la cible, indépendante d'AIMA. Aucune comparaison ici :
 on reconstitue et on vérifie.
 
-**Sortie de la Partie 2** : une **fiche concurrent structurée**,
-`~/Pipeline/Aima-Survey/concurency/competitors/{NOM}-PROFIL.md`, aux **mêmes axes que le profil AIMA**
-(pour un diff 1:1 en Partie 3). C'est le miroir concurrent du profil AIMA : fiche vivante,
-remise à jour à chaque analyse. Template et discipline de marquage :
-[references/templates/profil-concurrent.md](references/templates/profil-concurrent.md). Les
-phases 0-4 remplissent cette fiche ; la phase 4 la fige avec les verdicts de fact-check.
+**Sortie de la Partie 2** : un corpus vérifié, structuré **sur les mêmes axes que le profil
+AIMA** (pour un diff 1:1 en Partie 3), chaque chiffre portant son marqueur de preuve et son
+verdict de fact-check. Les phases 0-4 le construisent ; la phase 4 le fige.
+
+Il n'y a **pas de fiche intermédiaire sur disque**. Une fiche `competitors/{NOM}-PROFIL.md` a
+existé pour Natera en juillet 2026, puis les six analyses suivantes s'en sont passées : elle
+recopiait ce que P1 et P2 disent déjà, et se périmait dès la première correction. Le matériau
+vérifié reste dans la session et va directement en Partie 3.
 
 ### Phase 0 — Cadrage et prérequis
 
 1. Charger le **profil AIMA** (Partie 1) et déterminer **à quelle ligne** (MRD via mVAF v1.4, ou
    MCED via THEMELIO) le concurrent s'oppose — ou aucune.
 2. Identifier la cible (société, produit, URL ou fichier fourni).
-3. Vérifier les prérequis outils (`poppler-utils`, venv PDF).
-4. Lire la fiche existante dans `~/Pipeline/Aima-Survey/data/competitors.json` et ce que la
-   veille a déjà capté (DuckDB en read-only).
+3. **Fixer le SLUG**, qui nomme tous les fichiers du dossier. Règle appliquée par le code
+   (`cli.py` et `lib/competitive/profil.py::_slug`) : `nom.upper().replace(" ", "-")`.
+   ⚠ C'est le **nom de la société**, jamais celui du produit : `GUARDANT-HEALTH` et non
+   `GUARDANT-SHIELD`, `DELFI-DIAGNOSTICS` et non `DELFI-FIRSTLOOK` (les deux formes en
+   `rapports/` datent d'avant la convention). Le slug est un contrat avec Aima Tower, qui le
+   valide contre `^[A-Z0-9-]{2,40}$` et affiche `slug.replace("-"," ").title()` : un slug produit
+   afficherait une société qui n'existe pas. Il doit être **identique** au champ `name` de
+   `competitors.json`, sinon `competitive-profil` écrira P0/P3 sous un autre slug et le dossier
+   se dédoublera dans l'onglet.
+4. Vérifier les prérequis outils (`poppler-utils`, venv PDF).
+5. Lire la fiche existante dans `~/Pipeline/Aima-Survey/data/competitors.json` et ce que la
+   veille a déjà capté (DuckDB en read-only). Société absente du fichier → elle n'a **aucun**
+   évènement collecté : P0 et P3 sortiront vides tant que le bloc `watch` n'existe pas
+   (phase 6).
 
 Voir [references/extraction/phase0-cadrage.md](references/extraction/phase0-cadrage.md).
 
@@ -103,9 +135,9 @@ Voir [references/extraction/phase3-fanout.md](references/extraction/phase3-fanou
 affirmation chiffrée : CONFIRMÉ / INEXACT / TROMPEUR / NON VÉRIFIABLE. Inclut les affirmations
 sur **nos propres outils**, à vérifier aussi sévèrement.
 
-**Sortie** : la fiche `{NOM}-PROFIL.md` consolidée et figée, chaque chiffre portant son marqueur
-de preuve **et** son verdict de fact-check. C'est cette fiche, et non des notes éparses, qui
-entre en Partie 3.
+**Sortie** : le corpus consolidé et figé, chaque chiffre portant son marqueur de preuve **et**
+son verdict de fact-check. C'est ce matériau vérifié, et non des notes éparses, qui entre en
+Partie 3.
 
 Voir [references/extraction/phase4-factcheck.md](references/extraction/phase4-factcheck.md) et la
 grille [references/quality/grille-pieges.md](references/quality/grille-pieges.md).
@@ -120,22 +152,33 @@ Confronter le concurrent (Partie 2, vérifié) au profil AIMA (Partie 1), axe pa
 
 ### Phase 5 — Comparaison & rédaction
 
-La comparaison est un **diff axe par axe** entre `{NOM}-PROFIL.md` (Partie 2) et le profil AIMA
-(Partie 1), tous deux structurés sur les mêmes axes. La grille de cross-check des verrous AIMA
-(profil §7 ↔ fiche §6) est déjà remplie dans la fiche concurrent.
+La comparaison est un **diff axe par axe** entre le corpus vérifié (Partie 2) et le profil AIMA
+(Partie 1), structurés sur les mêmes axes. La grille de cross-check des verrous AIMA (profil §7)
+devient la section « Verrous AIMA » du P1.
 
-Les deux rapports **dérivent** de ce diff, pour deux publics : `{NOM}-P1-TECHNIQUE.md` (bioinfo)
-et `{NOM}-P2-MARCHE.md` (direction). Chaque chiffre garde son marqueur de preuve et son verdict.
-Section « positionnement vs AIMA » obligatoire dans les deux.
+Les deux rapports **dérivent** de ce diff, pour deux publics :
+`concurency/profils/{SLUG}-P1-TECHNIQUE.md` (bioinfo) et `{SLUG}-P2-MARCHE.md` (direction).
+Chaque chiffre garde son marqueur de preuve et son verdict. Section « positionnement vs AIMA »
+obligatoire dans les deux.
 
-⛔ **Commencer par le §0 « Faits majeurs »**, dans les DEUX rapports :
+⛔ **Lire les faits majeurs AVANT d'écrire**, et les traiter dans le corps des deux rapports :
 
 ```bash
 cd ~/Pipeline/Aima-Survey && python3 cli.py competitive-majeurs "{NOM}"
 ```
 
 Un rapport ordonné par récence enterre les faits lourds : c'est ce qui a relégué l'inclusion
-ACS de SimpleScreen en page 3 du dossier Freenome. Le §0 l'empêche par construction.
+ACS de SimpleScreen en page 3 du dossier Freenome.
+
+⚠ **Ne plus coller cette sortie en `## 0. Faits majeurs`** dans P1 et P2 — c'était la règle
+jusqu'au 30/07/2026. Elle vit maintenant dans son propre volet, `{SLUG}-P0-MAJEURS.md`,
+régénéré chaque lundi depuis `competitive_events` par la même fonction `faits_majeurs()` : une
+copie collée dans P1/P2 se périmerait sans que personne ne s'en aperçoive. La commande reste le
+moyen de **savoir ce que P0 dira**, et la règle de fond ne change pas : un fait majeur qui
+n'apparaît qu'en sous-section du corps est un rapport raté.
+
+Sortie vide → l'écrire, et vérifier que les bons canaux sont surveillés (bloc `watch`, phase 6)
+avant d'en conclure qu'il ne se passe rien.
 
 Voir [references/comparaison/phase5-redaction.md](references/comparaison/phase5-redaction.md),
 [references/templates/structure-rapports.md](references/templates/structure-rapports.md) et
@@ -157,14 +200,13 @@ Voir [references/comparaison/phase6-integration.md](references/comparaison/phase
 |---|---|
 | **Charger / mettre à jour le profil AIMA** | [aima/profil.md](references/aima/profil.md) |
 | Le profil AIMA lui-même (contenu) | `~/Pipeline/Aima-Survey/concurency/AIMA-POSITIONING.md` |
-| Prérequis, choix de la ligne produit, fiche concurrent | [extraction/phase0-cadrage.md](references/extraction/phase0-cadrage.md) |
+| Prérequis, SLUG, ligne produit visée, entrée `competitors.json` | [extraction/phase0-cadrage.md](references/extraction/phase0-cadrage.md) |
 | Extraire une plaquette PDF, analyser les absences | [extraction/phase1-sources-primaires.md](references/extraction/phase1-sources-primaires.md) |
 | Retrouver les vraies publications derrière un produit | [extraction/phase2-corpus-scientifique.md](references/extraction/phase2-corpus-scientifique.md) |
 | Prompts des 3 agents de recherche | [extraction/phase3-fanout.md](references/extraction/phase3-fanout.md) |
 | Protocole de vérification adversariale | [extraction/phase4-factcheck.md](references/extraction/phase4-factcheck.md) |
-| **Structure de la fiche profil concurrent** | [templates/profil-concurrent.md](references/templates/profil-concurrent.md) |
-| Rédiger les 2 rapports | [comparaison/phase5-redaction.md](references/comparaison/phase5-redaction.md) |
-| Mettre à jour competitors.json et la mémoire | [comparaison/phase6-integration.md](references/comparaison/phase6-integration.md) |
+| Rédiger P1 et P2 | [comparaison/phase5-redaction.md](references/comparaison/phase5-redaction.md) |
+| Inscrire le concurrent dans la veille (2 fichiers, pas 1) | [comparaison/phase6-integration.md](references/comparaison/phase6-integration.md) |
 | **Pièges chiffrés récurrents** (à lire absolument) | [quality/grille-pieges.md](references/quality/grille-pieges.md) |
 | Convention des marqueurs de preuve | [quality/niveaux-preuve.md](references/quality/niveaux-preuve.md) |
 | Plan type des rapports P1 et P2 | [templates/structure-rapports.md](references/templates/structure-rapports.md) |
@@ -175,7 +217,18 @@ Voir [references/comparaison/phase6-integration.md](references/comparaison/phase
 
 | Script | Usage |
 |---|---|
-| `scripts/md2pdf.py` | `python3 md2pdf.py sortie.pdf P1.md P2.md` — PDF combiné, charte AIMA, liens cliquables. Nécessite un venv avec `weasyprint` + `markdown` (voir phase 0). |
+| `scripts/md2pdf.py` | `python3 md2pdf.py sortie.pdf P0.md P1.md P2.md P3.md` — PDF combiné, charte AIMA, liens cliquables. Nécessite un venv avec `weasyprint` + `markdown` (voir phase 0). En routine c'est `run_profils.sh` qui l'appelle, pas nous. |
+
+Côté Aima-Survey, cinq sous-commandes `cli.py` servent ce skill — toutes en lecture, aucune
+n'écrit dans `competitors.json` :
+
+| Commande | Rôle | Quand |
+|---|---|---|
+| `competitive-probe "{NOM}" --domain x.com` | Découvre les identifiants `watch` (sitemap, CIK, sponsor ClinicalTrials) et **imprime** le bloc JSON à coller | une fois par concurrent, phase 6 |
+| `competitive-majeurs "{NOM}"` | Imprime les faits majeurs — aperçu de ce que P0 contiendra | avant de rédiger, phase 5 |
+| `competitive-profil --competitor "{NOM}"` | **Écrit** P0 et P3 depuis `competitive_events` | cron du lundi ; à la main pour vérifier un nouveau concurrent |
+| `competitive-pending` | Évènements collectés pas encore notifiés par mail | diagnostic |
+| `competitive-reclassify` | Rejoue la classification Haiku des articles PubMed après ajout d'un concurrent ou d'un alias | après édition de `competitors.json` |
 
 </tools>
 

@@ -1,6 +1,6 @@
 ---
 name: dossiers-concurrent-p1p2p3
-description: "Architecture des dossiers concurrent P1/P2/P3, les deux régimes d'écriture, et les trois pièges qui ont coûté cher"
+description: "Architecture des dossiers concurrent P0/P1/P2/P3, les deux régimes d'écriture, et les pièges qui ont coûté cher"
 metadata: 
   node_type: memory
   type: project
@@ -8,19 +8,34 @@ metadata:
   modified: 2026-07-30T06:44:09.189Z
 ---
 
-`concurency/profils/{SLUG}-P{1,2,3}-*.md` — 7 concurrents (2026-07-29). `SLUG` = nom canonique
-en majuscules, espaces → tirets. Servis par Aima-Tower sur `/profils`, un sous-onglet par
-concurrent, PDF téléchargeable.
+`concurency/profils/{SLUG}-P{0,1,2,3}-*.md` — **8 concurrents × 4 parties** (Biodesix ajoutée le
+2026-08-26). `SLUG` = nom canonique en majuscules, espaces → tirets. Servis par Aima-Tower sur
+`/profils`, onglet « Deep dive concurrent », un dossier par concurrent, PDF téléchargeable.
+
+⚠ **Le slug est un contrat avec la Tower**, pas un choix libre : validée contre
+`^[A-Z0-9-]{2,40}$`, elle affiche `slug.replace("-"," ").title()`. C'est le nom de la **société**
+(`GUARDANT-HEALTH`), jamais du produit (`GUARDANT-SHIELD`, forme des rapports gelés de juillet),
+et il doit égaler le champ `name` de `competitors.json` sinon le dossier se dédouble dans l'onglet.
 
 **Deux régimes d'écriture qu'il ne faut jamais confondre :**
 
-⚠ **Les TROIS parties sont écrites par Claude.** La distinction n'est pas « humain contre
+⚠ **Les QUATRE parties sont écrites par Claude.** La distinction n'est pas « humain contre
 machine », c'est le **rythme** — erreur que la doc portait jusqu'au 2026-07-30.
 
 | | écrit par | rythme |
 |---|---|---|
 | P1 technique, P2 marché | skill `deep-dive-concurency`, puis vérifiés | sur décision, jamais auto |
-| P3 trajectoire | `cli.py competitive-profil`, dérivée de `competitive_events` | cron lundi 10h00 |
+| P0 faits majeurs, P3 trajectoire | `cli.py competitive-profil`, dérivées de `competitive_events` | cron lundi 10h00 |
+
+⚠ **Un P0 vide n'est pas une panne.** « Majeur » = ce qui change leur droit de vendre ou qui
+paie : autorisation, recommandation professionnelle, remboursement. Une société qui vend en LDT
+sans jamais déposer de dossier n'en produit aucun — vérifié sur Biodesix, **zéro fait majeur sur
+60 mois** pour 44 évènements collectés, et c'est le portrait fidèle de l'entreprise. Même cas
+chez Geneseeq. Guardant, qui dépose, a un P0 fourni.
+
+⚠ **Le PDF n'est produit que si un `P1-TECHNIQUE.md` existe** (`run_profils.sh` boucle dessus).
+Un concurrent dont seuls P0 et P3 sont générés n'aura jamais de PDF, et la Tower affichera
+« PDF non généré » — c'est voulu, pas un incident.
 
 Un texte qui se réécrit tout seul finit par contenir une erreur que personne ne voit passer —
 d'où P1/P2 gelés. Le lien se fait par la §4 de la P3, qui **signale** sans réécrire.

@@ -6,14 +6,15 @@
 - [Claude Pro auth pattern](claude_pro_auth_pattern.md) — subprocess `claude -p` + CLAUDE_CODE_OAUTH_TOKEN (pas le SDK anthropic), HOME isolé, piège ANTHROPIC_API_KEY qui bypass le token
 - [Aima-Survey v6.1](aima_survey_v61.md) — classification sector/org_type/org_name via Haiku + migration Pro/Max, short-circuit gratuit sans affiliations, taxonomie enums fixes
 - [Explorer projets jumeaux d'abord](explore_pipeline_siblings_first.md) — pour toute tâche AIMA, chercher le pattern dans les autres ~/Pipeline/* avant de designer from-scratch
-- [Paysage concurrentiel AIMA](competitive_landscape.md) — 22 concurrents listés dans Aima-Survey/data/competitors.json + docs/COMPETITORS.md, query PubMed competitive_affiliations active, doublons UI Tower assumés
+- [Paysage concurrentiel AIMA](competitive_landscape.md) — 26 concurrents dans data/competitors.json + concurency/COMPETITORS.md, dont 8 seulement avec bloc `watch` ; lien vers queries.json manuel (test de sync depuis 2026-08-26)
 - [Profil AIMA canonique + Exis 1.1](aima_positioning_profil.md) — concurency/AIMA-POSITIONING.md, chiffre Exis figé 82,3 %/260 ≠ recalcul Tower 82,0 %/261, THEMELIO sans held-out
 - [Perfs poumon AIMA par stade](aima_poumon_perfs_par_stade.md) — 90,6 % (77/85) mais 88 % de stade IV, Lung-DI 13,3 % au stade I, et le mur de spécificité 95 % vs 50 %
 - [Freenome × poumon](freenome_poumon.md) — SimpleScreen Lung existe, CRC approuvé FDA le 27/07/2026, toutes leurs perfs à 50 % de spécificité, competitors.json périmé
-- [Collecteur de veille concurrentielle](veille_concurrentielle_collecteur.md) — décliner = 4 lignes de config, et les pièges d'API (openFDA 404 = zéro, lastmod ≠ datePublished, SEC User-Agent)
+- [Collecteur de veille concurrentielle](veille_concurrentielle_collecteur.md) — décliner = 4 lignes de config, crédibilité jugée VALEUR PAR VALEUR depuis 2026-08-26, crons en place, et les pièges d'API (openFDA 404 = zéro, lastmod ≠ datePublished, SEC User-Agent)
 - [Natera Signatera fact-checké](signatera_natera.md) — MRD tumor-informed, 94/98 vessie-spécifique, CDx FDA 05/2026, et le piège de comparaison vs AIMA
 - [Bug entrez_date + piège du fix](entrez_date_bug.md) — fetcher omet entrez_date depuis 2026-04-21 ; corriger naïvement ferait sortir ~50 % des articles des vues de Tower
 - [Couplage réel Tower ↔ Survey](tower_survey_coupling.md) — Tower en read-only, seen/bookmark en JSON séparés, et TOUTES les vues lisent DuckDB (la doc day/week markdown est obsolète depuis 2026-04-22)
 - [DELFI FirstLook](delfi_firstlook.md) — mécanique du concurrent fragmentomique, vraies perfs (84/53 observé, pas 80/58), et pourquoi la méthylation n'est pas une garantie au stade I
 - [Signal mitochondrial mesuré (Bam2Beta)](mitochondrial_signal_aima.md) — chrM déjà dans nos BAM à 2-148x, méthylation 0,69 % vs 71 % nucléaire, et l'abondance mito confondue par la cohorte à AUC 0,977
-- [Dossiers concurrent P1/P2/P3](dossiers_concurrent_p1p2p3.md) — deux régimes d'écriture, taxonomie à 3 niveaux (SOURCÉ/CALCULÉ/NON CONFIRMÉ), et les 4 pièges dont la légende sans forme unique
+- [Dossiers concurrent P0/P1/P2/P3](dossiers_concurrent_p1p2p3.md) — 8 concurrents × 4 parties, deux régimes d'écriture, le slug comme contrat avec la Tower, un P0 vide qui n'est pas une panne, taxonomie SOURCÉ/CALCULÉ/NON CONFIRMÉ
+- [Biodesix (BDSX)](biodesix.md) — 8e concurrent : protéomique poumon, zéro épigénétique, sensibilité 9-16 % absente de leurs communiqués, ALTITUDE annoncé randomisé mais enregistré observationnel

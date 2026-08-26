@@ -47,7 +47,7 @@ python3 -m venv /tmp/.venv-pdf && /tmp/.venv-pdf/bin/pip install -q pypdf weasyp
 
 Recommander à Boris `sudo apt-get install -y poppler-utils` s'il n'a jamais été installé.
 
-## 4. Lire la fiche concurrent existante
+## 4. Lire l'entrée existante dans `competitors.json`
 
 ```bash
 python3 -c "
@@ -59,8 +59,13 @@ for tier,items in d.items():
 "
 ```
 
-Champs de la fiche : `name`, `aliases`, `hq`, `founded`, `tech`, `product`, `stage`, `cancers`,
-`threat`, `threat_reason`, `url`, `include_in_query_b`.
+Champs : `name`, `aliases`, `hq`, `founded`, `tech`, `product`, `stage`, `cancers`, `threat`,
+`threat_reason`, `url`, `include_in_query_b`, et surtout `watch`.
+
+**Regarder d'abord s'il y a un bloc `watch`** : c'est lui qui déclenche la collecte
+d'évènements. Sans lui, la société est déclarée mais rien n'est collecté — P0 et P3 sortiront
+vides et l'étape 5 ci-dessous ne rendra rien. Sur les 25 sociétés déclarées au 26/08/2026, 7
+seulement en portent un.
 
 Si la société est absente, ce sera une création en phase 6.
 

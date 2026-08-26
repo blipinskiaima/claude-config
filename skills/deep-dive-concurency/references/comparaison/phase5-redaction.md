@@ -1,12 +1,12 @@
 # Phase 5 — Comparaison & rédaction des deux rapports
 
-## Point de départ : la fiche concurrent structurée
+## Point de départ : le corpus vérifié de la Partie 2
 
-Les deux rapports **dérivent** de `concurency/competitors/{NOM}-PROFIL.md` (produite en Partie 2,
-figée par le fact-check) confrontée au **profil AIMA** (`concurency/AIMA-POSITIONING.md`). Les deux ont
-les mêmes axes : la comparaison est un **diff axe par axe** (§2 wet lab ↔ §2, §5 perfs ↔ §5,
-§6 verrous ↔ §7 verrous AIMA…). Ne pas réextraire ni recomparer à la main ce qui est déjà dans
-la fiche — la rédaction met en récit ce diff pour deux publics.
+Les deux rapports **dérivent** du corpus figé par le fact-check (Partie 2), confronté au
+**profil AIMA** (`concurency/AIMA-POSITIONING.md`). Les deux sont structurés sur les mêmes axes :
+la comparaison est un **diff axe par axe** (wet lab ↔ wet lab, perfs ↔ perfs, verrous concurrent
+↔ §7 verrous AIMA…). Ne pas réextraire ni recomparer ce qui est déjà vérifié — la rédaction met
+ce diff en récit pour deux publics.
 
 ## Règle d'or
 
@@ -16,15 +16,18 @@ partie. Densité maximale : tableaux pour les données énumérables, prose pour
 Retirer sans regret : les redites entre sections, les listes de niveau de preuve en tableau
 géant, les commentaires méthodologiques qui n'apportent pas de décision.
 
-## Découpage — toujours deux documents
+## Découpage — deux documents à écrire, deux générés
 
-| Fichier | Public | Contenu |
-|---|---|---|
-| `{CIBLE}-P1-TECHNIQUE.md` | bioinformaticiens, data scientists | wet lab, dry lab, features, modèle, performances, comparaison technique, perspectives |
-| `{CIBLE}-P2-MARCHE.md` | direction générale | commercial, réglementaire, remboursement, financement, essais, concurrence, marché, implications |
+| Fichier | Public | Contenu | Qui l'écrit |
+|---|---|---|---|
+| `{SLUG}-P0-MAJEURS.md` | tous | les faits qui changent leur droit de vendre | `cli.py competitive-profil` |
+| `{SLUG}-P1-TECHNIQUE.md` | bioinformaticiens, data scientists | wet lab, dry lab, features, modèle, performances, comparaison technique, verrous AIMA | **ce skill** |
+| `{SLUG}-P2-MARCHE.md` | direction générale | commercial, réglementaire, remboursement, financement, essais, concurrence, marché, implications | **ce skill** |
+| `{SLUG}-P3-TRAJECTOIRE.md` | tous | ce qui a bougé depuis la dernière révision, chronologie, questions ouvertes | `cli.py competitive-profil` |
 
-Emplacement : `~/Pipeline/Aima-Survey/concurency/rapports/`. PDF combiné dans
-`~/Pipeline/Aima-Survey/concurency/pdf/` via `scripts/md2pdf.py`.
+Emplacement : `~/Pipeline/Aima-Survey/concurency/profils/` — **pas** `rapports/`, gelé depuis le
+29/07/2026. PDF combiné dans `concurency/pdf/profils/{SLUG}.pdf`, produit par le cron du lundi
+dès qu'un `P1-TECHNIQUE.md` existe : **sans P1, pas de PDF du tout**.
 
 Plan détaillé : [../templates/structure-rapports.md](../templates/structure-rapports.md).
 

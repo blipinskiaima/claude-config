@@ -61,7 +61,7 @@ S'il s'agit d'erreurs de l'analyse précédente, le dire simplement et passer à
 
 ## Sortie de phase
 
-Une liste de verdicts et de corrections appliquées — **consolidées dans la fiche
-`concurency/competitors/{NOM}-PROFIL.md`** (template [../templates/profil-concurrent.md](../templates/profil-concurrent.md)),
-chaque chiffre portant son marqueur de preuve et son verdict de fact-check. C'est cette fiche
-figée, et non des notes éparses, qui entre en Partie 3. **Alors seulement**, comparer et rédiger.
+Une liste de verdicts et de corrections appliquées, **consolidées dans le corpus** structuré sur
+les axes du profil AIMA, chaque chiffre portant son marqueur de preuve et son verdict de
+fact-check. C'est ce matériau figé, et non des notes éparses, qui entre en Partie 3.
+**Alors seulement**, comparer et rédiger.
