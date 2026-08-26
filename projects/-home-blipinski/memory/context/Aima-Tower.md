@@ -1,39 +1,41 @@
-# Context — Aima-Tower — 2026-08-26 (clôture session)
+# Context — Aima-Tower — 2026-08-26 (clôture session, 2e passe)
 
-**Branche** : main (poussé, origin/main = 1017ff0)
-**Dernier commit** : 1017ff0 — fix(ia): couche IA hors service (E2BIG) + durcissement /analytics
+**Branche** : main (poussé, origin/main = 09d6a11)
+**Dernier commit** : 09d6a11 — refactor(profil-aima): retirer toute comparaison chiffree nous/concurrents
 **Status** : clean (hors untracked `.claude/worktrees/` et `Exis 1.1.pdf`, hors scope
 depuis le 24/07)
 
 ## Où j'en suis
-Session de réparation, pas de feature. Partie d'un `/explore-projet` + une demande de tour
-de la page `/analytics` : découvert que **toute la couche IA de la Tower était morte** —
-`PIPELINE_CONTEXT` (164 Ko) passé dans un argument unique de `claude -p`, au-delà de
-MAX_ARG_STRLEN (128 Ko). Corrigé, puis les 10 autres problèmes relevés sur la page, puis
-un durcissement demandé par Boris pour rendre Draw with Aima Analyser générique.
-Prod rebuildée en dernier (`--no-cache` puis rebuild simple), alignée sur main en 5.3.1.
+Longue session de réparation puis de nettoyage, en 3 commits. Partie d'un `/explore-projet`
+et d'une demande de tour de `/analytics` : découvert que **toute la couche IA était morte**
+(E2BIG sur le system prompt), réparée, puis durcie à la demande de Boris pour rendre
+« Draw with Aima Analyser » générique quelle que soit la requête. Terminé par le retrait de
+toute comparaison chiffrée nous/concurrents sur `/profil-aima`.
+Prod rebuildée après chaque étape, alignée sur main en 5.3.2.
 
 ## Ce qui marche / ce qui foire
-- ✓ 4 endpoints qui renvoyaient 500 répondent : `/analytics/chat`, `/analytics/db-qa`,
-  `/overview/database`, et la synthèse `/survey` (même `call_claude`).
-- ✓ Vérifié en réel sur le conteneur, pas seulement en test : requête de la capture de
-  Boris rejouée (figure OK, 25,8 s), boucle infinie tuée en 5,0 s, 0 zombie,
-  `px.scatter(trendline="ols")` → 2 traces, 11 modules de l'allowlist importables.
-- ✓ 120 tests passent, dont `tests/test_analytics.py` (18 nouveaux).
-- ✓ `tests/test_dilution.py` échouait à la COLLECTE depuis juin et **bloquait toute la
-  suite** — débloqué (4 des 5 classes testaient l'API supprimée par 80f6330).
+- ✓ `1017ff0` — couche IA : `--system-prompt-file`, sous-processus tuable, boucle
+  d'auto-réparation, allowlist ↔ requirements, `/overview` sorti de `pages.py`.
+- ✓ `f9ca7f7` — synthèse `/survey` en Opus 5 (vérifiée : 4 205 car. sur un article de
+  méthylation cfDNA).
+- ✓ `09d6a11` — `/profil-aima` sans comparaison chiffrée, 667 → 462 lignes, 8 composants
+  orphelins supprimés. Vérifié dans le bundle réellement servi : les 10 libellés retirés
+  sont absents, les 8 conservés présents.
+- ✓ 5 endpoints qui renvoyaient 500 ce matin répondent tous. 120 tests passent.
 - ✗ 2 tests `test_exploratory_compute.py` rouges : snapshots figés à 383 samples cancer
   contre 416 en base (+33). **Préexistant, vérifié par git stash** — dérive de données,
   le nouveau chiffre demande une validation métier de Boris.
-- ⚠ `DeprecationWarning` sur `fork()` en Python 3.12 (process multi-thread). Inoffensif
-  ici (le child ne fait que du calcul + une connexion DuckDB neuve), mais `fork` change
+- ⚠ `DeprecationWarning` sur `fork()` en Python 3.12. Inoffensif ici, mais `fork` change
   de statut en 3.14.
-- ⚠ Survey laissée en Sonnet : question posée à Boris (Opus sur les synthèses d'articles ?),
-  restée sans réponse.
-- ℹ Non traités, assumés : onglet « Avancé » d'`/analytics` (feature à construire, pas un
-  bug), latence DB Q&A (2 appels IA en série, structurel), 5 660 lignes de Dash mort
-  (`pages.py` + `callbacks.py`, gardées pour le rollback v2.3.0 — la dépendance est
-  coupée, pas le code).
+- ⚠ Boris n'a pas encore regardé le rendu de `/profil-aima` à l'écran. J'ai fait un choix
+  au-delà de son énoncé : garder dans la fiche un tableau **descriptif du concurrent seul**
+  (produit, cohorte, sensibilité, spécificité, contexte) plutôt que de le supprimer. Aucune
+  de nos valeurs n'y figure. Question posée, restée sans réponse.
+- ℹ Piège rencontré : `/profil-aima` (Profil AIMA) ≠ `/profils` (Deep dive concurrent).
+  J'ai smoke-testé la mauvaise route avant de m'en apercevoir.
+- ℹ Non traités, assumés : onglet « Avancé » d'`/analytics` (feature à construire), latence
+  DB Q&A (2 appels IA en série, structurel), 5 660 lignes de Dash mort (gardées pour le
+  rollback v2.3.0 — la dépendance est coupée, pas le code).
 
 ## Prochaine étape
 Trancher les 2 snapshots `exploratory` : soit valider 416/374 comme nouvelle référence,
