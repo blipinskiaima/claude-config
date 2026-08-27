@@ -27,6 +27,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Rotation secrets Aima-Tower compromis** — `.env` était tracked dans git jusqu'au 2026-04-21 (historique pushé sur `aima-dx/Aima-Tower`, repo privé). Révoquer `ANTHROPIC_API_KEY` (console.anthropic.com > API Keys) + `accessToken` Seqera (cloud.seqera.io > Tokens), regénérer les 2 et mettre à jour `.env` local + `docker compose restart`. Voir `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/project_env_leak.md`.
 
 - [ ] **Aima-Tower — 2 snapshots `exploratory` périmés (décision métier)** — `tests/test_exploratory_compute.py` attend **383** samples cancer (et 341 en SpeedVac exclude), la base en compte **416** (et 374), soit **+33**. Échec **préexistant**, vérifié par `git stash` : ce n'est pas une régression de code mais la dérive normale de trace-prod depuis l'écriture du test. Seule chose rouge du repo. Trancher : soit valider 416/374 comme nouvelle référence et mettre à jour les deux assertions, soit comprendre d'où viennent ces 33 samples avant de figer.
+- [ ] **Aima-Survey — `events_pending_email` n'a aucun filtre de date** — un rattrapage de collecte avec une fenêtre large fait entrer des dépôts historiques dans la file de notification. Vécu le 2026-08-27 : `--days 2400` a collecté 93 dépôts SEC de 2020-2025 jamais vus, tous partis par mail au cron de 08:01. Borner `--days` côté CLI, ou filtrer la file par `event_date`, ou les deux. `lib/db.py:425`.
+
 ### Skills bioinformatiques
 - [ ] **Améliorer skills v1 avec /meta-skills-creator** — sample, debug-nf, check-consistency sont fonctionnels mais créés sans le processus rigoureux. Raffiner après usage.
 
@@ -59,6 +61,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-08-27 — Aima-Survey : refonte du dossier Biodesix, route EX-99.1, audit du profil AIMA
+
+- [x] **Dossier Biodesix refait sur documents primaires** — de dernier à premier des huit : P1 344 → 1 730 l. (45 → 218 marqueurs), P2 291 → 1 390 l. (47 → 236). Cause racine du dossier faible : écrit sur des métadonnées alors que 112 ko de prose 10-K dormaient déjà en base. 534 constats, 548 affirmations réfutées. Commit `d302c20`.
+- [x] **Collecteur : route 8-K EX-99.1 pour les résultats trimestriels** — 53 communiqués étaient en base sans corps (Guardant 26, Natera 22, Biodesix 5), là où vivent le CA par ligne, les volumes et la guidance. Rattrapés, 80/83. Seule route restante pour les concurrents publiant sur GlobeNewswire, injoignable (0/24 contre 76/76 sur PR Newswire). 8 tests, 263 au total.
+- [x] **`AIMA-POSITIONING.md` audité contre le PDF Exis 1.1** — 7 corrections, 5 ajouts, 3 passes adversariales. 3 marqueurs `[EXIS]` posés sur des valeurs absentes du rapport ; seuil décrit comme recalculé alors que le SD-02 le revendique *a priori* ; verrou n° 1 périmé par SPOT-MAS. Ajouts : cohorte vessie n=50, reproductibilité §2.5 (deux groupes à CV > 150 %), absence de validation LOD.
 
 ## 2026-08-26 — Aima-Tower : page QARA et réparation de la couche IA · short-read : protocole mVAF v1.4 · Aima-Survey : Biodesix et correctif du collecteur
 
