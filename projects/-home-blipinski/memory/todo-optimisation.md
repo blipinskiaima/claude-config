@@ -62,13 +62,14 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-08-27 — Aima-Survey : refonte du dossier Biodesix, route EX-99.1, audit du profil AIMA · Aima-Tower : mVAF v1.5 et lisibilité du graphe /reproductibilite
+## 2026-08-27 — Aima-Survey : refonte du dossier Biodesix, route EX-99.1, audit du profil AIMA · Aima-Tower : mVAF v1.5 et lisibilité du graphe /reproductibilite · Bam2Beta : temps de séquençage rétrospectif
 
 - [x] **Dossier Biodesix refait sur documents primaires** — de dernier à premier des huit : P1 344 → 1 730 l. (45 → 218 marqueurs), P2 291 → 1 390 l. (47 → 236). Cause racine du dossier faible : écrit sur des métadonnées alors que 112 ko de prose 10-K dormaient déjà en base. 534 constats, 548 affirmations réfutées. Commit `d302c20`.
 - [x] **Collecteur : route 8-K EX-99.1 pour les résultats trimestriels** — 53 communiqués étaient en base sans corps (Guardant 26, Natera 22, Biodesix 5), là où vivent le CA par ligne, les volumes et la guidance. Rattrapés, 80/83. Seule route restante pour les concurrents publiant sur GlobeNewswire, injoignable (0/24 contre 76/76 sur PR Newswire). 8 tests, 263 au total.
 - [x] **`AIMA-POSITIONING.md` audité contre le PDF Exis 1.1** — 7 corrections, 5 ajouts, 3 passes adversariales. 3 marqueurs `[EXIS]` posés sur des valeurs absentes du rapport ; seuil décrit comme recalculé alors que le SD-02 le revendique *a priori* ; verrou n° 1 périmé par SPOT-MAS. Ajouts : cohorte vessie n=50, reproductibilité §2.5 (deux groupes à CV > 150 %), absence de validation LOD.
 - [x] **`/reproductibilite` — mVAF v1.5 et seuils tracés** — v1.5 ajoutée aux modèles, seuil 0,0042 reporté de v1.4 (décision Boris) et non recalibré : la recette Exis appliquée à v1.5 donnerait 0,0025, donc sa spécificité réelle dépasse les 95 % visés. Les seuils sont désormais tracés sur le graphe — la couleur des points en dépendait déjà, rien ne le montrait. Commit `b45b14a`.
 - [x] **`/reproductibilite` — filtre de conformité QC et échelle log réparée** — case « Conformes uniquement » (≥ 5 M reads et ≥ 0,25×) qui recalcule CV et accord sur le sous-ensemble et retrouve exactement les 11 aliquots exclus en QARA §2.5. Deux bugs Plotly corrigés en log : axe partant à 1e-48 (range retenu du rendu précédent) et valeurs nulles invisibles. Détails : `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/reproductibilite_v15_graphe_qc.md`.
+- [x] **Temps de séquençage rétrospectif — 485 samples** — `/scratch/rarefaction_horaire/result.csv` (ID, sequencing_time, multi_run, nb_bam) : médiane **71h56**, 62,9 % des runs à ~72 h. 32 samples sur 2 flow cells détectés via la fraction de seconde (signature du run) — leur durée est une fenêtre calendaire, pas un temps machine. Conditionne les points 12h/24h/48h de la raréfaction horaire : 449 samples produisent 3 points, 36 en produisent 2.
 
 ## 2026-08-26 — Aima-Tower : page QARA et réparation de la couche IA · short-read : protocole mVAF v1.4 · Aima-Survey : Biodesix et correctif du collecteur
 
