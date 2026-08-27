@@ -35,7 +35,7 @@
 ## Données & infra
 - [Infra POD5/BAM/export](reference_infra_pod5_bam_export.md) — extraction barcode (+ workaround logs Pod2Bam), POD5 storage 6 colonnes, structure S3 AWS/SCW, BETA_28M, ordre export, IchorCNA, date_done, gsheet config, CLI defaults
 - [Frag softclip vs trim barcode](project_frag_softclip_trim.md) — AlCapone re-basecallé offline hétérogène (trim ON/OFF). frag_mode v1 gonflé jusqu'à +148bp sur ~81 samples ; **seul frag_mode_sc est fiable** en cross-cohorte
-- [Samples Twist](project_twist_samples.md) — 11 samples liquid CGFL (titration enrichissement Twist), pas un type/cohorte/commande
+- [Samples Twist](project_twist_samples.md) — 22 samples liquid CGFL (titration enrichissement Twist), pas un type/cohorte/commande. Série `_rep_2` = réplicats **inter-run** (run/barcode différents, PAS des rebasecalled) → témoin de reproductibilité : mVAF/Mode1_sc/probs stables malgré ×2,35 de profondeur, seuls les **classifieurs** divergent (TOO, ancestry). ⚠ `pod5_adresse` NULL sur les multiplexés
 - [HCL Verification](project_hcl_verification.md) — 275 samples vérifiés, transfert raw→S3 intègre, raw purgé 12/03/2026
 - [Script pod5_verification](reference_pod5_verification.md) — génération de pod5_verification.tsv
 

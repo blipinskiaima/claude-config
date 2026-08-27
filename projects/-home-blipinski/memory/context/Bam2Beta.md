@@ -1,36 +1,45 @@
-# Context — Bam2Beta — 2026-08-21T16:58:13+00:00
+# Context — Bam2Beta — 2026-08-27T15:23
 
 **Branche** : main
 **Dernier commit** : 5693a43 — feat(dev): backfill retrospectif du ratio N50/N75
-**Status** : 8 fichiers non propres (3 dev/SCW/*.sh + 5 non trackés) — tous
-préexistants, volontairement non commités
+**Status** : 14 fichiers (module RAREFACTION_HORAIRE d'une session parallèle, non commité par moi)
 
 ## Où j'en suis
 
-Session de **backfill rétrospectif sur les Bladder_Urine CGFL**, tout est terminé.
-mVAF v1.5 (chantier A du matin) est commitée ET déployée : 1 362/1 362 liquides.
+Deux chantiers, aucun code du pipeline touché (analyse rétrospective seule).
+
+**A. Impact référence/pipeline d'alignement** — question d'un interlocuteur externe qui
+aligne avec `epi2me-labs/wf-alignment` sur `Homo_sapiens.GRCh38.dna.primary_assembly.fa`
+au lieu de notre `GCA_000001405.15_GRCh38_no_alt_analysis_set`. Étapes 1→5 rendues,
+**étape 6 (stratégie de test) proposée et en attente de validation Boris**. Rien lancé.
+
+**B. Temps de séquençage** — LIVRÉ. `/scratch/rarefaction_horaire/result.csv`,
+485 samples (185 CGFL + 300 HCL), 4 colonnes : ID, sequencing_time, multi_run, nb_bam.
 
 ## Ce qui marche / ce qui foire
 
-- ✓ **MITO 37/37**, **SMALL_FRAGMENTS 7/7**, **n50_ratio 38/38** — plus rien ne tourne
-- ✓ `dev/backfill_n50_ratio.sh` commité : recalcul depuis le `read_lengths.csv` S3,
-  **le BAM n'est jamais stagé**, `cmp`-identique au pipeline sur Healthy_826 + Breast_6
-- ✓ mVAF v1.5 : V1.4 et V1.5 au même périmètre, 1 362/1 362 liquides, 0 écart
-- ✗ **`raima:0.5.4` toujours LOCALE, non poussée** — bloquant avant toute qualification
-- ✗ **v1.5 jamais testée en régime normal** (2-5 M reads EPIC) : `Healthy_826` sature
-- ✗ **8 runs Nextflow en parallèle ont saturé `/scratch`** (8 × 21 Go de staging) →
-  24 échecs `No space left on device`. Repris en série, tout récupéré.
-  `/scratch` est reparti à **237 Go libres**, les workdirs ne se recyclent pas
-- ✗ 25/55 samples relancés pour rien en SMALL_FRAGMENTS (sorties de juin déjà bonnes,
-  module inchangé depuis `d6d4556`) — croiser avec l'existant AVANT de lancer
-- ✗ `--bootstrap` sur 12 samples **annulé** : les 3 sorties existaient déjà
-- ✗ `MEMORY.md` à 21,2 Ko, au-dessus du seuil de 17,1 Ko — compactage à faire
+- ✓ **Notre référence confirmée sur 4 sources** : `nextflow.config:119` de Pod2Bam, le
+  rapport séquenceur MinKNOW, le PDF client, et les 195 @SQ des BAM réels (chrEBV présent)
+- ✓ **Le vrai écart est le preset minimap2**, pas la référence : wf-alignment utilise
+  `-ax map-ont -y` (k15/w10), notre chaîne `lr:hq` (k19/w19). Notre benchmark Pod2Bam
+  mesure +5 pts de mapping rate. Le `-q 20` de `Preprocess_28M` amortit côté mVAF ;
+  FRAG et BETA epic n'ont **aucun filtre MAPQ** → plus exposés
+- ✓ **Ensembl a démasqué le PAR de chrY** depuis la release 110 (GRCh38.p14, 2023) —
+  mesuré des deux côtés. Sans impact chez nous : 0 sonde EPIC dans les PAR, mVAF et CNV
+  sur chr1-22 seulement
+- ✗ **Le test hg38 vs GRCh38 de février ne prouve PAS ce que CLAUDE.md laisse croire** :
+  Bam2Beta n'a aucun aligneur, ce test comparait le FASTA aval (modkit/mosdepth), jamais
+  l'alignement. Formulation de `CLAUDE.md` à corriger — Boris n'a pas tranché
+- ✗ **2 trous non comblés** : régions masquées hors PAR sur chr5/14/19/21/22 (fichier NCBI
+  `unmasked_cognates_of_masked_CEN_PAR.txt` non récupéré, et c'est le seul endroit où la
+  référence pourrait toucher chr1-22) ; comportement de `raima::infer_sex` sur X/Y
+- ✓ **32 samples multi_run détectés** (2 flow cells) via la fraction de seconde, signature
+  du run. Leur `sequencing_time` est une fenêtre calendaire, pas un temps machine —
+  `HCL_Lung_26` = 99h35 affiché mais 50h57 + gap 1h50 + 46h49
 
 ## Prochaine étape
 
-Au choix :
-- Vider `/scratch/nxf-work` (sorties déjà sur S3) avant toute nouvelle vague
-- Pousser `raima:0.5.4` puis tester la v1.5 sur un sample à 2-5 M reads EPIC
-- Compacter `MEMORY.md` sous 17,1 Ko
-- Faire entrer les 38 nouveaux `n50_ratio.tsv` en base (30/38 en zone C →
-  déplacera les stats de la cohorte urinaire)
+Trancher le sort des **32 samples multi_run** pour la raréfaction horaire (traiter tels
+quels / exclure / traiter par run) — décision à prendre avant que la session parallèle
+avance. Puis, si Boris valide, l'étape 6 du chantier A : test du preset `lr:hq` vs
+`map-ont` sur un uBAM `demux_trimmed/`, en 2 étages avec porte de sortie.
