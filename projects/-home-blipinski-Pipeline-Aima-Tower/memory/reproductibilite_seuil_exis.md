@@ -20,7 +20,10 @@ if model == "mvaf_v14":
     return "detection" if score > MVAF_V14_SEUIL else "negatif"
 ```
 
-## Le seuil est propre à v1.4 — ne pas l'étendre à v1.0
+## Le seuil ne s'étend pas à v1.0 (mais bien à v1.5)
+
+⚠ L'argument porte sur l'**échelle**, pas sur le numéro de version : `mvaf_v15` partage la
+colonne et le format de v1.4 et a donc reçu ce seuil en report le 2026-08-27.
 
 `mvaf_v1` sort de `qc_metrics` (float), `mvaf_v14` de `retd_suivis` (VARCHAR virgule FR).
 Échelles différentes, et aucun seuil n'a été calibré pour v1.0 : lui appliquer 0,0042
@@ -48,13 +51,17 @@ dix-millième sous le seuil, et une famille unanime devient discordante. La mét
 d'accord est désormais **sensible au voisinage immédiat de 0,0042**, ce que l'ancienne
 règle (`> 0`) n'était pas. À dire quand on commente une baisse d'accord.
 
-## Limite visuelle connue
+## Limite visuelle — RÉSOLUE le 2026-08-27
 
-À l'échelle linéaire, tout ce qui est sous 0,0042 est collé à zéro : **les points changent
-de couleur sans qu'on voie pourquoi**. La case « Échelle logarithmique » le rend lisible.
-Aucune ligne de seuil ni mention « > 0,0042 » n'a été ajoutée à la légende — pas demandé.
-Le champ `thresholds` de `MODELS` ne convient pas tel quel : sa forme (`s1`/`s2`/3 labels)
-est spécifique à themelio et ferait rendre une légende à 3 catégories.
+À l'échelle linéaire, tout ce qui est sous 0,0042 est collé à zéro : **les points changeaient
+de couleur sans qu'on voie pourquoi**. C'est exactement ce que Boris a fini par signaler
+(« la coloration n'est pas dépendante du seuil alors qu'elle devrait l'être ») — elle l'était,
+mais rien ne le montrait.
+
+⚠ Ce paragraphe disait qu'aucune ligne de seuil n'avait été ajoutée et que le champ
+`thresholds` ne s'y prêtait pas. **Les deux ont changé** : `thresholds` accepte désormais
+`s2: null` (une coupure, légende à 2 catégories) et la ligne est tracée pour v1.4 et v1.5,
+valeur affichée en légende. Voir [[reproductibilite_v15_graphe_qc]].
 
 ## Tests
 
