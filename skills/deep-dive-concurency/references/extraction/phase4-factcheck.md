@@ -51,7 +51,7 @@ L'agent n'a pas accès à la plaquette locale (ni web, ni PubMed). Vérifier soi
 
 - **INEXACT** → corriger la valeur, et vérifier si l'argument construit dessus tient encore
 - **TROMPEUR** → reformuler avec le contexte manquant, ne pas supprimer
-- **NON VÉRIFIABLE** → conserver avec le marqueur `[NON VÉRIFIÉ]`, ne jamais deviner
+- **NON VÉRIFIABLE** → conserver avec le marqueur `[NON CONFIRMÉ]`, ne jamais deviner
 - Une erreur trouvée dans un raisonnement invalide **tout ce qui en découle** — relire la chaîne
 
 ## Rapporter honnêtement à Boris

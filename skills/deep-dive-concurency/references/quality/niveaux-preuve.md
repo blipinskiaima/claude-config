@@ -30,6 +30,27 @@ relecture est « puis-je opposer ce chiffre à l'extérieur ? ». Trois réponse
    aller lire la source.
 5. **Un `[NON CONFIRMÉ]` de notre fait engage.** Toute hypothèse de notre part doit être
    formulée comme telle et accompagnée de la manière de la tester.
+6. ⚠ **« Absent du document X » n'est PAS « non publié ».** Un négatif ne porte que sur la
+   source qu'on a réellement ouverte. Écrire « non publié » revient à affirmer quelque chose
+   du monde, et n'est licite qu'après avoir interrogé **la source qui le publierait
+   normalement**.
+
+   Cas mesuré le 26/08/2026 sur le dossier Biodesix, et c'est ce qui l'a rendu faible : le
+   volet remboursement concluait « aucun code PLA », « aucun tarif », « aucune LCD ». Les
+   trois étaient vrais du 10-K et **faux du monde** — les codes PLA sont publiés par l'AMA,
+   les tarifs ADLT par CMS chaque trimestre, les LCD par le MAC. La société avait trois tests
+   ADLT depuis 2018, 2019 et 2023, donc **trois tarifs publics**, et aucune requête n'avait
+   été passée. Le dossier de référence (Guardant) tient son tarif de 1 495 $ de CMS, pas d'un
+   10-K.
+
+   La règle pratique : **un dépôt d'entreprise dit ce que l'entreprise doit divulguer, jamais
+   ce qu'un tiers publie sur elle.** Prix, codes, couvertures, décisions réglementaires et
+   brevets ont chacun leur registre public — c'est là qu'on va, et le négatif ne s'écrit
+   qu'après.
+7. **Un négatif n'est opposable qu'avec sa requête.** « Aucun brevet Biodesix sur la
+   méthylation » ne vaut rien seul ; avec « PATENTSCOPE, `PA:(biodesix)`, 162 résultats,
+   aucun sur bisulfite, fragmentomique ou nanopore », c'est une donnée. Nommer la base, la
+   requête et le nombre de résultats — sinon c'est `[NON CONFIRMÉ]`, jamais `[SOURCÉ]`.
 
 ## Rappel compact à mettre en en-tête de rapport
 

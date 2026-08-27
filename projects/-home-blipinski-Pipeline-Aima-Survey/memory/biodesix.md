@@ -10,6 +10,30 @@ metadata:
 Ajoutée à la veille le 2026-08-26. `tier_3`, menace **BASSE**. Dossier complet :
 `concurency/profils/BIODESIX-P{0,1,2,3}-*.md`.
 
+⚠ **Le dossier a été entièrement refait le 2026-08-27** (commit `d302c20`). La version du 26/08
+était la plus faible des huit — écrite sur des métadonnées, jamais sur des documents. Ce qui suit
+reste vrai ; ce qui suit ne suffit plus. Cinq choses que seul le texte intégral donne :
+
+- **La VPN du Nodify CDT est un non-événement** : 66,5 % contre un taux de base de bénignité de
+  64,7 % dans la même cohorte, soit **+1,8 point**. Les auteurs l'écrivent eux-mêmes — « *should
+  be considered non-informative* ».
+- **Pitcher 2026 n'est pas une réplication indépendante** de Long 2025 : chevauchement ≥ 23 %. Et
+  son plus gros contributeur, **CLARIFY (42 % du pool)**, est une revue de dossiers où **le
+  clinicien connaissait le résultat** — les trois autres cohortes sont en aveugle. I² = 47 % au
+  seuil High, celui que la conclusion recommande.
+- **Le signal de sécurité d'ORACLE change de signe avec l'appariement** : −1,26 % (favorable)
+  avant PSM, **+3,91 % après**. Le diagnostic final est une des 8 variables d'appariement.
+  L'étude n'a apparié que **43,5 %** de sa propre cible, et **le test de non-infériorité
+  pré-spécifié n'est jamais rapporté**. Le comparateur repose sur **4 évènements**.
+- **ALTITUDE se raconte en trois versions contradictoires** : le 10-K Item 1 dit arrêt sur
+  recommandation du **DSMB**, le MD&A dit objectif d'inclusion **atteint**, le 10-Q ne garde que
+  la seconde, et le registre affiche toujours `ACTIVE_NOT_RECRUITING` / `2000 ESTIMATED` deux mois
+  après l'arrêt. Le motif du DSMB et l'effectif réel sont **inconnus**.
+- **Toute la croissance 2025 est hors Medicare** : Medicare **+1,8 %** (27,8 → 28,3 M$) contre
+  **+38 %** hors Medicare, calculé depuis le pourcentage et le total tous deux publiés. Le moteur
+  est **un payeur commercial jamais nommé** qui a repris ses remboursements au T3 2025, et dont
+  ils écrivent qu'il n'y a « *no guarantee of future reimbursement performance* ».
+
 ## Le verdict technique, en une ligne
 
 **Ni méthylation, ni fragmentomique, ni CNV genome-wide.** Nulle part : ni en produit, ni dans

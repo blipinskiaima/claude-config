@@ -97,6 +97,36 @@ résumé, le score IA et la classification. C'est pourquoi le `publication-sitem
 - **CT.gov reconstruit son snapshot vers 09:00 UTC** → un cron à 8h00 Paris lit celui de la veille.
 - Interdits par ToS : LinkedIn (contractuel), Crunchbase, Google Patents `/xhr/`. Aucune voie
   brevets à la fois licite et non authentifiée sans clé USPTO ODP.
+- **Les fac-similés USPTO se servent sans session** :
+  `image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/{numero}` → HTTP 200. C'est la seule
+  route brevets rejouable : Google Patents renvoie **503**, Espacenet / registre EPO / Justia /
+  lens.org **403**. ⚠ Tous les PDF n'ont pas de couche texte — trois brevets Biodesix sur cinq
+  rendaient 8 à 139 caractères à `pdftotext`. Le dire, ne pas deviner le contenu.
+- ⚠ **`api.patentsview.org` renvoie HTTP 200 avec une page HTML de transition** — l'API est
+  retirée. Un faux succès : toujours inspecter le corps, jamais le seul code.
+
+## GlobeNewswire est mort pour nous, l'EX-99.1 le remplace (2026-08-27)
+
+Mesure sur `presslinks` : **PR Newswire 76/76** corps récupérés (DELFI 53, Guardant 16,
+Singlera 7) contre **GlobeNewswire 0/24** (Biodesix 20, Singlera 4). Le domaine est injoignable
+depuis ce réseau — `http=000`, curl rc 92 en HTTP/2 **comme** en HTTP/1.1, délai dépassé en
+WebFetch, 5 tentatives sur deux jours.
+
+⚠ **Ce n'est PAS un défaut de `_ZONES` dans `newsroom.py`.** Un rapport d'agent affirmait
+« HTTP 200 avec `<article>` absent » et concluait à un extracteur trop étroit : **non
+reproductible**. La coupure est nette **par hôte**, pas par extracteur — élargir l'extracteur ne
+réparerait rien, et l'aurait fait passer pour réparé.
+
+La route de remplacement, implémentée dans `sec_edgar.py` : **8-K item 2.02 → exhibit EX-99.1**,
+lu dans `{accession}.txt` (le fichier de soumission complet, seul présent dans l'archive de tous
+les déposants — `index.json` ne liste pas les pièces chez Biodesix). Capturer après `<TEXT>` et
+non après `<TYPE>`, sinon `<SEQUENCE>`, `<FILENAME>` et `<DESCRIPTION>` fuient en tête de corps.
+
+Ça a débloqué **53 communiqués de résultats** (Guardant 26, Natera 22, Biodesix 5) qui étaient
+tous sans corps : c'est là que vivent le CA par ligne, les volumes de tests, la marge et la
+guidance — introuvables dans les 10-Q. Un communiqué de résultats reste **pan-activité**, donc il
+ne classe pas l'indication. Rattrapage sans risque : re-collecter suffit, `db.py` resynchronise
+`raw_text` à hash constant sans notifier.
 
 ## Contraintes structurelles à respecter
 

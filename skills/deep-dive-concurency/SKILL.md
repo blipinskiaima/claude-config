@@ -107,6 +107,29 @@ vérifié reste dans la session et va directement en Partie 3.
    évènement collecté : P0 et P3 sortiront vides tant que le bloc `watch` n'existe pas
    (phase 6).
 
+   ⚠ **« Ce que la veille a capté » veut dire le TEXTE, pas le décompte.** La colonne
+   `competitive_events.raw_text` porte le corps des documents, pas seulement leur titre :
+   sections `[litiges]` et `[concurrence]` des 10-K et 10-Q, et depuis le 27/08/2026 les
+   communiqués de résultats déposés en EX-99.1. **Ouvrir ces textes fait partie de la phase 0**,
+   au même titre que lire la plaquette.
+
+   ```bash
+   cd ~/Pipeline/Aima-Survey && python3 -c "
+   import duckdb
+   c = duckdb.connect('data/aima_survey.duckdb', read_only=True)
+   for r in c.execute('''select source, event_date, substr(title,1,60), length(coalesce(raw_text,\'\'))
+     from competitive_events where competitor ilike ? and coalesce(raw_text,\'\') <> \'\'
+     order by event_date desc''', ['%{NOM}%']).fetchall(): print(r)"
+   ```
+
+   Compté le 26/08/2026 sur Biodesix : **112 ko de prose réglementaire signée de la société
+   étaient en base le jour de la rédaction et n'ont pas été ouverts** — un 10-K et trois 10-Q.
+   Le dossier est parti sur les seuls nombres de l'API XBRL et s'est retrouvé avec 29
+   `[NON CONFIRMÉ]` contre 12 `[SOURCÉ]`, seul cas où le non-confirmé l'emporte sur les huit
+   dossiers. C'est la cause racine de sa refonte intégrale. **Une société cotée dit dans ses
+   dépôts ce qu'elle ne dira jamais dans un communiqué** : ses litiges, ses dépendances
+   fournisseur, et la liste de ceux qu'elle considère elle-même comme ses concurrents.
+
 Voir [references/extraction/phase0-cadrage.md](references/extraction/phase0-cadrage.md).
 
 ### Phase 1 — Sources primaires

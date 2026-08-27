@@ -9,7 +9,7 @@ Les confondre est l'erreur la plus fréquente **et la plus grave**.
 
 | Niveau | Ce que c'est | Marqueur |
 |---|---|---|
-| **Observé** | mesuré sur la cohorte de validation | `[MESURÉ]` |
+| **Observé** | mesuré sur la cohorte de validation | `[SOURCÉ]` |
 | **Repondéré** | réestimé sur une population de référence (stades, âge) | `[PONDÉRÉ]` |
 | **Validation croisée** | mesuré sur l'entraînement, **toujours meilleur** | ⚠ ne jamais citer comme performance |
 | **Marketing** | plaquette, souvent sans publication | `[MARKETING]` |

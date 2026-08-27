@@ -52,7 +52,7 @@ MCED via THEMELIO, ou aucune), ce que fait le test en une phrase, puis ce qu'il 
 en sont sur l'échelle LDT → marquage → approbation.
 
 **2. Wet lab** — tableau : tube, délai, traitement, extraction, kit de librairie, séquenceur,
-couverture, organisation en lots, insu. Marquer `[NON VÉRIFIÉ]` ce qui manque.
+couverture, organisation en lots, insu. Marquer `[NON CONFIRMÉ]` ce qui manque.
 
 **3. Dry lab & signaux mesurés** — schéma ASCII du pipeline avec les **versions exactes** des
 outils, puis un tableau des features avec leurs paramètres. Signaler les paramètres hérités d'un
@@ -76,6 +76,27 @@ section qui transforme un dossier en décision : elle dit ce qui reste défendab
 **Corpus** — tableaux par rôle avec PMID cliquables, en signalant les chiffres trompeurs
 directement dans la colonne « rôle ».
 
+⚠ **Toute source citée porte un lien permanent, pas seulement les publications.** Une date et
+un intitulé ne se ré-ouvrent pas : un dossier dont les sources primaires ne sont pas rejouables
+par un tiers n'est pas opposable. Les formes qui marchent, vérifiées le 27/08/2026 :
+
+| Source | Forme du lien |
+|---|---|
+| Dépôt SEC | `https://www.sec.gov/Archives/edgar/data/{cik}/{accession_sans_tirets}/{accession}-index.htm` |
+| LCD Medicare | `https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid={id}` |
+| Article de couverture | `https://www.cms.gov/medicare-coverage-database/view/article.aspx?articleid={id}` |
+| Brevet US | `https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/{numero}` — servi sans session ; Google Patents renvoie **503** et Espacenet, le registre EPO, Justia et lens.org **403** |
+| Essai | `https://clinicaltrials.gov/study/{NCT}` |
+| Publication | `https://pubmed.ncbi.nlm.nih.gov/{PMID}/` |
+
+⚠ **Jamais un chemin de travail local.** Le répertoire de session disparaît ; le lecteur du
+dossier n'y a pas accès. Si une source n'a pas d'URL stable, le dire dans la colonne d'accès.
+
+**Annoter le NIVEAU D'ACCÈS obtenu, source par source** — lu intégralement / extraction ciblée /
+résumé seul / inaccessible **avec son code HTTP**. C'est ce qui rend les négatifs opposables :
+« absent du 10-K que j'ai lu en entier » et « je n'ai pas ouvert le 10-K » ne se distinguent
+pas autrement.
+
 **Incertitudes à lever** — liste numérotée.
 
 **Journal de mise à jour** — une ligne datée par révision, ce qui a changé et pourquoi. Présent
@@ -92,7 +113,7 @@ En-tête identique, renvoi vers P1.
 lecteurs liront. **Les faits majeurs de P0 doivent y être repris et analysés**, pas seulement
 listés : P0 dit ce qui s'est passé, le §1 dit ce que ça change.
 
-**2. Où ils en sont commercialement** — tableau, avec les `[NON VÉRIFIÉ]` assumés (prix,
+**2. Où ils en sont commercialement** — tableau, avec les `[NON CONFIRMÉ]` assumés (prix,
 volumes). Ajouter une ligne « lecture » : ce que le silence sur certains chiffres signifie.
 Y loger la feuille de route produit quand elle existe.
 

@@ -1,32 +1,41 @@
-# Context — Aima-Survey — 2026-08-26 (clôture session)
+# Context — Aima-Survey — 2026-08-27
 
-**Branche** : main (poussé, origin/main = 3d9effa)
-**Dernier commit** : 3d9effa — feat(concurrence): Biodesix en 8e concurrent + crédibilité
-des sources jugée valeur par valeur
+**Branche** : main (poussé, origin/main = d302c20)
+**Dernier commit** : d302c20 — refonte(biodesix): dossier repris sur documents
+primaires + route 8-K EX-99.1
 **Status** : clean
 
 ## Où j'en suis
-Session terminée, feuille de route en 6 étapes menée au bout. Biodesix est le 8e concurrent
-surveillé : dossier complet en 4 volets dans `concurency/profils/`, visible dans l'onglet
-Deep dive concurrent de la Tower, PDF de 19 pages généré. Et le garde-fou `_source_credible`
-du collecteur a été corrigé — c'est le vrai apport technique de la session.
+Session terminée. Le dossier Biodesix a été entièrement refait — il était le plus
+faible des huit, il est maintenant le premier sur les quatre mesures de densité.
+Deux acquis dépassent Biodesix : la route 8-K EX-99.1 dans le collecteur, et
+l'audit du profil AIMA retourné contre nous.
 
 ## Ce qui marche / ce qui foire
-- ✓ Collecte Biodesix : 44 évènements, 3 sources actives, **0 source en échec**. Les 44 ont
-  été marqués notifiés sans envoi (demande de Boris) — la file est vide, seuls les vrais
-  deltas partiront désormais.
-- ✓ ClearNote réparé : la crédibilité se juge valeur par valeur, `publication-sitemap` retiré.
-  Simulation du cron quotidien sur les 8 concurrents → **0 source en échec**.
-- ✓ 255 tests passent (+3 dont un test de non-régression sur le jugement par valeur).
-- ✓ Skill `/deep-dive-concurency` réaligné sur la pratique — 7 dérives corrigées, dont les
-  chemins (`profils/` et non `rapports/`), les 4 volets, et les marqueurs de preuve.
-- ⚠ Profondeur du canal Biodesix limitée à ~20 communiqués (~10 mois) : leur newsroom ne
-  pagine pas. Le début d'une fenêtre à 12 mois n'est couvert que par la SEC.
-- ⚠ Le cron tourne à 8h00 Paris alors que ClinicalTrials.gov reconstruit son snapshot vers
-  09:00 UTC → on lit J-1 sur cette source. Assumé par défaut, jamais tranché.
-- ⚠ Aucune alerte d'échec de cron dans l'écosystème : un job mort reste invisible.
+- ✓ P1 1730 l. / 218 marqueurs, P2 1390 / 236, contre 344/45 et 291/47 avant.
+  534 constats, 548 affirmations réfutées (490 confirmées, 48 trompeuses,
+  10 inexactes). PDF régénéré 19 → 77 pages.
+- ✓ Route **8-K EX-99.1** (item 2.02) : 53 communiqués de résultats étaient en
+  base sans corps, tous concurrents confondus. Rattrapés, 80/83, moy. 19 385 car.
+  263 tests (+8).
+- ✓ `AIMA-POSITIONING.md` audité : 7 corrections, 5 ajouts, **3 passes** de
+  vérification adversariale contre le PDF SD-02. Tous les chiffres `[EXIS]`
+  confirmés exacts dans les deux sens.
+- ✗ **GlobeNewswire est mort pour nous** : PR Newswire 76/76 corps, GlobeNewswire
+  0/24. `http=000`, rc 92, curl et WebFetch. Ce n'est PAS `_ZONES` — la coupure
+  est par hôte. L'EX-99.1 est la route de secours.
+- ✗ **Mail parasite envoyé le 27/08 à 08:01** : mon rattrapage avec `--days 2400`
+  a collecté 93 dépôts SEC historiques 2020-2025 jamais vus, qui sont entrés dans
+  la file de notification. `events_pending_email` n'a aucun filtre de date. J'ai
+  voulu les marquer notifiés sans envoi, le classifieur a bloqué l'écriture, et le
+  cron est parti avant. File à zéro depuis.
+- ⚠ Les 3 passes ont trouvé 8, puis 5, puis 5 défauts graves, tous de moi. Le même
+  réflexe **quatre fois** : correction appliquée à un seul des deux endroits où
+  l'affirmation vivait. La boucle n'est pas sèche — j'ai arrêté sur jugement, la
+  gravité décroissant nettement.
 
 ## Prochaine étape
-Rien de bloquant. Deux candidats si on reprend ce sujet : trancher l'horaire du cron
-concurrentiel (8h00 Paris vs snapshot CT.gov à 09:00 UTC), ou porter une alerte d'échec de
-cron — c'est le trou le plus large du dispositif, identifié dès le 28/07 et jamais comblé.
+Rien de bloquant. Trois candidats si on reprend : une 4ᵉ passe de vérification du
+profil AIMA avant de le considérer opposable ; borner `--days` ou filtrer
+`events_pending_email` par date pour qu'un rattrapage ne puisse plus déclencher
+un mail d'archives ; et toujours l'alerte d'échec de cron, ouverte depuis le 28/07.
