@@ -62,6 +62,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-09-02 — trace-prod : schema v29 (amplitude fragmentomique) + dette v28 soldée
+
+- [x] **trace-prod schema v29 — amplitude fragmentomique** — `retd_suivis.frag_amplitude_sc` (liquid only), lue dans `Fragmentomics/filtered_softclipped/{s}.amplitude_fragmento_qc.tsv` ; backfill 1362/1362 (100 %, 0 KO), export « Amplitude Frag » en position 25/55 après Sex Predicted, 0 écart au contrôle croisé base↔fichiers et gsheet↔base. Détails dans `project_schema_v29_frag_amplitude_sc.md`.
+- [x] **Dette v28 soldée** — `rarefaction_horaire` (terminé fin août mais jamais commité) commité et documenté : section 12 du README + section CLAUDE.md avec ses 3 gotchas (Loyfer non bootstrapable, `LOG/` à exclure, `update-column -s` qui crée une ligne).
+
 ## 2026-08-27 — Aima-Survey : refonte du dossier Biodesix, route EX-99.1, audit du profil AIMA · Aima-Tower : mVAF v1.5 et lisibilité du graphe /reproductibilite · Bam2Beta : temps de séquençage rétrospectif
 
 - [x] **Dossier Biodesix refait sur documents primaires** — de dernier à premier des huit : P1 344 → 1 730 l. (45 → 218 marqueurs), P2 291 → 1 390 l. (47 → 236). Cause racine du dossier faible : écrit sur des métadonnées alors que 112 ko de prose 10-K dormaient déjà en base. 534 constats, 548 affirmations réfutées. Commit `d302c20`.
