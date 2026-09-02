@@ -20,7 +20,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## Haute priorité
 
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
-- [ ] **Bam2Beta — `assets/themelio_absent.csv` manquant (régression probable)** — `main.nf:217` référence ce fichier avec `checkIfExists: true` comme placeholder quand `THEMELIO=false` + `RAPPORT=true`, or il a été supprimé au commit `c1bd572` (2026-07-22, refonte check-conformity), ancêtre du HEAD. `conf/solid.config` déclare exactement cette combinaison (l.27 + l.30) → tout run `-profile solid` échouerait au lancement. **Constat en lecture de code uniquement, non confirmé par exécution.** Restaurer le fichier depuis l'historique (`git show c1bd572^:assets/themelio_absent.csv`, header seul sans données) ou retirer la dépendance. Le test du chemin de repli mentionné au CHANGELOG V2.2.0 date d'avant la suppression, donc à rejouer.
 
 ## Moyenne priorité
 
@@ -62,7 +61,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-09-02 — trace-prod : schema v29 (amplitude fragmentomique) + dette v28 soldée
+## 2026-09-02 — Bam2Beta V2.3.0 (release + qualif) · trace-prod : schema v29 (amplitude fragmentomique) + dette v28 soldée
+
+- [x] **Bam2Beta V2.3.0 — release + qualification** — restructuration EXIS (fusion QC/BETA/BETA_28M), raima 0.5.6 promu latest (Hub poussé), métrique `amplitude_fragmento_qc` (from-scratch + rétro), coupe des scores EPIC + CNV raima, marqueurs `.done`/`.failed` en qualif, lanceurs prod bumpés. TEST OK + QUALIF OK vs V2.2.0. Détails : `memory/restructuration-v2.3.0.md`.
+- [x] **Bam2Beta — themelio_absent.csv (crash latent)** — résolu en V2.3.0 par suppression du repli : `RAPPORT` exige désormais `THEMELIO` (garde plate), plus aucune référence à l'asset ; solid passe `RAPPORT=false`.
 
 - [x] **trace-prod schema v29 — amplitude fragmentomique** — `retd_suivis.frag_amplitude_sc` (liquid only), lue dans `Fragmentomics/filtered_softclipped/{s}.amplitude_fragmento_qc.tsv` ; backfill 1362/1362 (100 %, 0 KO), export « Amplitude Frag » en position 25/55 après Sex Predicted, 0 écart au contrôle croisé base↔fichiers et gsheet↔base. Détails dans `project_schema_v29_frag_amplitude_sc.md`.
 - [x] **Dette v28 soldée** — `rarefaction_horaire` (terminé fin août mais jamais commité) commité et documenté : section 12 du README + section CLAUDE.md avec ses 3 gotchas (Loyfer non bootstrapable, `LOG/` à exclure, `update-column -s` qui crée une ligne).
