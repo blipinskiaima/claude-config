@@ -1,31 +1,38 @@
-# Context — trace-prod — 2026-09-03T06:07:44+00:00
+# Context — trace-prod — 2026-09-03T12:41:17+00:00
 
 **Branche** : main
-**Dernier commit** : 388f777 — feat: schemas v30 + v31 — sequencing_time + multi_run
+**Dernier commit** : bbd1027 — docs: gotcha metadata.kit (non fiable côté HCL)
 **Status** : propre (untracked inchangés : backups .duckdb, CSV dev/, rapports HTML, metadata_HCL.tsv)
 
 ## Où j'en suis
-Schemas v30 + v31 terminés et poussés : `sequencing_time` (durée du run, `XhYm`) et
-`multi_run` (`yes`/`no`/`NA`) dans `retd_suivis`, liquid only, extraits de
-`QC/Samtools/{sample}.read_start_time.tsv`. Backfill des 1362 samples fait dans la nuit
-(9h33), gsheet exportée, doc et mémoire à jour. Les 4 étapes de la feuille de route sont
-bouclées, rien en attente.
+Deux chantiers dans la session. (1) Schemas v30/v31 terminés et poussés : `sequencing_time`
+(`XhYm`) + `multi_run` dans `retd_suivis`, backfill 1362/1362 en 9h33, validé 485/485 contre
+le calcul awk indépendant. (2) Analyse ad-hoc des pore scans, entièrement hors repo dans
+`/scratch/boris/pore-scan/` : extraction du pore scan initial de 146 rapports MinKNOW
+(92 CGFL + 54 HCL) → `pore_scan_initial.tsv`, puis cinétique de séquençage et mortalité des
+pores sur 4 runs. Rien n'est en cours, tout est livré.
 
 ## Ce qui marche / ce qui foire
-- ✓ 1362/1362 samples renseignés, 0 KO — validé **485/485 sans écart** contre le calcul
-  awk indépendant de Boris (`/scratch/rarefaction_horaire/result.csv`, 26/08)
-- ✓ Contrôle de vraisemblance : les 993 `multi_run=no` ne dépassent jamais 71 h, la limite
-  d'un run ONT — un faux négatif se verrait comme un `no` à 100 h, il n'y en a aucun
-- ✓ Gsheet CGFL 849×57 et HCL 513×57, colonnes 27-28, 0 cellule vide ; solid intact (40 col)
-- ✗ **Le préfixe de 500 Mo était faux** : il passait 5 tests sur 5 et sous-estimait de 3h54
-  sur `HCL/Healthy_41`. C'est la confrontation aux 485 valeurs de Boris qui l'a révélé —
-  un max ne s'échantillonne pas, la fin d'un run ne produit que quelques milliers de reads
-- ✗ 62 samples à `NA` (format `…SSZ` sans fraction de seconde, cohorte `Lung_Alc`), dont
-  12 dépassent 72 h : probablement multi-run, indémontrable depuis le fichier
-- ✗ Les `*_rebasecalled_*` ressortent massivement `multi_run=yes` — plausible, **non vérifié**
+- ✓ `pore_scan_initial.tsv` : 146 runs × 11 col (labo, flow cell, date, type, kit, nb samples,
+  pores totaux/dispo, ratio, nb scans). Scripts dans `/scratch/boris/pore-scan/`
+- ✓ **Aucune différence CGFL/HCL** sur les pores au lancement (médianes 2704 vs 2663, p=0,12),
+  ni sur le type de flow cell : `FLO-PRO114M` + `SQK-NBD114-96` sur les 146 runs
+- ✓ **La réserve de pores prédit la longévité** : r=+0,44 entre pores *totaux* au 1er scan et
+  demi-vie (<6500 → 25 h ; >8500 → 41 h). Le nombre de pores *disponibles* ne prédit rien
+  (plafonné par les ~2675 channels) — la bonne métrique qualité est le total
+- ✓ Cinétique : jamais de plateau, décroissance continue dès h+2 pilotée par la mortalité des
+  pores. 92-100 % des reads acquis à h+48 sur les 4 runs
+- ✓ Pores reconstituables **sans rapport MinKNOW** via les tags `ch:i`/`mx:i` du BAM
+  (validé à ±3 % contre le mux scan officiel du run test_002)
+- ✗ **2 faux départs corrigés en cours de route** : mon comptage de samples comptait le bruit
+  de démultiplexage (médiane 95/96 au lieu de 4) ; et ma détection de « chute brutale »
+  a classé PBK07581 sur du bruit de fin de vie alors qu'il saigne dès h+0
+- ✗ Cause du profil 2 non élucidée : ni paramètre de run, ni log, ni réutilisation de flow cell
+  (146 IDs distincts, aucun doublon). Le préfixe explique 10 % de la variance mais est
+  totalement confondu avec la date
 
 ## Prochaine étape
-Rien de bloquant. Deux fils ouverts : vérifier l'hypothèse `rebasecalled → multi_run=yes`
-(comparer les fractions de seconde d'un rebasecalled et de son sample d'origine), et
-contrôler dans la gsheet les formats de cellule à droite de la colonne 28, décalés d'un
-cran par l'ajout des deux colonnes (`clear()` n'efface pas les formats).
+Rien de bloquant. Trois fils : demander aux labos s'ils lavent/réutilisent des flow cells
+(seul moyen de trancher, aucune trace dans les rapports) ; investiguer les 3 runs CGFL du
+27/03/2026 qui meurent à l'identique en 8 h avec une réserve saine (cause commune probable :
+librairie ou lot de réactifs) ; et vérifier l'hypothèse non testée `rebasecalled → multi_run=yes`.
