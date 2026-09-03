@@ -1,32 +1,31 @@
-# Context — trace-prod — 2026-09-02T17:03:20+00:00
+# Context — trace-prod — 2026-09-03T06:07:44+00:00
 
 **Branche** : main
-**Dernier commit** : c7fb7b4 — docs: README + CLAUDE.md pour les schemas v28 et v29
-**Status** : propre, synchro avec origin/main (24 untracked inchangés : backups .duckdb,
-CSV dev/, rapports HTML, metadata_HCL.tsv)
+**Dernier commit** : 388f777 — feat: schemas v30 + v31 — sequencing_time + multi_run
+**Status** : propre (untracked inchangés : backups .duckdb, CSV dev/, rapports HTML, metadata_HCL.tsv)
 
 ## Où j'en suis
-Schema v29 (`frag_amplitude_sc`) terminé de bout en bout via /add-trace-prod : colonne, checker,
-backfill 1362 samples, export gsheet, doc et mémoire. Session ouverte sur une dette : v28
-(rarefaction_horaire) était terminé mais traînait en working tree non commité — commité en début
-de session pour poser un checkpoint propre, puis documenté avec v29 dans le même push.
+Schemas v30 + v31 terminés et poussés : `sequencing_time` (durée du run, `XhYm`) et
+`multi_run` (`yes`/`no`/`NA`) dans `retd_suivis`, liquid only, extraits de
+`QC/Samtools/{sample}.read_start_time.tsv`. Backfill des 1362 samples fait dans la nuit
+(9h33), gsheet exportée, doc et mémoire à jour. Les 4 étapes de la feuille de route sont
+bouclées, rien en attente.
 
 ## Ce qui marche / ce qui foire
-- ✓ v29 : 4 fichiers, 29 lignes. Backfill 849 CGFL + 513 HCL = 1362, couverture 100 %, 0 KO,
-  0 erreur (~20 min à -j 4). Contrôle croisé exhaustif base↔1362 fichiers source : 0 écart ;
-  relecture gsheet↔base : 0 écart, colonne en position 25/55 après Sex Predicted
-- ✓ Format du TSV vérifié sur les 1362 fichiers AVANT de coder (pas un échantillon) — le
-  précédent v1.3→v1.4 avait déplacé une colonne sans prévenir
-- ✓ v28 enfin historisé (97e56e4) + documenté (README section 12, CLAUDE.md)
-- ✓ Piège évité : `_LIQUID_QC` et `_SOLID_QC` sont textuellement identiques autour de
-  `Sex Predicted` → l'Edit a dû élargir son contexte jusqu'à `Small Fragments`
-- ✗ Formats de cellule de la gsheet non vérifiés : `clear()` ne les efface pas, l'insertion en
-  position 25 décale d'un cran tout ce qui était à droite. Aucun effet sur les données
-- ✗ Chemin KO non observable en prod (couverture 100 %) : prouvé sur sample inexistant seulement
+- ✓ 1362/1362 samples renseignés, 0 KO — validé **485/485 sans écart** contre le calcul
+  awk indépendant de Boris (`/scratch/rarefaction_horaire/result.csv`, 26/08)
+- ✓ Contrôle de vraisemblance : les 993 `multi_run=no` ne dépassent jamais 71 h, la limite
+  d'un run ONT — un faux négatif se verrait comme un `no` à 100 h, il n'y en a aucun
+- ✓ Gsheet CGFL 849×57 et HCL 513×57, colonnes 27-28, 0 cellule vide ; solid intact (40 col)
+- ✗ **Le préfixe de 500 Mo était faux** : il passait 5 tests sur 5 et sous-estimait de 3h54
+  sur `HCL/Healthy_41`. C'est la confrontation aux 485 valeurs de Boris qui l'a révélé —
+  un max ne s'échantillonne pas, la fin d'un run ne produit que quelques milliers de reads
+- ✗ 62 samples à `NA` (format `…SSZ` sans fraction de seconde, cohorte `Lung_Alc`), dont
+  12 dépassent 72 h : probablement multi-run, indémontrable depuis le fichier
+- ✗ Les `*_rebasecalled_*` ressortent massivement `multi_run=yes` — plausible, **non vérifié**
 
 ## Prochaine étape
-Rien de bloquant sur v29. Fils ouverts hérités des sessions précédentes :
-1. Barcodes des 12 `Colon_*_rep*` via les logs Pod2Bam (UPDATE SQL manuel)
-2. Adresse POD5 des 12 Twist + 3 Ma_SAB (Taille/Complétude POD5 vides)
-3. `28M %` / `CpG %` : QCChecker les code en dur à None, câblage quand Bam2Beta publiera
-4. `update-column mvaf_v14 liquid CGFL` comblerait 12 `Bladder_Urine_*` à NULL
+Rien de bloquant. Deux fils ouverts : vérifier l'hypothèse `rebasecalled → multi_run=yes`
+(comparer les fractions de seconde d'un rebasecalled et de son sample d'origine), et
+contrôler dans la gsheet les formats de cellule à droite de la colonne 28, décalés d'un
+cran par l'ajout des deux colonnes (`clear()` n'efface pas les formats).
