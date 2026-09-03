@@ -5,7 +5,7 @@
 - **Version courante : V2.3.0** (2026-09-02) — restructuration EXIS (fusion QC+BETA+BETA_28M), raima **0.5.6 = latest**, métrique `amplitude_fragmento_qc` (+ rétro), **BREAKING** : scores EPIC (bedMethyl/V2/V1.2/props_v1) et CNV raima coupés, `RAPPORT=false` sur solid. TEST OK vs QUALIF V2.2.0. Voir [restructuration-v2.3.0.md](restructuration-v2.3.0.md)
 - Historique : **V2.2.0** THEMELIO + metadata.json contrat unique ([themelio-module.md](themelio-module.md)) · **V2.1.0** TOO ([too-module.md](too-module.md)) · **V2.0.x** tf = mVAF v1.4 bootstrap, tri déterministe ([bootstrap-model-v1.md](bootstrap-model-v1.md))
 - Containers : `bam2beta:latest` + `raima:latest` (**0.5.6** depuis V2.3.0, locale non poussée ; 0.5.3/0.5.4 en rollback) + `too:0.4.1` + `themelio:1.0.0`. ⚠️ Scripts R de TOO hors image (chargés via `${projectDir}`)
-- Modules (V2.3.0) : MERGE, **EXIS**, FRAG (+ amplitude), CNV (log2ratio seul), ICHORCNA, IV, MITO, TOO, THEMELIO, RAPPORT, RETRO_FRAG_AMPLITUDE, SMALL_FRAGMENTS, RAREFACTIONS, RAREFACTION_HORAIRE
+- Modules (V2.3.0) : MERGE, **EXIS**, FRAG (+ amplitude), CNV (log2ratio seul), ICHORCNA, IV, MITO, TOO, THEMELIO, RAPPORT, RETRO_FRAG_AMPLITUDE, SMALL_FRAGMENTS, RAREFACTIONS, RAREFACTION_HORAIRE, **RAREFACTION_HORAIRE_THRESHOLD**
 - **Prod** active : MERGE + EXIS + FRAG + CNV + IV + TOO + THEMELIO + RAPPORT + MITO. ⚠️ `ICHORCNA=false` en prod mais **true en liquid/solid** (lanceurs `dev/SCW/` sans `prod`)
 - Retry : doublement CPU/RAM par tentative, plafond `cpus_max`/`memory_max`
 
@@ -30,6 +30,7 @@
 - [Module IV](iv-module.md) — sexe + ancestry, consommé par TOO, hors qualification
 - [Check_Input](check-input-qc.md) — QC d'entrée, chemin gracieux input-KO (SUCCESS + `FAILED_QC_INPUT`)
 - [bootstrap mVAF v1/v1.4](bootstrap-model-v1.md) — reproductibilité (tri déterministe + seeding raima) ; retro archivé en V2.3.0
+- [Rarefaction temporelle](rarefaction-horaire.md) — les 2 modules `st:Z:` : 12/24/48 h et 5/10/15/20 M molécules (seuil 30 M). ⚠ `mktime` corrige l'ordre lexicographique faux sur un changement d'heure ; **100 % des reads primaires sont horodatés** (2 samples) ; à palier égal les BAM varient de 36 %
 - [Rarefaction cascade](rarefaction-cascade.md) — GOTCHA : seed incrémenté par niveau obligatoire (`samtools -s` = hash absolu)
 - [Flux small_fragment](small-fragment-flow.md) — BAM filtré 75-200 se fait passer pour merged, cœur inchangé
 - [Refactors 2026-05](refactors-2026-05.md) — QC/Raima refactors, code mort (purgé en V2.3.0)
