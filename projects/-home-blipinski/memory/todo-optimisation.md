@@ -69,6 +69,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 - [x] **Bam2Beta — module RAREFACTION_HORAIRE_THRESHOLD** — BAM aux 5/10/15/20 premiers millions de molécules dans l'ordre `st:Z:`, inclusion à ≥ 30 M. Validé sur Breast_11 : 4 paliers exacts au read près, nesting sans orphelin, et **100 % des reads primaires horodatés** (constat inédit, 2 samples). Détails dans `~/.claude/projects/-home-blipinski-Pipeline-Bam2Beta/memory/rarefaction-horaire.md`.
 
+- [x] **Analyse des pore scans MinKNOW — 146 runs** — pore scan initial extrait des rapports HTML (92 CGFL + 54 HCL, soit la moitié des runs en base) → `/scratch/boris/pore-scan/pore_scan_initial.tsv`. **Aucune différence entre labos** (pores, flow cell et kit identiques), mais la **réserve de pores *totaux* prédit la longévité du run** (r=+0,44 ; <6500 → 25 h, >8500 → 41 h) là où les pores *disponibles* ne prédisent rien. 24 runs ratés en 2 profils : flow cell pauvre (8/9 HCL) et mort en <20 h (13/15 CGFL), cause non élucidée. Cinétique : jamais de plateau, 92-100 % des reads acquis à h+48. Détails : `project_pore_scan_analyse.md`.
+- [x] **`metadata.kit` corrigé — HCL utilise bien le kit 96** — la colonne a 57 valeurs distinctes côté HCL (contre 1 pour CGFL) dont des kits ONT inexistants ; `SQK-NBD114.24` y côtoie des barcodes 43/53/64. Rapports MinKNOW et headers BAM confirment `SQK-NBD114-96` dans les deux labos. Gotcha documenté dans `CLAUDE.md` (commit `bbd1027`).
+
 ## 2026-09-02 — Bam2Beta V2.3.0 (release + qualif) · trace-prod : schema v29 (amplitude fragmentomique) + dette v28 soldée
 
 - [x] **Bam2Beta V2.3.0 — release + qualification** — restructuration EXIS (fusion QC/BETA/BETA_28M), raima 0.5.6 promu latest (Hub poussé), métrique `amplitude_fragmento_qc` (from-scratch + rétro), coupe des scores EPIC + CNV raima, marqueurs `.done`/`.failed` en qualif, lanceurs prod bumpés. TEST OK + QUALIF OK vs V2.2.0. Détails : `memory/restructuration-v2.3.0.md`.
