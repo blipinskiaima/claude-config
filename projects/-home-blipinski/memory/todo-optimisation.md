@@ -61,6 +61,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-09-03 — trace-prod : schemas v30/v31 (temps de séquençage + multi-flow-cell)
+
+- [x] **trace-prod schemas v30/v31 — temps de séquençage** — `retd_suivis.sequencing_time` (`XhYm`) + `multi_run` (flag multi-flow-cell), lus dans `QC/Samtools/{s}.read_start_time.tsv` ; backfill 1362/1362 en 9h33 (0 KO), validé **485/485 sans écart** contre le calcul awk du 26/08. Le préfixe de 500 Mo d'abord retenu sous-estimait de 3h54 — un max ne s'échantillonne pas, d'où le scan complet des 3,44 To. Détails : `project_schema_v30_v31_sequencing_time.md`.
+
 ## 2026-09-02 — Bam2Beta V2.3.0 (release + qualif) · trace-prod : schema v29 (amplitude fragmentomique) + dette v28 soldée
 
 - [x] **Bam2Beta V2.3.0 — release + qualification** — restructuration EXIS (fusion QC/BETA/BETA_28M), raima 0.5.6 promu latest (Hub poussé), métrique `amplitude_fragmento_qc` (from-scratch + rétro), coupe des scores EPIC + CNV raima, marqueurs `.done`/`.failed` en qualif, lanceurs prod bumpés. TEST OK + QUALIF OK vs V2.2.0. Détails : `memory/restructuration-v2.3.0.md`.
