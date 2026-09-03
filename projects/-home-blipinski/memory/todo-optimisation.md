@@ -28,6 +28,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Aima-Tower — 2 snapshots `exploratory` périmés (décision métier)** — `tests/test_exploratory_compute.py` attend **383** samples cancer (et 341 en SpeedVac exclude), la base en compte **416** (et 374), soit **+33**. Échec **préexistant**, vérifié par `git stash` : ce n'est pas une régression de code mais la dérive normale de trace-prod depuis l'écriture du test. Seule chose rouge du repo. Trancher : soit valider 416/374 comme nouvelle référence et mettre à jour les deux assertions, soit comprendre d'où viennent ces 33 samples avant de figer.
 - [ ] **Aima-Survey — `events_pending_email` n'a aucun filtre de date** — un rattrapage de collecte avec une fenêtre large fait entrer des dépôts historiques dans la file de notification. Vécu le 2026-08-27 : `--days 2400` a collecté 93 dépôts SEC de 2020-2025 jamais vus, tous partis par mail au cron de 08:01. Borner `--days` côté CLI, ou filtrer la file par `event_date`, ou les deux. `lib/db.py:425`.
 
+- [ ] **Bam2Beta — Temps 2 de l'expérience de concordance** — le module RAREFACTION_HORAIRE_THRESHOLD produit les BAM, pas les scores. Écrire la boucle `--EXIS true --MERGE false` sur les 4 paliers de chaque sample, puis agréger les mVAF v1.4 + v1.5 en un récapitulatif par seuil (c'est ce que demande le cahier des charges). Corriger au passage `dev/SCW/rarefaction_horaire_threshold.sh` : `Cd ~/Run` ligne 3 (majuscule → pas de cd) et témoin d'idempotence `${ID}_12h` ligne 10 au lieu de `${ID}_20M`.
+
 ### Skills bioinformatiques
 - [ ] **Améliorer skills v1 avec /meta-skills-creator** — sample, debug-nf, check-consistency sont fonctionnels mais créés sans le processus rigoureux. Raffiner après usage.
 
@@ -61,9 +63,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-09-03 — trace-prod : schemas v30/v31 (temps de séquençage + multi-flow-cell)
+## 2026-09-03 — trace-prod : schemas v30/v31 (temps de séquençage + multi-flow-cell) · Bam2Beta : module RAREFACTION_HORAIRE_THRESHOLD
 
 - [x] **trace-prod schemas v30/v31 — temps de séquençage** — `retd_suivis.sequencing_time` (`XhYm`) + `multi_run` (flag multi-flow-cell), lus dans `QC/Samtools/{s}.read_start_time.tsv` ; backfill 1362/1362 en 9h33 (0 KO), validé **485/485 sans écart** contre le calcul awk du 26/08. Le préfixe de 500 Mo d'abord retenu sous-estimait de 3h54 — un max ne s'échantillonne pas, d'où le scan complet des 3,44 To. Détails : `project_schema_v30_v31_sequencing_time.md`.
+
+- [x] **Bam2Beta — module RAREFACTION_HORAIRE_THRESHOLD** — BAM aux 5/10/15/20 premiers millions de molécules dans l'ordre `st:Z:`, inclusion à ≥ 30 M. Validé sur Breast_11 : 4 paliers exacts au read près, nesting sans orphelin, et **100 % des reads primaires horodatés** (constat inédit, 2 samples). Détails dans `~/.claude/projects/-home-blipinski-Pipeline-Bam2Beta/memory/rarefaction-horaire.md`.
 
 ## 2026-09-02 — Bam2Beta V2.3.0 (release + qualif) · trace-prod : schema v29 (amplitude fragmentomique) + dette v28 soldée
 
