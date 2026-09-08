@@ -1,6 +1,6 @@
 ---
 name: twist-samples
-description: "Twist_* = série de titration liquid/CGFL (chimie d'enrichissement Twist), ni type ni cohorte ni commande. 22 samples en base dont une série _rep_2 (réplicats inter-run)."
+description: "Twist_* = série de titration liquid/CGFL (chimie d'enrichissement Twist), ni type ni cohorte ni commande. 30 samples en base : série initiale + _rep_2 + _rep_3 (réplicats inter-run)."
 metadata: 
   node_type: memory
   type: project
@@ -9,11 +9,14 @@ metadata:
 
 « twist » n'est **ni un sample_type, ni une cohorte, ni une commande** dans trace-prod (zéro occurrence dans le code). Ce sont des samples `Twist_*` stockés comme `liquid` / `CGFL`, une série de titration pour la validation de la chimie d'enrichissement **Twist** (concurrent de Watchmaker). Leur `metadata.class` vaut `Test dilution Twist_0.1pc`, le reste des metadata est vide (pas de patient réel).
 
-## État base (27/08/2026) — 22 samples
+## État base (08/09/2026) — 30 samples
 
 Première série (mai-juin 2026) : `Twist_0pct`, `Twist_0_1pct`, `Twist_0_25pct`, `Twist_0_5pct`,
 `Twist_1pct`, `Twist_10_1`→`Twist_10_7`, `Twist_Diluant_RB`.
 Série **`_rep_2`** (15/06/2026) : `Twist_10_1_rep_2`→`Twist_10_8_rep_2`, `Twist_Diluant_RB_rep_2`.
+Série **`_rep_3`** (ajoutée en base le 08/09/2026, 8 samples) : `Twist_10_1_rep_3`→`Twist_10_6_rep_3`,
+`Twist_1_rep_3`, `Twist_Diluant_RB_rep_3` — PROD OK, probs epic bootstrap + Loyfer chargées le jour même
+(`check` puis `probs --probs_loyfer` / `--probs_bootstrap`, exports Prop + data). Pas de `_10_7`/`_10_8` en rep_3.
 
 ⚠ **Périmé dans la version précédente de cette note** : elle annonçait 12 samples et
 `Twist_10_5` « hors DB » — il y est depuis le 12/06/2026, et toute la série `_rep_2` a suivi.

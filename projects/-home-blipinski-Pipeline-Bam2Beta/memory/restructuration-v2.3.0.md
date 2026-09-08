@@ -82,6 +82,6 @@ listes propres obligatoires).
 - `docker push blipinskiaima/raima:latest` + `:0.5.6` (Hub a 0.5.3, divergence si autre noeud)
 - Tarball 0.5.6 → `s3://aima-resources/raima-model/` (n'existe que sur /mnt/temp/florian)
 - Token Tower en dur dans `nextflow.config:59` (golden rule, preexistant)
-- Backfill amplitude des ~1500 samples RetD via `--RETRO_FRAG_AMPLITUDE` (glob batch valide
-  sur le papier, a exercer sur 2-3 samples d'abord)
+- ~~Backfill amplitude des ~1500 samples RetD via `--RETRO_FRAG_AMPLITUDE`~~ — **module retire
+  le 2026-09-04** (Boris), plus de backfill possible par le pipeline. Voir [[dilution-lung]]
 - Lung_4 n'est plus testable from-scratch (BAM horaires purges, comme Breast_28/Breast_6)

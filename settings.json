@@ -234,7 +234,7 @@
       "/home/blipinski/Run"
     ]
   },
-  "model": "claude-fable-5[1m]",
+  "model": "fable[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -271,9 +271,8 @@
     "superpowers@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true
   },
-  "effortLevel": "max",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
-  "agentPushNotifEnabled": true,
-  "skipWorkflowUsageWarning": true
+  "skipWorkflowUsageWarning": true,
+  "agentPushNotifEnabled": true
 }

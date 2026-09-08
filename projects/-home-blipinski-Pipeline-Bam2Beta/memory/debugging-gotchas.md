@@ -12,6 +12,10 @@ metadata:
 
 ## Nextflow / pipeline
 
+- **Le shell des process est `bash -o pipefail` SANS `-e`** (`conf/base.config:11` remplace le defaut
+  NF `-ue` ; verifie sur un `.command.sh` reel) : une commande qui echoue a mi-script ne stoppe pas
+  le process, seul le dernier exit compte. Poser `set -e` en tete du script quand chaque etape doit
+  bloquer (fait dans `Dilution_Lung_Merge`, voir [[dilution-lung]]).
 - **Container assigne par `withName:` dans `conf/base.config`**, pas dans le process : tout
   nouveau process raima sans entree `withName` herite du defaut `bam2beta:latest`.
 - **`raima:latest` doit etre rebuild** apres modification du Dockerfile, sinon Docker sert
