@@ -9,6 +9,7 @@
 
 ## Schemas & features
 - [Retraits d'export + fallback Indication](project_export_retraits_et_fallback_indication.md) — masquer une colonne = retirer de `_LIQUID_QC`/`_SOLID_QC` **en gardant le mapping** (N50, mVAF v1.3 ; comme n75). ⚠ `clear()` sans `resize()` laisse une colonne vide à droite et les formats de cellule ne suivent pas le décalage. `Indication` de 'QC read' vient de `metadata.class` + fallback par nom (Lung_Alc/Bladder_Urine/Colon), le COALESCE protège Rectum/Sigmoïde
+- [Renommage étiquettes Nb lignes total / Nb molécule](project_rename_labels_nb_lignes_molecule.md) — sept. 2026, **étiquettes seules** (`_BASE_COLS`, Small Fragments, Dilution, Rarefaction + clés des checkers), colonnes DuckDB inchangées, anciennes clés gardées dans `TSV_TO_DB_QC` (sûr : `_prepare_data` saute les clés absentes). ⚠ `raima/R/evaluate-score.R` + `exploratory-analysis` lisent l'export **par en-tête** → à adapter côté R. ⚠ un renommage d'étiquette touche 4 endroits, dont les dicts des checkers (sinon la colonne n'est plus écrite)
 - [Schema v6 — colonnes IV/QC](project_schema_v6_iv_qc.md) — 4 colonnes retd_suivis (read_start_time, ancestry, sex_proba, sex_predicted), path IV/ sœur de QC/
 - [Schema v7 — short_read](project_schema_v7_short_read.md) — retd_suivis.short_read, 6 dossiers S3 dans le mirror {labo}_short_read (liquid only). Gotcha `s3 ls --recursive` = clés complètes
 - [Schema v8 — short_read_metrics](project_schema_v8_short_read_metrics.md) — table 28 colonnes (FK sample_id), CLI check-short-read indépendante + export-short-read-like
