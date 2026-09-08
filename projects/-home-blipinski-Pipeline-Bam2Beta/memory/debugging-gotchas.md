@@ -55,6 +55,11 @@ metadata:
   `--thresholds`, ni `--use-median` ; il genere 195 lignes de summary et ~1 300 de global.dist
   pour n'en lire qu'une de chaque, plus un per-base de 456 Mo jamais lu.
 
+- **Les backups `.duckdb` de trace-prod ne sont PAS gitignores** : `.gitignore` n ignore que
+  `database/samples_status.duckdb`, pas les `samples_status.backup-pre-*.duckdb` — 19 fichiers
+  non suivis de ~200 Mo piece au 2026-09-08. Un `git add .` dans ce depot les embarquerait.
+  Toujours `git add <fichier>` explicitement.
+
 ## Donnees / unites
 
 - **75 `sample_name` sont portes par 2 echantillons distincts** (un CGFL, un HCL, profondeurs

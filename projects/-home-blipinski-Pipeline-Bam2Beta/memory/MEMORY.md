@@ -30,6 +30,7 @@
 - [Module IV](iv-module.md) — sexe + ancestry, consommé par TOO, hors qualification
 - [Check_Input](check-input-qc.md) — QC d'entrée, chemin gracieux input-KO (SUCCESS + `FAILED_QC_INPUT`)
 - [bootstrap mVAF v1/v1.4](bootstrap-model-v1.md) — reproductibilité (tri déterministe + seeding raima) ; retro archivé en V2.3.0
+- [sequencing_time — chemin rapide](sequencing-time-fastpath.md) — Bam2Beta publie le TSV, trace-prod ne balaie plus 2,5 Go. ⚠️ une clef a `'KO'` ECRASE la valeur (omettre la clef) ; clefs en libelles FR ; bug DST mesure comme non-declenchant, ne pas reinstruire
 - [Rarefaction temporelle](rarefaction-horaire.md) — les 2 modules `st:Z:` : 12/24/48 h et 5/10/15/20 M molécules (seuil 30 M). ⚠ `mktime` corrige l'ordre lexicographique faux sur un changement d'heure ; **100 % des reads primaires sont horodatés** (2 samples) ; à palier égal les BAM varient de 36 %
 - [Dilution lung 50/50 + trace des 480 dilués](dilution-lung.md) — module `DILUTION_LUNG` (N = min primaires, N premiers reads `st:Z:`, vérif 2N + MM, `set -e` car shell NF sans `-e`) ; les 480 dilués viennent de `~/Pipeline/Dilution` (preuve `@PG`), trace `dilution_trace.nf` non câblée
 - [Rarefaction cascade](rarefaction-cascade.md) — GOTCHA : seed incrémenté par niveau obligatoire (`samtools -s` = hash absolu)

@@ -53,6 +53,12 @@ print mktime(ts) - off, $1                          # TZ=UTC force
 ordre `mktime` = **C A B** (correct) · ordre lexicographique = **B C A** (place le dernier en
 premier). Le bug est donc corrige a la racine, pas contourne.
 
+⚠ Nuance mesuree le 2026-09-08 ([[sequencing-time-fastpath]]) : pour le seul calcul des
+**2 extremes** (duree d un run), l ordre lexicographique donne en pratique le meme resultat —
+le prefixe de date domine la comparaison. Verifie sur `Prostate_31` (2 offsets presents,
+33 M reads) : memes lo/hi que `mktime`. Ici l enjeu est different, la rarefaction a besoin d un
+**ordre total** sur tous les reads, pas seulement du min et du max.
+
 ⚠ Angle mort **commun aux deux modules** : `substr(s, length(s)-5)` suppose un offset `+HH:MM`.
 Un timestamp finissant par `Z` casserait le calcul, silencieusement. Jamais rencontre.
 
