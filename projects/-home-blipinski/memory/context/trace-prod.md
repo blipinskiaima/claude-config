@@ -1,27 +1,39 @@
-# Context — trace-prod — 2026-09-08T10:03:29+00:00
+# Context — trace-prod — 2026-09-08T14:20:00+00:00
 
 **Branche** : main
-**Dernier commit** : 560622b — refactor: étiquettes d'export Nb reads total/Nb read alignés → Nb lignes total/Nb molécule
-**Status** : 5 fichiers modifiés (lots v33 `dilution_lung` + `EXPORT_HIDDEN_SAMPLES` d'autres sessions,
-non commités) + `lib/checkers_dilution_lung.py` untracked + backups/CSV/HTML habituels
+**Dernier commit** : 19923c1 — refactor: colonnes nb_lignes_total / nb_molecule (migration v34)
+**Status** : working tree clean (hors untracked habituels : backups .duckdb, CSV dev, rapports HTML).
+5 commits poussés ce jour, à la suite de 608fdf3 (session parallèle).
 
 ## Où j'en suis
-Session 03→08/09. (1) Probs epic bootstrap + Loyfer 28M : 119 urine chargés, puis audit exhaustif
-des 1509 samples (fichiers sources relus) → liquid 100 % conforme (1 seul HCL corrigé,
-`Healthy_11_rebasecalled_V5.2.0`), solid : 25 Loyfer comblés, epic solid gardées en v1.3 (0 dossier
-BOOTSTRAP en solid, choix Boris). (2) 8 Twist `_rep_3` créés (`check`) + probs + exports.
-(3) Renommage d'étiquettes `Nb lignes total` / `Nb molécule`, 6 onglets ré-exportés et relus,
-commit 560622b (staging partiel, les lots des autres sessions laissés en place).
+Session du 08/09, quatre chantiers menés bout à bout et livrés :
+1. **Masquage de 5 colonnes** de l'export trace-prod (mVAF v1/v2, Multi Run, BEDMETH EPICS,
+   Props Epic) — mappings conservés, colonnes toujours alimentées en base.
+2. **`export-run`** (nouveau) : une ligne par run de séquençage → gsheet « Trace Run » dédiée,
+   onglet `Run`, **292 × 13**. Rien ajouté en base, tout dérivé par `GROUP BY (run_id, labo)`.
+3. **Correction des agrégats par run** : `reads_per_flowcell` / `samples_per_run` excluent
+   désormais les rebasecallés (qui reçoivent NULL) et comptent les **molécules**
+   (`nb_reads_aligned`) au lieu des lignes. 1515 valeurs recalculées, max 876,15 → 335,92.
+4. **Renommage v34** : `nb_reads_total` → `nb_lignes_total`, `nb_reads_aligned` → `nb_molecule`,
+   14 colonnes sur 7 tables + 159 identifiants dans 15 fichiers. Étiquettes d'export inchangées.
 
 ## Ce qui marche / ce qui foire
-- ✓ `probs` : liquid 857 CGFL + 513 HCL = epic bootstrap + Loyfer, 0 trou ; solid 147 Loyfer, 49 epic NULL (aucune source)
-- ✓ 6 onglets relus : nouvelles étiquettes partout, aucune ancienne
-- ✗ `raima/R/evaluate-score.R:237,240` (+ `exploratory-analysis` misc/dev) lisent l'export par l'ancien
-  en-tête `Nb reads total` → casseront au prochain `download_trace_prod_metadata()`
-- ✗ Les 8 Twist `_rep_3` n'ont pas de metadata (`import-metadata` non lancé, hors demande)
-- ✗ Lock DuckDB très disputé (3 sessions en parallèle) : toujours un retry sur « Could not set lock » ;
-  une connexion `read_only` attend autant qu'un writer
+- ✓ Non-régression prouvée : 9275 lignes ligne à ligne vs backup (0 écart), 19 contraintes
+  identiques, 1512 samples d'export identiques, et **A/B contre le code d'avant** sur `check`,
+  `update-column stockage_pod5`, `probs --probs_loyfer`, `--probs_bootstrap` → 0 divergence.
+- ✓ Base ↔ export `run` concordent sur 291/291 runs.
+- ✗ **`check liquid CGFL -s 26BM01841` détruit le sample** : `run_id`/`barcode` → NULL,
+  reads → 0,00, alors que le dossier S3 existe. **Comportement préexistant** (reproduit à
+  l'identique avec le code d'avant le renommage), pas une régression. Ce sample est dans
+  `EXPORT_HIDDEN_SAMPLES`. Non diagnostiqué — cause à chercher côté checker.
+- ✗ `SCHEMA_VERSION` reste à **33** alors que la migration v34 est appliquée en base : à bumper
+  en coordination avec la session qui porte la v33.
+- ⚠ Le renommage de `lib/checkers.py` est parti dans `608fdf3`, commit d'une session parallèle
+  dont le message ne le mentionne pas.
+- ⚠ Trois sessions travaillaient en parallèle : le HEAD a bougé en cours de route et le lock
+  DuckDB a bloqué plusieurs lectures.
 
 ## Prochaine étape
-Adapter les lectures par en-tête de `raima` / `exploratory-analysis` avant tout re-téléchargement ;
-laisser la session v33 committer son lot (`dilution_lung` + `EXPORT_HIDDEN_SAMPLES`).
+Décider du bump `SCHEMA_VERSION` 33 → 34 avec la session v33, et diagnostiquer pourquoi le
+`check` remet `26BM01841` à zéro. Côté Bam2Beta, la ligne `export-run` a été ajoutée hors boucle
+dans `dev/SCW/Bam2Beta.sh`.
