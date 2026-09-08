@@ -63,11 +63,14 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-09-08 — Bam2Beta dilution lung + trace des 480 dilués
+## 2026-09-08 — Bam2Beta dilution lung + trace des 480 dilués · trace-prod : probs bootstrap/Loyfer + étiquettes
 
 - [x] **Bam2Beta — module DILUTION_LUNG** — BAM 50/50 lung/healthy par paire (220 paires HCL), N = min des molécules primaires, N premiers reads générés (`st:Z:`), vérif 2N + MM ; validé en synthétique et sur Lung_100/Healthy_16 (50/50 exact, 0 écart). Commit `18d9e57`, mémoire `dilution-lung.md`.
 - [x] **Bam2Beta — origine des 480 dilués retrouvée et tracée** — script = `~/Pipeline/Dilution/scripts/generate_dilution.sh` (`e3c38cb`), prouvé par les `@PG` des BAM S3 ; cœur consigné dans `workflow/BAM/dilution_trace.nf`, non câblé. Commit `641c93e`.
 - [x] **Bam2Beta — retrait RETRO_FRAG_AMPLITUDE + refactor rapport.nf** — amplitude native depuis V2.3.0, mode rétro retiré partout (plus de backfill par le pipeline) ; `csv_to_kv` factorise les parses TOO/THEMELIO, bloc V2.json mort supprimé. Commits `ec22851`, `7858fe7`.
+- [x] **trace-prod — probs epic bootstrap + Loyfer 28M partout** — 119 urine chargés, puis audit des 1509 samples (fichiers sources relus) : liquid 100 % conforme (1 HCL corrigé), solid 25 Loyfer comblés, epic solid gardées en v1.3 (0 dossier BOOTSTRAP en solid). 3 onglets Prop ré-exportés. Mémoire `project_probs_bootstrap_mode.md`.
+- [x] **trace-prod — 8 Twist `_rep_3` en base** — `check` + probs bootstrap/Loyfer + exports (Prop 857, data 851) ; metadata non importées (hors demande). Note `project_twist_samples.md` à jour (30 samples).
+- [x] **trace-prod — étiquettes `Nb lignes total` / `Nb molécule`** — renommage dans tous les exports gsheet/TSV + clés des checkers, colonnes DuckDB inchangées, 6 onglets relus. Commit `560622b`. ⚠ `raima/R/evaluate-score.R:237,240` + scripts `exploratory-analysis` lisent encore l'ancien en-tête `Nb reads total`.
 
 ## 2026-09-03 — trace-prod : schemas v30/v31 (temps de séquençage + multi-flow-cell) · Bam2Beta : module RAREFACTION_HORAIRE_THRESHOLD
 
