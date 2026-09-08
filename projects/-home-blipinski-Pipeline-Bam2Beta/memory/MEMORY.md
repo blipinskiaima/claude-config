@@ -17,6 +17,7 @@
 - [Comptage 28M et CpG](reads-28m-cpg-counting.md) — `uniq+skipped` ±0,002 %, backfill 1 506 samples, ~35 % des reads 28M sans CpG ; ⚠️ clé TYPE+LABO+ID
 - [QC primaire / QC contributif](qc-deux-niveaux.md) — architecture 2 niveaux (5 M / 4 M), non implémentée ; seuil 5 M appliqué nulle part sauf Aima-Tower
 - [metadata.json](metadata-json.md) — provenance des champs, 2 constructeurs exclusifs, gotcha `status` absent = OK
+- [Statut QC Exis/Thémélio](qc-status-exis-themelio.md) — arbre de décision Synthèse (5 critères, pire statut gagne), process `QC_status`, 4 champs JSON (33), rétro `--RETRO_REPORT` 1366/1379 ; ⚠ le glob `RetD/liquid/CGFL/*` casse côté S3, un dossier seul passe
 - [Module TOO](too-module.md) — vendoring vs wrapper, seuils dans le bundle, parse quote-aware
 - [Module MITO](mito-module.md) — 11 colonnes, mosdepth merged non filtré ; ⚠️ V2.3.0 : requiert EXIS, mode rétro retiré
 - [Figure distribution de longueur](length-distribution-figure.md) — PNG vs 3 références, pondéré par la MASSE d'ADN

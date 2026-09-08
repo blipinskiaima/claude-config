@@ -60,3 +60,11 @@ ecrits dans les DEUX blocs → toute evolution du schema doit toucher `rapport.n
 - **Aucun script de conformite ne verifie les champs de comptage** : `check-run-output.sh` ne
   teste qu'existence + taille non nulle. Les 3 champs `nb_reads_*` ne sont jamais qualifies
   (constat 2026-08-11).
+
+## V2.3.x (2026-09-08) — 4 champs de statut QC, 33 champs
+
+`exis_qc_status` / `exis_qc_reason` (apres `exis_quantification_threshold`) et `themelio_qc_status` /
+`themelio_qc_reason` (apres `themelio_OutlierPattern_threshold`), lus de `QC/{ID}.qc_status.tsv`
+(process `QC_status`). Statut SUCCESS/WARNING/FAILED/NA, raison chaine anglaise ou `null`. Voir
+[[qc-status-exis-themelio]]. Le retro `--RETRO_REPORT` a regenere les 1366 JSON liquid (`version_raima`
+= null faute de fichier publie, `version_bam2beta` = manifest du run retro).

@@ -71,3 +71,4 @@
 - Manquant : "NA" en export, NULL en DB. Table `samples` : colonne `sample_type` (pas `type`)
 
 Détails par colonne : `~/Pipeline/trace-prod/README.md` (Tables 2/3/4) et `~/Pipeline/trace-prod/CLAUDE.md`.
+- [Schema v34 — statuts QC Exis/Thémélio](project_schema_v34_qc_status.md) — 4 colonnes retd_suivis lues dans metadata.json, preserve si JSON absent/ancien ; + chemin rapide sequencing_time.tsv
