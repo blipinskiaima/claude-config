@@ -63,6 +63,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-09-08 — Bam2Beta dilution lung + trace des 480 dilués
+
+- [x] **Bam2Beta — module DILUTION_LUNG** — BAM 50/50 lung/healthy par paire (220 paires HCL), N = min des molécules primaires, N premiers reads générés (`st:Z:`), vérif 2N + MM ; validé en synthétique et sur Lung_100/Healthy_16 (50/50 exact, 0 écart). Commit `18d9e57`, mémoire `dilution-lung.md`.
+- [x] **Bam2Beta — origine des 480 dilués retrouvée et tracée** — script = `~/Pipeline/Dilution/scripts/generate_dilution.sh` (`e3c38cb`), prouvé par les `@PG` des BAM S3 ; cœur consigné dans `workflow/BAM/dilution_trace.nf`, non câblé. Commit `641c93e`.
+- [x] **Bam2Beta — retrait RETRO_FRAG_AMPLITUDE + refactor rapport.nf** — amplitude native depuis V2.3.0, mode rétro retiré partout (plus de backfill par le pipeline) ; `csv_to_kv` factorise les parses TOO/THEMELIO, bloc V2.json mort supprimé. Commits `ec22851`, `7858fe7`.
+
 ## 2026-09-03 — trace-prod : schemas v30/v31 (temps de séquençage + multi-flow-cell) · Bam2Beta : module RAREFACTION_HORAIRE_THRESHOLD
 
 - [x] **trace-prod schemas v30/v31 — temps de séquençage** — `retd_suivis.sequencing_time` (`XhYm`) + `multi_run` (flag multi-flow-cell), lus dans `QC/Samtools/{s}.read_start_time.tsv` ; backfill 1362/1362 en 9h33 (0 KO), validé **485/485 sans écart** contre le calcul awk du 26/08. Le préfixe de 500 Mo d'abord retenu sous-estimait de 3h54 — un max ne s'échantillonne pas, d'où le scan complet des 3,44 To. Détails : `project_schema_v30_v31_sequencing_time.md`.
