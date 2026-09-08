@@ -63,7 +63,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-09-08 — Bam2Beta dilution lung + trace des 480 dilués · trace-prod : probs bootstrap/Loyfer + étiquettes
+## 2026-09-08 — Bam2Beta dilution lung + trace des 480 dilués · trace-prod : probs bootstrap/Loyfer + étiquettes · Aima-Tower : règle run-level des prompts IA
 
 - [x] **Bam2Beta — module DILUTION_LUNG** — BAM 50/50 lung/healthy par paire (220 paires HCL), N = min des molécules primaires, N premiers reads générés (`st:Z:`), vérif 2N + MM ; validé en synthétique et sur Lung_100/Healthy_16 (50/50 exact, 0 écart). Commit `18d9e57`, mémoire `dilution-lung.md`.
 - [x] **Bam2Beta — origine des 480 dilués retrouvée et tracée** — script = `~/Pipeline/Dilution/scripts/generate_dilution.sh` (`e3c38cb`), prouvé par les `@PG` des BAM S3 ; cœur consigné dans `workflow/BAM/dilution_trace.nf`, non câblé. Commit `641c93e`.
@@ -71,6 +71,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **trace-prod — probs epic bootstrap + Loyfer 28M partout** — 119 urine chargés, puis audit des 1509 samples (fichiers sources relus) : liquid 100 % conforme (1 HCL corrigé), solid 25 Loyfer comblés, epic solid gardées en v1.3 (0 dossier BOOTSTRAP en solid). 3 onglets Prop ré-exportés. Mémoire `project_probs_bootstrap_mode.md`.
 - [x] **trace-prod — 8 Twist `_rep_3` en base** — `check` + probs bootstrap/Loyfer + exports (Prop 857, data 851) ; metadata non importées (hors demande). Note `project_twist_samples.md` à jour (30 samples).
 - [x] **trace-prod — étiquettes `Nb lignes total` / `Nb molécule`** — renommage dans tous les exports gsheet/TSV + clés des checkers, colonnes DuckDB inchangées, 6 onglets relus. Commit `560622b`. ⚠ `raima/R/evaluate-score.R:237,240` + scripts `exploratory-analysis` lisent encore l'ancien en-tête `Nb reads total`.
+- [x] **Aima-Tower — comptages de runs faux dans les 2 cartes IA** — 329 flowcells au lieu des 291 de l'export Trace RUN : solid inclus (+35), rebasecallés inclus (+3, ils réutilisent le `run_id` de l'original) et une ligne par sample au lieu d'une par run (×4,6, jusqu'à ×21). Règle énoncée dans les deux prompts + `TestRunLevelRule`, seule protection puisque aucune requête en dur n'agrège ces colonnes ; les 291 valeurs `reads_per_flowcell` sont identiques à la gsheet. v5.4.1, commit `2f96ae2`, mémoire `analytics_prompt_run_level.md`.
+- [x] **Aima-Tower — panne « Import interdit: time » sur /analytics** — le Contract du prompt n'énonçait pas l'allowlist : le modèle la découvrait dans l'erreur de sa reprise unique et la gaspillait. Allowlist écrite dans le prompt, `time` autorisé (stdlib, `sleep` déjà couvert par le sous-processus 60 s), test d'alignement des 3 listes. Commit `b8960bc`.
 
 ## 2026-09-03 — trace-prod : schemas v30/v31 (temps de séquençage + multi-flow-cell) · Bam2Beta : module RAREFACTION_HORAIRE_THRESHOLD
 
