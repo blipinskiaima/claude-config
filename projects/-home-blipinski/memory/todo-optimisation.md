@@ -26,6 +26,8 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Rotation secrets Aima-Tower compromis** — `.env` était tracked dans git jusqu'au 2026-04-21 (historique pushé sur `aima-dx/Aima-Tower`, repo privé). Révoquer `ANTHROPIC_API_KEY` (console.anthropic.com > API Keys) + `accessToken` Seqera (cloud.seqera.io > Tokens), regénérer les 2 et mettre à jour `.env` local + `docker compose restart`. Voir `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/project_env_leak.md`.
 
 - [ ] **Aima-Tower — 2 snapshots `exploratory` périmés (décision métier)** — `tests/test_exploratory_compute.py` attend **383** samples cancer (et 341 en SpeedVac exclude), la base en compte **416** (et 374), soit **+33**. Échec **préexistant**, vérifié par `git stash` : ce n'est pas une régression de code mais la dérive normale de trace-prod depuis l'écriture du test. Seule chose rouge du repo. Trancher : soit valider 416/374 comme nouvelle référence et mettre à jour les deux assertions, soit comprendre d'où viennent ces 33 samples avant de figer.
+- [ ] **Aima-Tower — deux dérivations restantes sur `/qara`** — les matrices CUP en mode « row % » (le **défaut**) affichent **47 pourcentages calculés** (compte ÷ total de ligne) absents du texte du document ; et 4 seuils du schéma de gating (`mVAF v1.4 > 0`, `≥ 0.32`, `max_p < 0.826`, `≥ 0.826`) sont écrits en dur dans `CupTab.tsx` au lieu d'être lus dans `CUP_STRATA`. Trancher : basculer le défaut sur « counts » ou assumer le calcul, et sourcer les seuils. Relevé lors de la vérification du 2026-09-10 (143/143 valeurs conformes par ailleurs).
+
 - [ ] **Aima-Survey — `events_pending_email` n'a aucun filtre de date** — un rattrapage de collecte avec une fenêtre large fait entrer des dépôts historiques dans la file de notification. Vécu le 2026-08-27 : `--days 2400` a collecté 93 dépôts SEC de 2020-2025 jamais vus, tous partis par mail au cron de 08:01. Borner `--days` côté CLI, ou filtrer la file par `event_date`, ou les deux. `lib/db.py:425`.
 
 - [ ] **Bam2Beta — Temps 2 de l'expérience de concordance** — le module RAREFACTION_HORAIRE_THRESHOLD produit les BAM, pas les scores. Écrire la boucle `--EXIS true --MERGE false` sur les 4 paliers de chaque sample, puis agréger les mVAF v1.4 + v1.5 en un récapitulatif par seuil (c'est ce que demande le cahier des charges). Lanceur `dev/SCW/rarefaction_horaire_threshold.sh` (Temps 1 + boucle EXIS) déjà commité (`62d9bf9`) ; reste l'agrégation.
@@ -56,6 +58,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 2 — En cours
+
+## 2026-09-10 — Aima-Tower : refonte du rendu de la page QARA
+
+- [x] **Aima-Tower — refonte du rendu `/qara` (v5.5.0)** — vue d'ensemble « gamme » (3 cartes, ordre Themelio · Exis · CUP), bandeau de synthèse par produit au même gabarit et toggle EN/FR limité à l'habillage ; numéros de section et références au document masqués à l'affichage (chaîne exacte conservée dans les données et au survol), et un défaut logique du schéma de gating CUP corrigé. Périmètre et valeurs inchangés, **vérifié contre le Doc relu en API : 143/143 valeurs retrouvées onglet par onglet et 3/3 matrices conformes aux exactitudes publiées** ; commit `0379bf9`, détails dans `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/qara_refonte_vitrine.md`.
 
 - [ ] **Prise en charge nouveau client** — premier mail envoyé, en attente de retour.
 
