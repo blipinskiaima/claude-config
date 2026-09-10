@@ -31,7 +31,7 @@ avant de choisir le modèle.
 ## Colonnes (63)
 
 - Identité (5) : `sample_name` PK, `lung_id`, `healthy_id`, `lung_pct`, `healthy_pct` (INTEGER) —
-  parsés par `split_couple()` (regex `^(Lung_\d+)_(Healthy_\d+)_(\d+)_(\d+)$`, rejette `LOG`).
+  parsés par `split_couple()` (regex `^(Lung_.+?)_(Healthy_.+?)_(\d+)_(\d+)$`, rejette `LOG`, accepte les parents rebasecalled).
 - Statuts (2) : `bam_status_dilution_lung` (demandé), `prod_status_dilution_lung` (ajouté :
   BAM vaut **OK sur 33/33** et ne discrimine rien, PROD = `BAM+BETA+QC` vaut 12/33).
   **Pas** de `bootstrap_props` OK/KO (redondant avec les 16 epic à NULL).
@@ -60,13 +60,14 @@ Suffixe `_dilution_lung` sur statuts/métriques/probs ; les 5 colonnes d'identit
 
 | Onglet | Col | Contenu |
 |---|---|---|
-| `mVAF` | 17 | `ID complet` (= `sample_name`, déjà concaténé) · `ID Lung` · `ID Healthy` · `% Lung` · `% Healthy` + 6 paires parent lung / dilué (`Nb lignes total`, `Nb molécule`, `Depth`, `Coverage`, `mVAF v1.4`, `mVAF v1.5`, suffixe ` dilution`) |
+| `mVAF` | **21** (depuis le 10/09, 17 avant) | `ID complet` (= `sample_name`, déjà concaténé) · `ID Lung` · `ID Healthy` + **un triplet par métrique** parent lung / parent healthy / dilué (`Nb lignes total`, `Nb molécule`, `Depth`, `Coverage`, `mVAF v1.4`, `mVAF v1.5`, suffixes ` lung` / ` healthy` / ` dilution`). Les `% Lung` / `% Healthy` (toujours 50) ont été **retirés de l'onglet**, pas de la base |
 | `Prop` | 52 | 5 identité + 47 probs, en-têtes nus, **point** décimal |
 
-Valeurs initiales : jointure `lung_id` → `samples` avec **`labo = 'HCL'` en dur** (vérifié : les
-34 parents sont tous en base HCL avec leurs métriques → 0 `NA` côté initial). En-têtes
+Valeurs initiales : deux jointures `lung_id` et `healthy_id` → `samples` avec **`labo = 'HCL'` en dur**
+(vérifié le 10/09 : 9 lungs + 68 healthys, dont le rebasecalled, tous en base HCL → 0 `NA` côté parents). En-têtes
 `Nb lignes total` / `Nb molécule` repris du threshold à la demande de Boris (« renommer comme pour
-la raréfaction »), les colonnes DB gardent `nb_reads_*`.
+la raréfaction »). Depuis le refactor v34 (`19923c1`, 08/09) les colonnes DB s'appellent aussi
+`nb_lignes_total_dilution_lung` / `nb_molecule_dilution_lung` (renommage global, toutes tables).
 
 ## État (07/09/2026)
 
@@ -78,6 +79,7 @@ cellules**. `compact()` testé sur copie : table + PK préservées.
 
 ## Gotchas / observations données
 
+- ⚠ **Les parents peuvent être des variantes rebasecalled** (`Lung_119_Healthy_34_rebasecalled_V6.0.0_50_50`, apparu le 10/09). La regex initiale `Healthy_\d+` le rejetait → ligne insérée **sans identité** (`lung_id` NULL) parce que ma routine de relance passait les nouveaux noms en `-s` sans le filtre `split_couple`. Regex élargie à `^(Lung_.+?)_(Healthy_.+?)_(\d+)_(\d+)$` (non-greedy, 89/89 noms reconnus, `LOG` toujours rejeté). Le parent `Healthy_34_rebasecalled_V6.0.0` existe bien en base HCL → valeurs initiales du lung inchangées (jointure sur `lung_id`).
 - `Lung_100_Healthy_84` : 55,5 M reads contre ~106 M pour les autres Lung_100. C'est la règle
   du `LOG/{couple}.dilution_lung.log` : le lung est ramené au nombre de molécules du healthy
   (Healthy_84 = 27,7 M). Le LOG donne les molécules de chaque parent — **hors scope** pour

@@ -62,6 +62,7 @@
 - Communication en **français**, réponses concises ; [réponses courtes dans le chat](feedback_reponses_courtes.md) — les longs messages le font décrocher
 - Runs Nextflow depuis `~/Run*`, jamais depuis le répertoire du pipeline
 - [S3 Never Delete](feedback_s3_no_delete.md) — ne **jamais** rien supprimer sur S3
+- [Temporaires dans /scratch/boris](feedback_scratch_boris.md) — jamais à la racine de `/scratch` ; le scratchpad /tmp n’est pas lisible depuis un container
 - [Bash inline dans les process NF](feedback_bash_inline.md) — `script:"""…"""` plutôt que scripts externes
 - [Versioned template swap](feedback_versioned_template_swap.md) — jamais modifier en place un fichier référencé par un workflow actif
 - [Google Doc — jamais de réécriture de section](feedback_gdoc_no_overwrite.md) — remplacements de chaînes exactes uniquement (incident 2026-08-14)

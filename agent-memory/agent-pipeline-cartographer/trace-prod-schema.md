@@ -1,50 +1,62 @@
 ---
 name: trace-prod-schema
-description: Schéma DuckDB trace-prod (courant v24, 2026-08), 11 tables, cohorte liquide (1359), conventions matrice/statut/clés, mapping cascade lecture A/B/C/D
+description: Schéma DuckDB trace-prod (courant v34, 2026-09-08), 14 tables (lib/duckdb.py:1363), cohorte liquide 1384 (2026-09-10), cascade lecture A/B/C/D (qc), depth/coverage (qc_metrics), export gsheet "QC read", convention chemins S3 non stockés
 metadata:
   type: project
 ---
 
-## Schéma courant (v24, 2026-08-12) — 11 tables (schéma évolue vite, ~1 migration/semaine)
+## Schéma courant (v34, 2026-09-08) — 14 tables
 
-**samples** (racine, 1506 lignes = 1359 liquid + 147 solid ; liquid = 846 CGFL + 513 HCL) : `id` INTEGER PK auto (`nextval`), `sample_name`/`sample_type`/`labo` NOT NULL VARCHAR, `UNIQUE(sample_name, sample_type, labo)`. ⚠️ `sample_name` seul N'EST PAS unique : 75 sample_name liquides existent en CGFL ET HCL (ex. `Colon_1`, `Lung_9`) — `labo` obligatoire pour identifier un échantillon sans ambiguïté.
+Source : `/home/blipinski/Pipeline/trace-prod/lib/duckdb.py`, `SCHEMA_VERSION = 34` (ligne 13), liste exhaustive des tables ligne 1363. Vérifié en live sur `database/samples_status.duckdb` (chemin par défaut, `duckdb.py:1090`) : `_schema_version` confirme v34 appliquée le 2026-09-08 16:01:53. **Schéma évolue vite (~1 migration/semaine), toujours re-vérifier avant de citer un numéro de version ou un nom de colonne.**
 
-**qc** (v23, ajoutée 2026-08-11, 1332/1359 liquides) : cascade de comptage reads publiée par Bam2Beta — 12 comptages INTEGER + 11 % DECIMAL(5,2). Colonnes : `reads_total/mapped/alignments/primary/primary_mapped/frag/28m/unmapped/secondary/supplementary/off_chr1_22/mapq_lt20` (+ `_pct` pour tous sauf `reads_total`). Mappe 1:1 les strates A(non alignées)/B(secondaires)/C(supplémentaires)/D(primaires mappées) documentées dans la mémoire projet Bam2Beta `read-counting-cascade.md` : `reads_total`=A+B+C+D, `reads_alignments`=A+C+D (cramino col4), `reads_primary`=A+D (cramino col6, = "molécules générées"), `reads_primary_mapped`=D, `reads_unmapped`=A (idxstats), `reads_secondary`=B, `reads_supplementary`=C. Vérifié arithmétiquement A+B+C+D=reads_total sur 1324/1324 lignes non-NULL. `reads_28m`/`reads_mapq_lt20` (Preprocess_28M, filtre chr1-22+MAPQ≥20) sont **NULL à 100 % (0/1359)** — jamais publiés par le pipeline, colonnes présentes dans le schéma mais mortes. 27 liquides sans ligne `qc` du tout (tous `Bladder_Urine_02_1xx`, CGFL) ; 8 de plus avec ligne mais sans idxstats (`unmapped`/`primary_mapped`/`mapped`/`off_chr1_22` NULL, aussi tous `Bladder_Urine_02_*`).
+**samples** (racine) : 1531 lignes au 2026-09-10 (requête live `GROUP BY sample_type`) = **1384 liquid** (871 CGFL + 513 HCL) + 147 solid. `id` INTEGER PK auto, `UNIQUE(sample_name, sample_type, labo)`. ⚠️ `sample_name` seul n'est pas unique (doublons inter-labo type `Colon_1`).
 
-**qc_metrics** (1:1 samples via FK, jamais NULL sur `nb_reads_*`) : `nb_reads_total`/`nb_reads_aligned` = mêmes métriques que `qc.reads_total`/`reads_primary` mais en **millions** (DECIMAL(12,2), 2 déc.) — sourcées du `metadata.json` Bam2Beta, cohérence à 1e4 près vérifiée sur 1332/1332 lignes communes. `nb_reads_aligned` = A+D, inclut les reads NON alignées (nom trompeur dans metadata.json, cf mémoire Bam2Beta). Aussi : `mvaf_v1/v2/v1_10m/v1_20m/v1_ft092/v1_ft095`, `score_cnv`, `n50`/`n75`/`n50_n75_ratio` (v21-22), `pct_mass_removed` (v24, toujours en écho avec `qc` : 35 NULL au lieu de 27, mêmes 8 samples sans idxstats).
+**qc** (duckdb.py:60-89, DDL cascade brute, inchangé depuis v25) : 24 colonnes non-clé `reads_total/mapped/alignments/primary/primary_mapped/frag/28m/with_cpg/unmapped/secondary/supplementary/off_chr1_22/mapq_lt20` (+`_pct` sauf reads_total), liste exacte = constante `QC_COLUMNS` (duckdb.py:732-747). **Aucune colonne depth/coverage dans `qc`** (existent seulement dans `qc_metrics`). Remplie par `lib/checkers_qc.py::QCChecker.check_sample()` (ligne 106) depuis 4 fichiers déjà publiés par Bam2Beta (aucune lecture de BAM, cf docstring checkers_qc.py:1-18) :
+- `reads_total` = "nombre de lignes de BAM" (A+B+C+D) ← `QC/Samtools/{S}.nb_reads_total.tsv` (checkers_qc.py:111)
+- `reads_primary` = "nombre de molécules" (A+D) ← cramino colonne `num_reads`, `QC/Cramino/{S}.merged.cramino.tsv` (checkers_qc.py:77-92, ligne 112)
+- `reads_alignments` (A+C+D) ← cramino `num_alignments` ; `reads_unmapped` (A) ← idxstats ligne `*` col4 (checkers_qc.py:95-104)
+- mapped/primary_mapped/secondary/supplementary/off_chr1_22 = soustractions ; `reads_28m`/`reads_mapq_lt20` restent NULL (Preprocess_28M non publié par le pipeline)
+- Écriture : `DuckDBService.upsert_qc()` (duckdb.py:1645)
 
-**metadata** (1:1 samples, absente pour 320/1359 liquides — surtout `Lung_*`/`Bladder_*` non encore importés du GSheet) : `class` porte un statut **mixte**, pas un champ binaire propre : `'Healthy'` (329, 100 % cohérent avec préfixe `Healthy_*`), type de cancer anatomique (`Lung`/`Colon`/`Bladder`/`Breast`/`Prostate`/`Rectum`/`Pancreas`/`Rectosigmoïde`/`Sigmoïde`/`Ovary`/`Oropharynx`/`Lymphoma`), nom de cohorte/essai clinique (`NUCLEAR` 16, `TNE` 10 — probable cancer, aucun champ clinique clair pour confirmer : `stage`/`grade`/`active_cancer` NULL, `gene1_mutated`='Non réalisé'/'WT'), ou catégorie technique (`'Test dilution Twist_0.1pc'` 15, `'Plasma_RB'` 2). `category` = sous-classification VAF clinique (`Cat 1..4`), indépendante du statut cancer/healthy.
+**qc_metrics** (duckdb.py:32-58, 1:1 samples via FK) : `depth` DECIMAL(10,2) et `coverage_percent` DECIMAL(5,2) (lignes 38-39) — les SEULES colonnes `depth`/`coverage_percent` au niveau "sample entier" de toute la base (les autres `depth_*`/`coverage_percent_*` sont des variantes small_fragments/dilution/rarefaction/horaire/threshold/dilution_lung, tables dédiées). Remplies par `lib/checkers.py::get_depth()` (ligne 725, lit `QC/Mosdepth/merged/{S}.merged.mosdepth.summary.txt` ligne "total" col4 via `extractors.py::extract_mosdepth_depth` ligne 205) et `get_coverage()` (ligne 730, lit `.mosdepth.global.dist.txt` avant-dernière ligne col3 via `extract_mosdepth_coverage` ligne 215). Chaîne d'écriture : dict "Depth"/"Coverage" (checkers.py:1002-1003) → mapping `TSV_TO_DB_QC` (duckdb.py:887,893-894 : "Depth"→"depth", "Coverage"→"coverage_percent") → `DuckDBService.upsert_sample()` (duckdb.py:1480) → `_upsert_table("qc_metrics", ...)` (duckdb.py:1504).
+⚠️ **Renommage v34** (`_migrate_reads_columns_rename`, duckdb.py:1131) : `nb_reads_total`→`nb_lignes_total`, `nb_reads_aligned`→`nb_molecule`. Anciens libellés TSV ("Nb reads total"/"Nb read alignés") encore acceptés en import via alias dans `TSV_TO_DB_QC` (duckdb.py:889-890). **Corrige mémoire précédente (v24)** qui citait encore `nb_reads_total`/`nb_reads_aligned` — ne plus utiliser ces noms.
 
-**dilution** (v9, 2026-05-28, PK `sample_name` seule, **aucune FK vers samples**, 480 lignes) et **rarefaction** (v16, 2026-07-07, PK composite `(sample_name, labo)`, **aucune FK**, 2962 lignes = pseudo-échantillons `{sample}_{niveau}`) : univers séparés et autonomes — NE PAS les compter dans la cohorte liquide/solide (1506). Corrige mémoire précédente (mai 2026, schéma v8) qui affirmait leur absence — elles ont été ajoutées juste après.
+## Export gsheet "QC read"
 
-**retd_suivis**, **bam_metadata**, **probs**, **short_read_metrics** : inchangées pour l'essentiel depuis la fiche précédente (statuts fichiers, run/pod5/barcode, probabilités déconvolution, subsampling 75-200bp).
+Spreadsheet dédié, ID `1kUk5ShkMiVVUiOugY1ki7v9yfbjmSFjdoDbpHWoKiw0` (`database/gsheets_config.json:76`, clé `qc_read`) — **distinct** du spreadsheet principal trace-prod (`1gm_vB7vTzAq38dgkJFNpgA3Cy_XRlUqunMgoBvKnh6M`, qui porte liquid_CGFL/liquid_HCL/solid_CGFL/probs_*/Plateform/ONT Sample/Small Fragments/Dilution/Rarefaction). Cet ID `1kUk5Shk...` n'apparaît qu'une fois dans tout le repo → aucun autre onglet du pipeline n'y pointe (mais pas de vérification API live du contenu réel du document — pourrait avoir des onglets manuels non référencés dans le code).
 
-## Convention matrice liquide (plasma / urine / autre) — piège connu confirmé
+Code : `lib/gsheets.py::export_qc()` (ligne 274). Colonnes = `_QC_READ_HEADERS` (gsheets.py:255-269), **16 colonnes dans cet ordre exact** : Sample, Indication, LABO, Total(`reads_total`), puis 12 `*_pct` de `qc` (Mapped/Alignments/Primary/Primary mapped/FRAG/28M/CpG/Unmapped/Secondary/Supplementary/Hors chr1-22/MAPQ<20 %). Lignes triées `ORDER BY labo, sample_name`. Source : `DuckDBService.get_qc_unified()` (duckdb.py:1577) = `qc` LEFT JOIN `samples` + `metadata` (indication = `metadata.class`, fallback par préfixe de nom pour Lung_Alc/Bladder_Urine/Colon sans metadata), **filtré `sample_type='liquid'` uniquement** (jamais solid). CLI : `check_samples.py export-qc` (ligne 566 ; option `--tsv <path>` pour preview local sans toucher au gsheet). Pour ajouter une colonne : l'ajouter à `QC_COLUMNS`/DDL `qc` si nouvelle métrique brute, puis à `_QC_READ_HEADERS` (gsheets.py) — `get_qc_unified()` l'inclut automatiquement via `QC_COLUMNS`.
 
-`metadata.class`/`category` NE distingue PAS plasma/urine (même `class='Bladder'` pour un `Bladder_Urine_*` et un `Bladder_Blood_*`, vérifié). La matrice se lit dans le NOM : `Bladder_Urine_{01,02}_NNN` (116) vs `Bladder_Blood_{01,02}_NNN` (58, dont un `_02_156bis`) — couverture exhaustive, 116+58=174 = tout le préfixe `Bladder_`, zéro fuite hors préfixe. Le reste (1158/1359) = plasma par défaut, non marqué explicitement. Contrôles synthétiques `Twist_*` (22, préfixe explicite, dilutions/réplicats compris). 5 échantillons liquides inclassables sans aucune métadonnée ni préfixe reconnu : `Ma_SAB_12-1958_Run_{1,2,merged}`, `26BM03032`, `ANG-CA-11081963` (à l'inverse `26BM01841` a `class`='Bladder or mesothelioma', classé mais matrice non confirmée par le nom).
+## Chemins S3 des sorties : aucune colonne ne les stocke
 
-⚠️ **Angle mort EQC** : 12 contrôles qualité externes CGFL (`Breast_17/32/47/49/50/52`, `Prostate_2/3/23/37/38/39`, cf mémoire Bam2Beta `n50-ratio-qc.md`) sont enregistrés dans trace-prod EXACTEMENT comme des patients cancer normaux (`class`='Breast'/'Prostate', `category` clinique VAF renseignée) — **aucun champ trace-prod ne les marque comme EQC**, confirmé par lecture directe. Liste à maintenir en dehors de la base. Seul `Breast_17` a une variante `_rebasecalled_V5.0.0_trimmed`.
+Reconstruits à la volée par convention f-string, dupliquée dans `lib/checkers.py:774,785` et `database/check_samples.py:1472,1476,1532` : merged BAM = `s3://aima-bam-data/processed/MRD/RetD/{sample_type}/{labo}/{sample}/BAM/{sample}.merged.bam` ; données brutes = `s3://aima-bam-data/data/{labo}/{sample_type}/{sample}/` (⚠️ ordre `labo`/`sample_type` inversé entre les deux patterns, vérifié dans les 2 fichiers). Seule adresse S3 littéralement stockée en base : `bam_metadata.pod5_adresse` VARCHAR (duckdb.py:162) — mais c'est l'adresse POD5 en **entrée**, pas une sortie pipeline.
 
-Aucune lignée cellulaire trouvée dans la cohorte liquide (recherche exhaustive `'cell'`/`'lign'` sur tous les champs texte `metadata` — seuls faux positifs : "cellules tumorales/claires/suspectes" en texte clinique libre français).
+## Convention matrice liquide (plasma / urine / autre) — piège connu (non re-vérifié le 2026-09-10)
 
-## Rebasecalled / réplicats = lignes distinctes, même patient
+`metadata.class`/`category` NE distingue PAS plasma/urine. La matrice se lit dans le NOM : `Bladder_Urine_{01,02}_NNN` vs `Bladder_Blood_{01,02}_NNN`. Contrôles synthétiques `Twist_*`.
 
-`_rebasecalled_V{4.2.0,4.3.0,5.0.0,5.0.0_trimmed,5.2.0,6.0.0}` (208 liquides, 6 variantes de version) et `_rep1`/`_rep2`/`_rep_2` (33 liquides, dont certains avec suffixe `_OK` additionnel type `Colon_17_rep1_OK`) sont des `sample_id` DISTINCTS de l'original, mais héritent du même `metadata.patient_id`/`class` (propagation confirmée sur `Breast_17` vs `Breast_17_rebasecalled_V5.0.0_trimmed`, id 14 vs 4740, même patient_id/class/gene1_vaf). Comptent comme échantillons distincts en base (QC/`qc`/`qc_metrics` propres à chaque run), mais PAS comme patients/spécimens cliniques distincts.
+⚠️ **Angle mort EQC** (non re-vérifié) : 12 contrôles qualité externes CGFL (`Breast_17/32/47/49/50/52`, `Prostate_2/3/23/37/38/39`) enregistrés comme patients cancer normaux, aucun champ trace-prod ne les marque comme EQC.
+
+## Rebasecalled / réplicats = lignes distinctes, même patient (non re-vérifié)
+
+`_rebasecalled_V{...}` et `_rep1`/`_rep2` sont des `sample_id` distincts héritant du même `metadata.patient_id`/`class`.
 
 ## Clé primaire réelle
 
-`samples.id` (surrogate, séquence) est LA clé référencée par FK 1:1 dans qc/qc_metrics/retd_suivis/metadata/probs/bam_metadata/short_read_metrics (`sample_id INTEGER PRIMARY KEY REFERENCES samples(id)`). La clé logique/métier est `UNIQUE(sample_name, sample_type, labo)` — jamais `sample_name` seul (cf doublons inter-labo ci-dessus).
+`samples.id` (surrogate) référencé par FK 1:1 dans qc/qc_metrics/retd_suivis/metadata/probs/bam_metadata/small_fragments_metrics. Clé logique/métier : `UNIQUE(sample_name, sample_type, labo)` — jamais `sample_name` seul.
 
 ## Où stocker les VAF sources
 
-- `metadata.gene1_vaf` : VAF tumorale mesurée (VARCHAR libre, ex : 28.4%, 73.0%) — source GSheet
-- `qc_metrics.mvaf_v1/v2` (+ v10m/v20m/ft092/ft095) : mVAF calculée par raima après Bam2Beta
-- Pour les healthys : `metadata.class = 'Healthy'`, `gene1_vaf` = NULL
+- `metadata.gene1_vaf` : VAF tumorale mesurée (VARCHAR libre) — source GSheet
+- `qc_metrics.mvaf_v1/v2` (+v10m/v20m/ft092/ft095) : mVAF calculée par raima après Bam2Beta
+- Healthy : `metadata.class = 'Healthy'`, `gene1_vaf` = NULL
 
 ## Key files
 
-- `/home/blipinski/Pipeline/trace-prod/lib/duckdb.py` — DDL complet, SCHEMA_VERSION = 24 (table `_schema_version` = changelog exact avec dates)
-- `/home/blipinski/Pipeline/trace-prod/README.md` — documentation schéma
-- `/home/blipinski/Pipeline/trace-prod/database/check_samples.py` — CLI principal
-- `/home/blipinski/Pipeline/trace-prod/lib/checkers.py` — BaseChecker, LiquidChecker, get_prod_status()
-- `/home/blipinski/Pipeline/trace-prod/database/samples_status.duckdb` — DB courante (135 Mo). Multiples backups horodatés dans le même dossier (`*.backup-pre-*.duckdb`), ne pas confondre avec la DB active.
+- `/home/blipinski/Pipeline/trace-prod/lib/duckdb.py` — DDL complet, SCHEMA_VERSION=34, migrations (`_migrate_*`)
+- `/home/blipinski/Pipeline/trace-prod/lib/checkers_qc.py` — checker cascade `qc` (dédié, 4 fichiers Bam2Beta)
+- `/home/blipinski/Pipeline/trace-prod/lib/checkers.py` — checker générique (depth/coverage/mvaf/... → qc_metrics/retd_suivis/bam_metadata)
+- `/home/blipinski/Pipeline/trace-prod/lib/gsheets.py` — tous les `export_*()`, un par onglet
+- `/home/blipinski/Pipeline/trace-prod/database/gsheets_config.json` — IDs spreadsheet + nom d'onglet par clé
+- `/home/blipinski/Pipeline/trace-prod/database/check_samples.py` — CLI principal (Click)
+- `/home/blipinski/Pipeline/trace-prod/database/samples_status.duckdb` — DB active (227 Mo au 2026-09-10). De nombreux `*.backup-pre-*.duckdb` dans le même dossier, ne pas confondre.

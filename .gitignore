@@ -33,6 +33,7 @@ projects/**/*.jsonl
 projects/**/subagents/
 projects/**/sessions-index.json
 projects/**/tool-results/
+projects/**/custom-title.json
 projects/**/workflows/
 
 # Machine-specific settings
