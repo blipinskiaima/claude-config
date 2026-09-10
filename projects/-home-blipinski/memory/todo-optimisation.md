@@ -59,15 +59,15 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 2 — En cours
 
-## 2026-09-10 — Aima-Tower : refonte du rendu de la page QARA
-
-- [x] **Aima-Tower — refonte du rendu `/qara` (v5.5.0)** — vue d'ensemble « gamme » (3 cartes, ordre Themelio · Exis · CUP), bandeau de synthèse par produit au même gabarit et toggle EN/FR limité à l'habillage ; numéros de section et références au document masqués à l'affichage (chaîne exacte conservée dans les données et au survol), et un défaut logique du schéma de gating CUP corrigé. Périmètre et valeurs inchangés, **vérifié contre le Doc relu en API : 143/143 valeurs retrouvées onglet par onglet et 3/3 matrices conformes aux exactitudes publiées** ; commit `0379bf9`, détails dans `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/qara_refonte_vitrine.md`.
-
 - [ ] **Prise en charge nouveau client** — premier mail envoyé, en attente de retour.
 
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-09-10 — Aima-Tower : refonte du rendu de la page QARA
+
+- [x] **Aima-Tower — refonte du rendu `/qara` (v5.5.0)** — vue d'ensemble « gamme » (3 cartes, ordre Themelio · Exis · CUP), bandeau de synthèse par produit au même gabarit et toggle EN/FR limité à l'habillage ; numéros de section et références au document masqués à l'affichage (chaîne exacte conservée dans les données et au survol), et un défaut logique du schéma de gating CUP corrigé. Périmètre et valeurs inchangés, **vérifié contre le Doc relu en API : 143/143 valeurs retrouvées onglet par onglet et 3/3 matrices conformes aux exactitudes publiées** ; commit `0379bf9`, détails dans `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/qara_refonte_vitrine.md`.
 
 ## 2026-09-08 — Bam2Beta dilution lung + trace des 480 dilués · trace-prod : probs bootstrap/Loyfer, étiquettes, export Trace Run, agrégats hors rebasecallés, renommage v34 · Aima-Tower : règle run-level des prompts IA · statut QC Exis/Thémélio (Bam2Beta + trace-prod v34)
 - [x] **trace-prod — export `Trace Run`, une ligne par run de séquençage** — nouvelle commande `export-run` (liquid hors rebasecallés) : **292 runs × 13 colonnes** vers une gsheet dédiée, onglet `Run`. **Aucune colonne ni calcul ajouté en base** : tout est dérivé par `GROUP BY (run_id, labo)`. Date et flow cell viennent de `metadata.run_number` (209 runs / 291 seulement). ⚠ `sequencing_time` est une donnée de **barcode**, pas de run — 26 runs portent plusieurs valeurs, jusqu'à 30 h d'écart → la colonne liste les valeurs distinctes. Réutilise le helper d'export existant sans le modifier. Commit `5cda8ee`, mémoire `project_export_run.md`.
