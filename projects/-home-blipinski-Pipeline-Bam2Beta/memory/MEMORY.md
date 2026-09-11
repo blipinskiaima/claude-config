@@ -38,6 +38,9 @@
 - [Flux small_fragment](small-fragment-flow.md) — BAM filtré 75-200 se fait passer pour merged, cœur inchangé
 - [Refactors 2026-05](refactors-2026-05.md) — QC/Raima refactors, code mort (purgé en V2.3.0)
 - [Rapport PDF Typst V2](report_pdf_typst_v2.md) — pivot Typst, génération désactivée depuis 2026-06
+- [Perf du module EXIS](perf-exis-traces.md) — les traces Nextflow sont sur S3 (`{sample}/LOG/`) malgre `trace.enabled=false` ; `Raima_score_mVAF` = 74-81 % du wall-clock EXIS, queue mono-tache a 12 % ; MERGE = 40 % du run. Le seul levier dans notre code = la boucle de tri (mesuree −54 %, non appliquee)
+- [Dimensionnement cpus/memory](ressources-dimensionnement.md) — docker : `--memory` plafond dur, `--cpu-shares` simple poids ; ⚠️ `peak_rss` **censure** par le plafond ; ⚠️ `task.cpus` → `--ncores` → sommes flottantes raima (A/B obligatoire) ; plafond ≠ allocation, `params.cpu` n'existe pas
+- [Provisionner les dependencies](dependencies-provisioning.md) — 23 fichiers eclates sur 2 prefixes S3, ⚠️ `ichorCNA/` **absent du bucket**, depot Hub `raima` **prive** ; aucune dependance nouvelle depuis V2.2.0
 - [Qualif check-conformity](qualif-check-conformity.md) — 6 étapes, valeurs figées inline, étape 6 non-régression PROD bloquante
 
 ## Verified Findings

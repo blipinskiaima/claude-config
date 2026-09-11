@@ -60,6 +60,19 @@ metadata:
   non suivis de ~200 Mo piece au 2026-09-08. Un `git add .` dans ce depot les embarquerait.
   Toujours `git add <fichier>` explicitement.
 
+## Determinisme des outils de tri (verifie 2026-09-11)
+
+- **`samtools sort` est deterministe entre nombres de threads** : `-@ 4/8/16` et `-m 2G/3G`
+  donnent le **meme ordre de reads** (md5 du SAM identique, teste sur Healthy_826, samtools
+  1.22.1). Le fichier BAM differe en octets, mais uniquement par la ligne `@PG CL:` qui
+  enregistre la commande. => on peut monter `-@` sans risque sur les sorties.
+- **`LC_ALL=C sort -S … --parallel=…` n'altere pas la sortie** : sans `-s` ni `-u`, GNU sort
+  compare la **ligne entiere** en dernier recours quand les cles sont a egalite, donc l'ordre
+  total est independant de l'algorithme, du buffer et du nombre de threads. Verifie sur
+  400 000 lignes a ex-aequo massifs, sur l'hote (coreutils 9.4) **et** dans le container raima
+  (8.32). `gzip -1` vs `gzip -6` : contenu decompresse identique, fichier +25 %, relecture
+  +12 % (1,62 -> 1,81 s). ⚠ **`pigz` est ABSENT du container raima** (`xargs` y est present).
+
 ## Donnees / unites
 
 - **75 `sample_name` sont portes par 2 echantillons distincts** (un CGFL, un HCL, profondeurs

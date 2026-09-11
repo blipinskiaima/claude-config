@@ -37,8 +37,10 @@ le cramino EPIC (v1.5) + publication `merged.epic.bam`. `metadata.json` strictem
 
 ## raima 0.5.6 = latest + amplitude_fragmento_qc
 
-- Tarball `/mnt/temp/florian/raima_0.5.6.tar.gz`, image locale non poussee sur Docker Hub
-  (Hub reste a 0.5.3 — **push en suspens**). 0.5.3/0.5.4 en tags de rollback. Les 6 process
+- Tarball `raima_0.5.6.tar.gz` : sur `/mnt/temp/florian` **et** sur
+  `s3://aima-resources/raima-model/`. Image **poussee sur le Hub** (verifie 2026-09-11 :
+  `raima:latest` et `:0.5.6` presents ; le depot est **prive**, d'ou le "object not found"
+  de l'API publique). `:0.5.3` n'est plus sur le Hub. 0.5.4 en tag de rollback local. Les 6 process
   raima sur `latest`. Les 11 fonctions utilisees verifiees exportees avant bascule.
 - `amplitude_fragmento_qc(csv)` : histogramme longueurs 80-600 pb → baseline scam → FFT →
   amplitude max periode 130-200 pb. **Scalaire deterministe.** Refs : Healthy_826 236.0128,
@@ -79,8 +81,8 @@ listes propres obligatoires).
 
 ## En suspens apres release
 
-- `docker push blipinskiaima/raima:latest` + `:0.5.6` (Hub a 0.5.3, divergence si autre noeud)
-- Tarball 0.5.6 → `s3://aima-resources/raima-model/` (n'existe que sur /mnt/temp/florian)
+- ~~`docker push blipinskiaima/raima:latest` + `:0.5.6`~~ — **fait** (verifie 2026-09-11)
+- ~~Tarball 0.5.6 → `s3://aima-resources/raima-model/`~~ — **fait**
 - Token Tower en dur dans `nextflow.config:59` (golden rule, preexistant)
 - ~~Backfill amplitude des ~1500 samples RetD via `--RETRO_FRAG_AMPLITUDE`~~ — **module retire
   le 2026-09-04** (Boris), plus de backfill possible par le pipeline. Voir [[dilution-lung]]
