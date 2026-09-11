@@ -1,37 +1,39 @@
-# Context — Bam2Beta — 2026-09-08
+# Context — Bam2Beta — 2026-09-11T09:59
 
 **Branche** : main
-**Dernier commit** : e988b21 — feat(qc): statut QC Exis/Themelio — process QC_status, 4 champs metadata.json (33), module retro RETRO_REPORT
-**Status** : 2 fichiers modifiés, pas de moi (dev/SCW/Bam2Beta.sh, dev/SCW/dilution_lung.sh — lanceurs de Boris)
+**Dernier commit** : bbbc009 — chore(perf): right-sizing des ressources mesure sur 46 traces, paires dilution en 4 lots
+**Status** : clean (seul `pair_current.tsv` non suivi, temporaire du lanceur)
 
 ## Où j'en suis
 
-Feature « statut QC Exis/Thémélio » livrée de bout en bout et poussée sur les 2 dépôts :
-Bam2Beta e988b21 (process QC_status → QC/{ID}.qc_status.tsv, 4 champs dans metadata.json = 33,
-module temporaire --RETRO_REPORT) et trace-prod 2a114b8 (schema v34, read_qc_status preserve,
-_update_qc_status, export gsheet). Rétro exécuté : 1366/1379 JSON liquid générés, 157 anciens
-sauvegardés en .pre_qc_status, base backfillée par Boris, gsheet vérifiée (distributions identiques
-JSON = base = gsheet). Aussi dans la journée : rapport.nf simplifié (7858fe7), sequencing_time.tsv
-dans Read_Start_Time + chemin rapide trace-prod (bb84b5e / 19923c1). Mémoire à jour
-(qc-status-exis-themelio.md, project_schema_v34_qc_status.md).
+Session d'optimisation des performances, pas de feature. Cartographie du module EXIS puis
+analyse de perf sur **46 traces Nextflow récupérées sur S3** (les lanceurs passent
+`-with-trace` en CLI malgré `trace.enabled=false` — c'est LA source, `cleanup=true` purge
+le workDir local). Right-sizing de `conf/base.config` appliqué et poussé. Fiches mémoire
+écrites : `perf-exis-traces`, `ressources-dimensionnement`, `dependencies-provisioning`.
 
 ## Ce qui marche / ce qui foire
 
-- ✓ Arbre validé par Boris (5 critères, branche 5–20 M, pire statut gagne, raisons FAILED > WARNING > ordre)
-  et prouvé : 19 cas fabriqués, Healthy_826 FAILED, Lung_9 SUCCESS, JSON QUALIF inchangé sur 29 champs
-- ✓ Cohorte : CGFL 449 S/S · 223 W/W · 105 W/F · 77 F/F ; HCL 475 · 31 · 6. « Non-human » ne sort
-  jamais (arrêté avant par l'arbre), gDNA 6 fois seulement
-- ✗ Le glob RetD/liquid/CGFL/* casse côté S3 (ListBucketHandler, 4/4, même bridé) ; HCL passe ; un
-  dossier seul passe. Cause non établie (Twist_0% = résidu de lanceur, suspect non confirmé).
-  CGFL a été généré par Boris via l'arbre data/CGFL/liquid/*
-- ✗ Reste ouvert : v34 vs v35 (le commit 19923c1 dit « migration v34 » sans l'avoir portée) ;
-  --RETRO_REPORT à retirer plus tard ; backups .duckdb non ignorés par git ; runs sous Nextflow
-  25.10.2 (shell) vs 25.04.8 (tmux/documenté) ; artefacts de test DEV/retro_report_test{,2} sur S3
-- ⚠ Runs de Boris toujours en cours (tmux Dilution/lung_hcl : dilution_lung Lung_104_Healthy_51)
+- ✓ Diagnostic solide : `Raima_score_mVAF` = 74-81 % du wall-clock EXIS sur 7 samples de
+  0,4 à 44 Go, queue mono-tâche à 12 % d'occupation ; phase MERGE = 40 % du run
+- ✓ Right-sizing poussé (`0856f3f` + `bbbc009`) : `IV_call` 8→16 G (2 OOM réels corrigés),
+  ternaire `Mosdepth_qc` rendu cohérent à 16 G, ~20 sur-allocations ramenées à 2 G,
+  MERGE monté à 16 cpus (`BAM_sort` 40 G)
+- ✓ Déterminisme prouvé : `samtools sort` entre threads (md5 SAM identique) et
+  `GNU sort -S/--parallel` (hôte 9.4 + container 8.32)
+- ✗ **Optimisation de la boucle de tri jamais appliquée** — mesurée 10,82 → 4,96 s par
+  chromosome, contenu md5-identique, ≈ −300 s sur Lung_9. C'est le seul levier restant
+  dans notre code
+- ✗ `Raima_score_mVAF` passé à 8 cpus **sans A/B** : `--ncores` pilote `setDTthreads`, qui
+  agit sur des sommes flottantes de raima → peut changer une sortie qualifiée. Et les
+  workers étaient déjà affamés (2,2 cœurs sur 4), donc gain douteux
+- ✗ `Read_Start_Time` commenté dans `qc.nf` — supprime aussi `sequencing_time.tsv`
+  (chemin rapide trace-prod). Réactivation prévue par Boris
+- ✗ `ichorCNA/` (5 fichiers) n'existe que sur ce serveur, absent de `s3://aima-resources`
+- ✗ Machine sursouscrite : jusqu'à 9 runs Nextflow simultanés, load 119 sur 32 cœurs
 
 ## Prochaine étape
 
-Trancher v34/v35 avec Boris, puis planifier le retrait de --RETRO_REPORT une fois le
-pipeline nominal (QC_status dans RAPPORT) passé sur quelques samples prod. Qualif V2.4.0
-à prévoir (/test_bam2beta : metadata.json 33 champs, check-conformity signalera les 4 nouveaux
-champs en WARNING « nouvelle feature »).
+Appliquer l'optimisation de la boucle de tri dans `workflow/beta_28M.nf` (~ligne 166) :
+`sort -S 2G --parallel=${task.cpus}`, `gzip -1`, et `xargs -P` sur les 22 itérations.
+`xargs` est dans le container raima, `pigz` non.
