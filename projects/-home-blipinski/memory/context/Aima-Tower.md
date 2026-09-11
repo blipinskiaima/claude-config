@@ -1,45 +1,41 @@
-# Context — Aima-Tower — 2026-09-10 (clôture session)
+# Context — Aima-Tower — 2026-09-11 (clôture session)
 
-**Branche** : main (poussé, origin/main = 0379bf9)
-**Dernier commit** : 0379bf9 — feat(qara): vue d'ensemble, bandeaux produit
-et toggle EN/FR — v5.5.0
-**Status** : clean (hors untracked `.claude/worktrees/` et `Exis 1.1.pdf`,
-hors scope depuis le 24/07)
+**Branche** : main (poussée, origin/main = df7159a)
+**Dernier commit** : df7159a — fix(charte): tuiles et échelle d'Exploration sur la grille d'état
+**Status** : clean (hors untracked `.claude/worktrees/` et `Exis 1.1.pdf`, hors scope depuis le 24/07)
 
 ## Où j'en suis
-Session entière sur le **rendu** de `/qara`, à valeurs et périmètre inchangés
-— `qara-data.ts` n'a pas été touché de la journée. Ajout d'une vue d'ensemble
-(3 cartes, ordre Themelio · Exis · CUP), d'un bandeau de synthèse par produit
-et d'un toggle EN/FR limité à l'habillage. Puis ~15 itérations de mise en page
-pilotées par les commentaires de Boris sur un aperçu artifact publié
-(`claude.ai/code/artifact/97e777e5…`), généré depuis les vrais composants via
-`react-dom/server`. Terminé par une vérification complète contre le Google Doc.
+Chantier terminé et **déployé** : la charte graphique du site officiel
+(preview.aima-diagnostics.com) est appliquée à toute la Tour, en **v5.6.0**.
+Quatre checkpoints validés par Boris (accès et outils → charte extraite en tokens →
+rendu QARA côte à côte → plan de déclinaison), puis trois phases d'exécution.
+Le conteneur tourne avec la charte **et** le correctif trace-prod v34 de la session
+parallèle, mergé sans conflit. Comportement, données et routes inchangés.
 
 ## Ce qui marche / ce qui foire
-- ✓ Vérification finale contre `Aima_QARA` relu en API (GET) : **143/143**
-  valeurs affichées retrouvées onglet par onglet (Exis 60, Themelio 64, CUP 19),
-  et les 3 matrices reproduisent exactement accuracy ET balanced accuracy
-  publiées (36,8/30,0 · 47,4/42,5 · 90,4/72,9).
-- ✓ `qara-ui.ts` ne contient **aucun littéral numérique** : ses chiffres sont
-  lus dans `qara-data.ts`. Vérifié par grep.
-- ✓ v5.5.0 alignée sur les 4 sources, Tower rebuildée, `healthy`, aucune erreur.
-- ✗ **47 pourcentages calculés** dans les matrices CUP en mode « row % » (le
-  défaut) : compte ÷ total de ligne, absents du texte du document. Les comptes
-  sont validés, les pourcentages restent dérivés. Signalé à Boris, non corrigé.
-- ✗ **4 seuils écrits en dur** dans `CupTab.tsx` (`mVAF v1.4 > 0`, `≥ 0.32`,
-  `max_p < 0.826`, `≥ 0.826`) : conformes aujourd'hui, mais ils ne suivront pas
-  une mise à jour de `CUP_STRATA`.
-- ✗ Les 2 tests `test_exploratory_compute.py` restent rouges. **Inchangés depuis
-  le 26/08**, non traités : snapshots figés à 383 samples cancer contre 416.
-- ⚠ Piège de méthode : le contrôle « nombre affiché ∈ données » ne signalait que
-  **4** valeurs manquantes — les 43 autres pourcentages calculés coïncident par
-  hasard avec des nombres du fichier. Compter les cellules, pas les absents.
-- ⚠ Ne pas rebuilder le container à chaque itération : `docker compose build`
-  refait le build vite dans l'image, soit ~2× le cycle pour rien.
+- ✓ Conteneur reconstruit et vérifié en ligne : santé 200, `/api/samples` 200,
+  API en 5.6.0, logos servis, QARA / Échantillons / Exploration / Reproductibilité
+  capturés avec données, zéro erreur console.
+- ✓ Couche de tokens dans `frontend/src/index.css` : les anciens noms de palette et les
+  193 classes Tailwind nommées sont en **alias**, donc aucun composant n'a été édité
+  pour changer de couleur. Diff confiné aux styles.
+- ✓ Tests : 138 passent. Les 2 échecs restants sont les snapshots `exploratory`
+  **préexistants** (383 vs 416 samples cancer), sans lien avec la charte.
+- ✗ **Un alias ne porte pas le sens de la couleur remplacée** : la tuile « Spécificité AI »
+  et le palier 60-80 % d'`/exploration` sortaient en magenta (= alerte) pour de bonnes
+  valeurs. Vu seulement **en ligne avec données**, corrigé en df7159a. D'autres endroits
+  où l'ancien violet codait un état peuvent rester à relire.
+- ✗ Le bandeau de `/sample/:id` affiche encore « Aima Tower · v4.2 · ISO 15189-ready »
+  (texte hérité du mockup, jamais relié à la version réelle).
+- ⚠ La section « Structure » du README décrit encore l'arbo Dash v2 (`src/pages.py`,
+  `callbacks.py`, `assets/`) et ignore tout le frontend React. Obsolète **avant** cette
+  session, signalée, non corrigée.
+- ⚠ `MEMORY.md` fait 28 Ko pour une limite de 24,4 Ko : une partie n'est pas chargée au
+  démarrage. Les entrées d'index sont trop longues, à consolider.
 
 ## Prochaine étape
-Trancher les deux dérivations restantes de `/qara` : basculer le défaut des
-matrices sur « counts » (ou assumer les 47 % calculés), et sourcer les 4 seuils
-du schéma de gating depuis `CUP_STRATA`. Puis, toujours en suspens depuis le
-26/08 : valider 416/374 comme nouvelle référence des snapshots `exploratory`,
-ou comprendre les +33 samples cancer.
+Trancher les deux restes cosmétiques : la mention de version en dur du bandeau
+`/sample/:id`, et la relecture des derniers endroits où l'alias violet → magenta fait
+passer une valeur normale pour une alerte (chercher `--aima-violet-` dans `Qualite.tsx`
+et `AimaComparaison.tsx`). Puis, toujours en suspens depuis le 26/08 : valider 416/374
+comme nouvelle référence des snapshots `exploratory`, ou comprendre les +33 samples.
