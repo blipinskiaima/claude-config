@@ -35,7 +35,7 @@ le piège rencontré deux fois au passage à la charte ([[charte_site_tokens]]).
 | Produit | Régime | Pourquoi |
 |---|---|---|
 | **Exis** | `exploratory_service.compute()` aux réglages Exis figés | **Aucun calcul maison** — mêmes réglages que [[qara_tower_skill]]. La sortie est lue telle quelle (chaînes `« 95.1% (213/224) »`, champ `Sens_Cancer_AI` et **non** `Sens_AI`) |
-| **CUP** | comptage de `too_final_decision` | La strate est **déjà décidée par le pipeline** ; `max_p` n'est pas en base, donc **aucun seuil n'est ré-appliqué** |
+| **CUP** | comptage de `too_final_decision` | Strate **déjà décidée par le pipeline**, `max_p` absent de la base → **aucun seuil ré-appliqué**. ⚠ Marqué `comparable: False` lui aussi (voir plus bas) |
 | **Themelio** | seuils s1/s2 du bundle sur `themelio_score` | Mesuré et affiché, mais marqué `comparable: False` |
 
 ## ⚠ Themelio : l'écart mesure la méthode, pas les données
@@ -63,6 +63,30 @@ s1 et 4 au-dessus de s2, cancers Detection 24 / Suspicious 18 / Negative 35.
 ⚠ Ne **pas** utiliser `screening_top10_xgb/results/screening_top10_xgb_predictions.csv` :
 il donne 0 sain au-dessus des deux seuils et 119 cancers — c'est un autre entraînement.
 Je m'y suis trompé et j'ai conclu à tort que le score avait été recalculé.
+
+## ⚠ CUP non plus n'est comparable — la même fuite que Themelio
+
+Découvert en cherchant pourquoi la *balanced accuracy* montait de **72,9 à 81,3 %**.
+`releases/too5_v0_4_1/MANIFEST.md` : « Illustrative outputs from the **deployed 3-fold
+ensemble (not OOF)** ». SD-03 : « Analytical performance is estimated **out-of-fold** ».
+
+```
+                 FIGÉ (OOF, n=94)      BASE (déployé, n=156)
+Lung              36/37   97,3 %        54/54   100,0 %
+Colon             21/24   87,5 %        39/39   100,0 %
+Prostate          16/17   94,1 %        23/23   100,0 %
+Breast            12/14   85,7 %        21/22    95,5 %
+Bladder+Pancreas   0/2     0,0 %         2/18    11,1 %
+balanced          72,9 %                81,3 %
+```
+
+⚠ **Le top-1 masquait la fuite** : il passe de 90,4 à 89,1 % (−1,3 pt) parce que
+Bladder+Pancreas grossit de 2 à 18 échantillons à 11 % de rappel — la métrique **pondérée**
+baisse pendant que la **non pondérée** monte. J'avais conclu de ce −1,3 pt que la nuance
+OOF était « beaucoup plus faible ici que sur Themelio ». C'était le mauvais indicateur.
+
+⚠ La **porte d'entrée reste stable** : 284/284 mVAF v1.4 identiques. C'est la *prédiction
+de classe* qui est contaminée, pas le gating. **Seul Exis reste une comparaison véritable.**
 
 ## ⚠ La cohorte CUP du document n'est pas reproductible
 
