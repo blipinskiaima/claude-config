@@ -1,39 +1,31 @@
-# Context — trace-prod — 2026-09-08T14:20:00+00:00
+# Context — trace-prod — 2026-09-11T09:54:04+00:00
 
 **Branche** : main
-**Dernier commit** : 19923c1 — refactor: colonnes nb_lignes_total / nb_molecule (migration v34)
-**Status** : working tree clean (hors untracked habituels : backups .duckdb, CSV dev, rapports HTML).
-5 commits poussés ce jour, à la suite de 608fdf3 (session parallèle).
+**Dernier commit** : 2444113 — docs: schema v32 — état final du lot threshold + gotcha BAM périmé
+**Status** : propre (untracked inchangés : backups .duckdb, CSV dev/, rapports HTML, metadata_HCL.tsv)
 
 ## Où j'en suis
-Session du 08/09, quatre chantiers menés bout à bout et livrés :
-1. **Masquage de 5 colonnes** de l'export trace-prod (mVAF v1/v2, Multi Run, BEDMETH EPICS,
-   Props Epic) — mappings conservés, colonnes toujours alimentées en base.
-2. **`export-run`** (nouveau) : une ligne par run de séquençage → gsheet « Trace Run » dédiée,
-   onglet `Run`, **292 × 13**. Rien ajouté en base, tout dérivé par `GROUP BY (run_id, labo)`.
-3. **Correction des agrégats par run** : `reads_per_flowcell` / `samples_per_run` excluent
-   désormais les rebasecallés (qui reçoivent NULL) et comptent les **molécules**
-   (`nb_reads_aligned`) au lieu des lignes. 1515 valeurs recalculées, max 876,15 → 335,92.
-4. **Renommage v34** : `nb_reads_total` → `nb_lignes_total`, `nb_reads_aligned` → `nb_molecule`,
-   14 colonnes sur 7 tables + 159 identifiants dans 15 fichiers. Étiquettes d'export inchangées.
+Schema v32 (`rarefaction_horaire_threshold`) terminé et le lot est **clos** : 1620 lignes
+(456 CGFL / 1164 HCL, 405 bases × 4 paliers), PROD/mVAF/epic/Loyfer à **1620/1620**, les
+2 onglets de la gsheet dédiée `1FG4KfL4…` à jour. 9 passes `check` + export du 03 au 09/09
+ont accompagné la montée en charge (308 → 1620). Doc README + CLAUDE.md remises à niveau et
+poussées. Rien en attente côté code.
 
 ## Ce qui marche / ce qui foire
-- ✓ Non-régression prouvée : 9275 lignes ligne à ligne vs backup (0 écart), 19 contraintes
-  identiques, 1512 samples d'export identiques, et **A/B contre le code d'avant** sur `check`,
-  `update-column stockage_pod5`, `probs --probs_loyfer`, `--probs_bootstrap` → 0 divergence.
-- ✓ Base ↔ export `run` concordent sur 291/291 runs.
-- ✗ **`check liquid CGFL -s 26BM01841` détruit le sample** : `run_id`/`barcode` → NULL,
-  reads → 0,00, alors que le dossier S3 existe. **Comportement préexistant** (reproduit à
-  l'identique avec le code d'avant le renommage), pas une régression. Ce sample est dans
-  `EXPORT_HIDDEN_SAMPLES`. Non diagnostiqué — cause à chercher côté checker.
-- ✗ `SCHEMA_VERSION` reste à **33** alors que la migration v34 est appliquée en base : à bumper
-  en coordination avec la session qui porte la v33.
-- ⚠ Le renommage de `lib/checkers.py` est parti dans `608fdf3`, commit d'une session parallèle
-  dont le message ne le mentionne pas.
-- ⚠ Trois sessions travaillaient en parallèle : le HEAD a bougé en cours de route et le lock
-  DuckDB a bloqué plusieurs lectures.
+- ✓ Table complète, 0 valeur manquante ; 0 fantôme `LOG`, 0 base incomplète, 0 ligne sans
+  parent dans `samples`, 92 collisions inter-labo conservées par la PK composite
+- ✓ Relecture gsheet ↔ base à chaque passe : **0 cellule divergente** (25 920 + 82 620 valeurs)
+- ✓ Aucune duplication de code : le checker importe `_bootstrap_means` et `_read_props`, les
+  2 exports réutilisent `_export_rarefaction_horaire`
+- ✗ **`Lung_77_20M` reste périmé** : BAM réécrit le 09/09 à 13:02, BOOTSTRAP du 09/09 à 03:15
+  → ses 12 valeurs sont calculées sur un autre tirage. **Aucun `NA` ne le signale**, c'est le
+  cas dangereux du gotcha. Les 11 autres pseudo-samples des 3 bases relancées sont sains
+- ✗ Piège systémique : un BAM re-sous-échantillonné rend son aval périmé et **trace-prod ne
+  peut pas le détecter** (il lit des fichiers, pas leurs dates relatives)
+- ✗ Contention DuckDB régulière avec les sessions parallèles (dilution_lung, Twist) —
+  single writer, mes vérifs ont dû attendre le lock jusqu'à 75 s
 
 ## Prochaine étape
-Décider du bump `SCHEMA_VERSION` 33 → 34 avec la session v33, et diagnostiquer pourquoi le
-`check` remet `26BM01841` à zéro. Côté Bam2Beta, la ligne `export-run` a été ajoutée hors boucle
-dans `dev/SCW/Bam2Beta.sh`.
+Relancer l'aval Bam2Beta sur `Lung_77_20M` (décision Boris), puis
+`check-rarefaction-horaire-threshold HCL -s Lung_77_20M` + les 2 exports — commandes prêtes,
+même schéma que les recheck ciblés de cette session.

@@ -80,6 +80,34 @@ valeur unique, version périmée — le `probs` standard est passé à `props_v1
 - L'écart **123 vs 120** entre métriques QC et mVAF n'est pas un bug : 3 pseudo-samples ont déjà
   `QC/` et `EXTRACT_FULL_28M/` mais pas encore `BETA/` ni `BOOTSTRAP/` (vague de production).
 
+## ⚠⚠ Un BAM re-sous-échantillonné rend son aval périmé — indétectable par trace-prod
+
+Relancer une base exécute `Rarefaction_Horaire_Threshold_Cascade`, qui **réécrit les 4
+`BAM/{ps}.merged.bam`**. Si l'aval (QC → BETA_28M → mVAF/BOOTSTRAP/Loyfer) ne suit pas, les
+valeurs en base restent celles d'un **tirage aléatoire différent** — un sous-échantillon n'est
+pas reproductible.
+
+**Le checker ne peut pas le voir** : il lit des fichiers, pas leurs dates relatives. Il rapporte
+une ligne complète, et c'est précisément le cas **sans aucun `NA`** qui est dangereux. Le 09/09,
+`Lung_77_20M` affichait ses 12 valeurs sur 12 ; seuls ses voisins privés de Loyfer trahissaient
+la relance. Sans eux, la ligne serait passée pour bonne.
+
+Détection = comparer les dates S3 (one-liner awk complet dans `README.md`) :
+`BAM/{ps}.merged.bam` **plus récent que** `BOOTSTRAP/{ps}.merged.all.bootstrap_v1.props.tsv`
+→ ligne périmée. Sur les 188 880 clés du lot, 6 étaient dans ce cas le 09/09.
+
+À rejouer pour **toute table alimentée depuis des fichiers régénérables** (les deux
+`rarefaction`, `dilution`, `dilution_lung`) : la fraîcheur d'une ligne ne se déduit pas de sa
+complétude.
+
+## ⚠ Un log de cascade peut mentir sans échouer
+
+`Lung_12` avait `molecules primaires (A+D)` **vide** dans son log et seulement 10,28 M reads
+horodatés `st:Z` sur 50,75 M → ses paliers `20M` et `15M` étaient **identiques** (10,28 M), et
+5M/10M tirés d'un cinquième biaisé du BAM. Côté Nextflow : `succeededCount=1; failedCount=0`.
+Lire `LOG/{base}.rarefaction_horaire_threshold.log` avant de faire confiance aux paliers hauts.
+La relance du 09/09 a corrigé la base (5/10/15/20 M conformes).
+
 ## Vérifications
 
 - 4 samples croisés base ↔ fichiers sources : mVAF v1.4/v1.5 relues dans le TSV **et moyenne
@@ -97,10 +125,14 @@ valeur unique, version périmée — le `probs` standard est passé à `props_v1
 - `update-column-rarefaction-horaire -s <inexistant>` **ne crée plus de ligne** : le garde-fou
   existe dans le code. Le gotcha noté en v28 est périmé.
 
-## État (03/09/2026)
+## État final (09/09/2026, lot clos)
 
-**308 lignes** = 176 CGFL (44 bases) + 132 HCL (33 bases), 77 bases × 4 paliers, 77 par palier.
-BAM 308/308 · PROD 120 · métriques QC + Loyfer 123 · mVAF + epic 120.
+**1620 lignes** = 456 CGFL (114 bases) + 1164 HCL (291 bases), **405 bases × 4 paliers**.
+**PROD, mVAF, epic et Loyfer à 1620/1620** — aucune valeur manquante.
+Montée en charge en **9 passes** `check` + export (03→09/09) : 308 → 396 → 816 → 900 → 1564 →
+1620 lignes, PROD 120 → 1620. Le CGFL s'est figé à 114 bases dès le 04/09 ; toute la croissance
+ensuite est venue du HCL. ⚠ **Aucun décompte intermédiaire n'était définitif** — annoncer un
+total comme final pendant une production en cours est toujours faux.
 Backup `samples_status.backup-pre-rarefaction-horaire-threshold-*.duckdb`,
 checkpoint `checkpoint-pre-rarefaction-horaire-threshold` (sur `388f777`).
 
