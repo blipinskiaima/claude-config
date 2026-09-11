@@ -65,6 +65,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-09-11 — Aima-Tower : charte graphique du site officiel (v5.6.0)
+
+- [x] **Aima-Tower — charte du site officiel appliquée à toute la Tour (v5.6.0)** — charte extraite de preview.aima-diagnostics.com en styles calculés (palette, typo Montserrat/Inter/Plex Mono, espacements, rayons, ombre, logos, style rédactionnel) puis transposée dans la couche de tokens de `index.css` : les anciens noms de palette et les **193 classes Tailwind nommées** passent en alias, donc **aucun composant édité pour changer de couleur** — comportement, données et routes inchangés. Logos du site posés (aíma blanc/couleur, wordmarks themélio et exís), palette Plotly alignée côté serveur et client, sémantique d'état commune. Déployé avec le correctif trace-prod v34 mergé ; commits `9d830f9`+`df7159a`, tags `pre-charte-site` (retour) et `charte-site-v1`, mémoire `charte_site_tokens.md`.
+- [x] **Piège retenu : un alias ne porte pas le sens de la couleur remplacée** — le violet devenu magenta faisait passer la spécificité d'`/exploration` pour une alerte ; vu **seulement en ligne avec données**, pas dans le code. Corrigé, mais chaque endroit où l'ancienne couleur codait un état reste à relire.
+
 ## 2026-09-10 — Aima-Tower : refonte du rendu de la page QARA
 
 - [x] **Aima-Tower — refonte du rendu `/qara` (v5.5.0)** — vue d'ensemble « gamme » (3 cartes, ordre Themelio · Exis · CUP), bandeau de synthèse par produit au même gabarit et toggle EN/FR limité à l'habillage ; numéros de section et références au document masqués à l'affichage (chaîne exacte conservée dans les données et au survol), et un défaut logique du schéma de gating CUP corrigé. Périmètre et valeurs inchangés, **vérifié contre le Doc relu en API : 143/143 valeurs retrouvées onglet par onglet et 3/3 matrices conformes aux exactitudes publiées** ; commit `0379bf9`, détails dans `~/.claude/projects/-home-blipinski-Pipeline-Aima-Tower/memory/qara_refonte_vitrine.md`.
