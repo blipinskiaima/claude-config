@@ -64,7 +64,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-09-11 — Aima-Tower : charte graphique du site officiel (v5.6.0) · trace-prod : schema v32 threshold, lot clos · Bam2Beta : où passe le temps dans EXIS + right-sizing des ressources
+## 2026-09-11 — Aima-Tower : charte graphique du site officiel (v5.6.0) · trace-prod : schema v32 threshold, lot clos · Bam2Beta : où passe le temps dans EXIS + right-sizing des ressources · Bam2Beta + trace-prod : QC post-filtre 80 pb – 1 kb (v35)
 
 - [x] **Aima-Tower — charte du site officiel appliquée à toute la Tour (v5.6.0)** — charte extraite de preview.aima-diagnostics.com en styles calculés (palette, typo Montserrat/Inter/Plex Mono, espacements, rayons, ombre, logos, style rédactionnel) puis transposée dans la couche de tokens de `index.css` : les anciens noms de palette et les **193 classes Tailwind nommées** passent en alias, donc **aucun composant édité pour changer de couleur** — comportement, données et routes inchangés. Logos du site posés (aíma blanc/couleur, wordmarks themélio et exís), palette Plotly alignée côté serveur et client, sémantique d'état commune. Déployé avec le correctif trace-prod v34 mergé ; commits `9d830f9`+`df7159a`, tags `pre-charte-site` (retour) et `charte-site-v1`, mémoire `charte_site_tokens.md`.
 - [x] **Piège retenu : un alias ne porte pas le sens de la couleur remplacée** — le violet devenu magenta faisait passer la spécificité d'`/exploration` pour une alerte ; vu **seulement en ligne avec données**, pas dans le code. Corrigé, mais chaque endroit où l'ancienne couleur codait un état reste à relire.
@@ -79,6 +79,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **Piège retenu : changer les cpus d'un process raima peut changer une sortie qualifiée** — `task.cpus` → `--ncores` → `data.table::setDTthreads()`, qui agit sur des sommes **flottantes** (`sum(mod_qual - 0.001953125)`) — c'est d'ailleurs la raison d'être du tri déterministe. `Raima_process_loyfer` laissé à 4 cpus pour cette raison ; `Raima_score_mVAF` est passé à 8 **sans A/B**, à valider.
 - [x] **Bam2Beta — paires de dilution découpées en 4 lots** — les 4 fichiers `early_lung_dilution_pairs{,2,3,4}.tsv` étaient des **copies identiques** (220 paires chacun), donc les 4 boucles du lanceur refaisaient le même travail. Partition en **4 × 55** : aucune paire dupliquée, chaque `Lung` réparti 2-3 fois par lot, aucun `Healthy` répété dans un lot.
 - [x] **Trou repéré : `ichorCNA/` n'a aucune copie hors du serveur** — les 23 dépendances sont éclatées sur **deux préfixes** de `s3://aima-resources`, et les 5 fichiers `ichorCNA/` ne sont **nulle part dans le bucket** alors qu'`ICHORCNA=true` en profil `liquid` (celui du lanceur prod). Mémoire `dependencies-provisioning.md`.
+
+- [x] **QC après filtre 80 pb – 1 kb (1378 liquides)** — le filtre coupe du **court** (reads écartés 78,5 pb en moyenne contre 177,2 pb conservés) : comptages −7,4 %, depth −3,2 %, coverage −0,96 %, et **50 bascules de statut Exis / 46 Themelio**, toujours par le seul comptage de molécules, jamais par depth ni coverage. 3 colonnes en base (trace-prod **v35**) + export « QC read » + synthèse dans le Google Doc QC. Détails : `~/.claude/projects/-home-blipinski-Pipeline-Bam2Beta/memory/qc-filtre-80-1kb.md`.
+- [x] **`qc_metrics.coverage_percent` n'a qu'1 point de précision** — trouvé en passant : entier rond sur 1378/1378, la `global.dist` de mosdepth ne publiant que 2 décimales de proportion. Tout seuil bâti sur cette colonne hérite de cette granularité.
 
 ## 2026-09-10 — Aima-Tower : refonte du rendu de la page QARA
 
