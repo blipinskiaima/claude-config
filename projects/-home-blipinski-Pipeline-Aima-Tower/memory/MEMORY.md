@@ -1,171 +1,143 @@
 # Aima Tower — Auto Memory
 
-## Charte graphique du site appliquée à la Tour (2026-09-10)
-**v5.6.0 déployée**. Tokens du site dans `index.css`, anciens noms en alias. ⚠ navy jamais en texte ; ⚠ un alias ne porte pas le sens de la couleur remplacée. Retour : `pre-charte-site`. Détails : [charte_site_tokens.md](charte_site_tokens.md)
-
-## Migration trace-prod v34 — colonnes reads (2026-09-10)
-`nb_reads_total`→**`nb_lignes_total`**, `nb_reads_aligned`→**`nb_molecule`**, unité inchangée (millions). ⚠ Deux propagations **silencieuses** : `get_sample_detail` fait `SELECT q.*` (pas d'erreur, clés JSON changées) et `_apply_dynamic_filters` ignore une colonne inconnue (filtre no-op). Détails : [migration_v34_colonnes_reads.md](migration_v34_colonnes_reads.md)
-
-## 5 endpoints /api/exploration cassés — préexistants (2026-09-10)
-`scores`, `bladder`, `qc-data`, `mvaf-dotplot`, `filtered-dataset` en 500 **avant** la v34, prouvé en rejouant le code d'origine sur une copie de base remise aux anciens noms. Non corrigé, hors périmètre. Détails : [endpoints_exploration_casses_preexistants.md](endpoints_exploration_casses_preexistants.md)
+> Index. Une entrée = un titre, le piège qui évite une erreur, et le lien vers le détail.
+> La narration vit dans les topic files, jamais ici — sinon l'index dépasse la limite de
+> chargement (~24 Ko) et ses dernières entrées cessent d'être lues.
 
 ## `/qara` — comparaison au point figé (2026-09-11, v5.7.0)
-Toggle sous les cartes figées → seconde rangée mesurée sur trace-prod. **Alignement structurel** : la carte dynamique réutilise le composant `Kpi` et itère sur `p.kpis`, donc mêmes métriques aux mêmes places par construction (`Kpi` a gagné un emplacement `middle` pour l'écart). ⚠ Écart **jamais coloré** (`=`, `↑/↓ pt`, `+n éch.`). **Trois régimes** : Exis = `compute()` aux réglages figés, **aucun calcul maison** ; CUP = comptage de `too_final_decision`, **aucun seuil ré-appliqué** (`max_p` absent de la base) ; Themelio = mesuré mais **`comparable: False`**. ⚠ **Themelio** : `clinical_config.rds` dit calibration « 5-fold OOF » (le doc) contre production « transfer (full model, not OOF) » (la base) → 54,5 % vs 62,3 % sur les mêmes 301 échantillons, **même bundle des deux côtés**. Source des chiffres publiés = `releases/themelio_1_0/results/oof_predictions.csv` filtré `5-fold OOF` ; ⚠ **pas** `results/screening_top10_xgb_predictions.csv`, autre entraînement (je m'y suis trompé). ⚠ **CUP non comparable AUSSI** (`MANIFEST.md` : « deployed 3-fold ensemble (not OOF) ») — 3 classes à **100 % exactement**, balanced 72,9 → 81,3 ; ⚠ le **top-1 masque la fuite** (−1,3 pt) car Bladder+Pancreas passe de 2 à 18 à 11 % de rappel. **Seul Exis reste comparable.** ⚠ **Cohorte CUP du doc non reproductible** : 284 = jeu de développement figé, 522 aujourd'hui — mais **284/284 mVAF identiques**. ⚠ **Divergence 94/95 résolue** : un échantillon a `max_p` exactement au seuil, `>` strict donne les chiffres publiés. ⚠ **`sample_name` n'est pas unique** (1531/1456) : joindre par `unique_id`. Détails : [qara_comparaison_dynamique.md](qara_comparaison_dynamique.md)
+Toggle → seconde rangée mesurée sur trace-prod. Alignement **structurel** : la carte dynamique réutilise le composant `Kpi` et itère sur `p.kpis`. ⚠ **Seul Exis est comparable.** Themelio ET CUP scorent avec un **modèle déployé** là où le doc publie de l'**out-of-fold** — CUP sort 3 classes à 100 % exactement, et son **top-1 masque la fuite** (−1,3 pt) pendant que la balanced monte de 8,4. ⚠ `sample_name` n'est pas unique (1531/1456) : joindre par `unique_id`. [qara_comparaison_dynamique.md](qara_comparaison_dynamique.md)
 
 ## `/qara` — refonte du rendu pour un lecteur externe (2026-09-10)
-Périmètre et valeurs **inchangés** (`qara-data.ts` non touché, prouvé par `git diff`) : ajout d'une **vue d'ensemble** (3 cartes, ordre **Themelio · Exis · CUP**, l'ordre venant de `PRODUCTS` donc cartes ET onglets suivent ensemble), d'un **bandeau de synthèse** par produit au même gabarit, et d'un **toggle EN/FR** dont la portée est **strictement l'habillage que nous écrivons** — intitulés, notes, libellés de colonne et valeurs restent en anglais dans les deux langues. ⚠ **`qara-ui.ts` ne contient aucun littéral numérique** : tous ses chiffres sont *lus* dans `qara-data.ts`. **Règle directrice** : un chiffre phare ne s'affiche jamais sans dénominateur ni périmètre → **CUP n'affiche aucune fraction** (le doc donne 94 et 95 selon l'endroit) et porte toujours « 1 of 3 strata », sans quoi 90,4 % se lirait comme la performance du produit. **Retirés sur demande explicite** : numéros de section (affichage seul — la chaîne exacte reste dans les données et **au survol**), références au document (cartes **et** bandeaux → plus aucun lien chiffre ↔ version de doc), et `n = 284`/`n = 95` du schéma de gating qui y étaient **écrits en dur**. **Bug corrigé** : le libellé de groupe « max_p ≥ 0.826 » répétait la condition de (iii) et **contredisait** (ii). **Vérification finale** contre le Doc relu en API (GET) : **143/143** valeurs retrouvées onglet par onglet, 3/3 matrices reproduisant exactement les exactitudes publiées. ⚠ **Exception assumée** : les matrices en mode « row % » (défaut) affichent **47 pourcentages calculés**, absents du texte du document. ⚠ **Piège** : le contrôle « nombre affiché ∈ données » n'en signalait que **4** — les 43 autres coïncident par hasard avec des nombres du fichier ; compter les cellules, pas les absents. Détails : [qara_refonte_vitrine.md](qara_refonte_vitrine.md)
+Vue d'ensemble, bandeaux, toggle EN/FR **limité à l'habillage** (les libellés du document restent en anglais dans les deux langues). ⚠ **`qara-ui.ts` ne contient aucun littéral numérique.** ⚠ Un chiffre phare ne s'affiche jamais sans dénominateur ni périmètre → CUP sans fraction. Numéros de section et références au document **masqués sur demande**. [qara_refonte_vitrine.md](qara_refonte_vitrine.md)
+
+## Charte graphique du site appliquée à la Tour (2026-09-10, v5.6.0)
+Couche de tokens + **alias** : les 193 classes Tailwind suivent sans éditer les composants. ⚠ **Un alias ne porte pas le sens de la couleur remplacée** — violet → magenta a fait passer deux bonnes valeurs pour des alertes. ⚠ Plotly ne lit ni les custom properties ni `color-mix()` → `lib/tokens.ts`. [charte_site_tokens.md](charte_site_tokens.md)
+
+## Migration trace-prod v34 — colonnes reads (2026-09-10)
+`nb_reads_total` → **`nb_lignes_total`**, `nb_reads_aligned` → **`nb_molecule`** (⚠ ne pas confondre). Deux propagations **silencieuses** : `SELECT q.*` de `get_sample_detail()` et le `continue` de `_apply_dynamic_filters`. À re-vérifier à chaque migration. [migration_v34_colonnes_reads.md](migration_v34_colonnes_reads.md)
+
+## 5 endpoints /api/exploration cassés — préexistants (2026-09-10)
+`scores`, `bladder`, `qc-data`, `mvaf-dotplot`, `filtered-dataset` en 500 **avant** la migration v34. Méthode de preuve réutilisable : reconstituer l'état d'avant sur une copie de base. ⚠ Comparer les lignes **positionnellement**, pas par `sample_name`. [endpoints_exploration_casses_preexistants.md](endpoints_exploration_casses_preexistants.md)
 
 ## `/analytics` — règle run-level dans les prompts (2026-09-08)
-Les deux cartes IA comptaient **329 flowcells** au lieu des **291** de l'export gsheet **Trace RUN**. **Trois causes cumulées**, aucune dans les données : **solid** inclus (+35, hors périmètre liquid), **rebasecallés** inclus (+3 seulement — ils **réutilisent le `run_id` de l'original**, donc dupliquent des runs déjà comptés), et `bam_metadata` a **une ligne par sample** avec `reads_per_flowcell` **constant par run** → chaque flowcell comptée **4,6 fois, jusqu'à 21**. ⚠ Prouvé par **égalité ensembliste des `run_id`**, pas par le compte seul. ⚠ **Aucune requête en dur** n'agrège ces colonnes (grep exhaustif) : la règle vit **uniquement dans les deux prompts** (`analytics_assistant.py` + `database_qa.py`), d'où `TestRunLevelRule` qui la verrouille. Même famille, même jour : la panne **« Import interdit: time »** — le Contract n'énonçait pas l'allowlist, le modèle la découvrait dans l'erreur de sa **reprise unique** ; `time` autorisé (stdlib, `sleep` déjà couvert par le sous-processus 60 s) et **3 listes** désormais à aligner (`requirements.txt` ↔ set ↔ prompt). ⚠ **Piège de méthode** : la base a changé en cours de session (`update-column`), mes moyennes citées sont devenues fausses (203 → 149) alors que les comptages tenaient — mesurer effectifs et valeurs **dans la même copie**. Vérifié : 291 des deux côtés, **291 valeurs identiques à la gsheet**. Détails : [analytics_prompt_run_level.md](analytics_prompt_run_level.md)
+329 flowcells au lieu de 291 : solid inclus, rebasecallés inclus, et `bam_metadata` a **une ligne par sample**. ⚠ **Aucune requête en dur** n'agrège ces colonnes — la règle ne vit que dans les deux system prompts, `TestRunLevelRule` est sa seule protection. ⚠ **3 listes d'imports à aligner**. [analytics_prompt_run_level.md](analytics_prompt_run_level.md)
 
 ## `/reproductibilite` — mVAF v1.5, seuils tracés, filtre QC (2026-08-27)
-**mVAF v1.5** ajoutée aux modèles : seuil **0,0042 REPORTÉ de v1.4** (décision Boris), pas recalibré — la recette Exis appliquée à v1.5 donnerait **0,0025**, et v1.5 étant ≤ v1.4 sur les 224 sains, sa spécificité réelle à 0,0042 **dépasse** les 95 % visés. Le « propre à v1.4 » d'avant visait l'**échelle** (v1.0 = autre colonne), pas le numéro. **Seuils désormais tracés** : `thresholds` accepte `s2: null` (2 catégories) — la coloration dépendait déjà du seuil, rien ne le montrait. ⚠ **Deux pièges Plotly, prouvés dans la page et non par lecture de code** : (1) le **range est retenu** d'un rendu à l'autre et relu comme des exposants au passage en log (axe à 1e-48 = la « diagonale ») → `autorange` ne suffit **pas**, range explicite ; (2) les `shapes` prennent la **valeur brute même sur axe log** (0,0042 → 188 px dans le cadre, `log10` → 3746 px hors cadre) — j'avais introduit ce `log10` en croyant à tort à un bug pré-existant. **Zéros en log** posés sur un plancher, marqueur creux, hover sur le vrai 0. **Case « Conformes uniquement »** (≥5 M reads ET ≥0,25×) qui **recalcule** les stats et écarte **11 runs = les 11 aliquots de QARA §2.5**, dont **8 partiels déjà hors calculs** (11 annoncés pour 3 visibles → décompte en deux parties). Détails : [reproductibilite_v15_graphe_qc.md](reproductibilite_v15_graphe_qc.md)
+v1.5 **reporte** le seuil 0,0042 de v1.4, il n'est pas recalibré. ⚠ Deux pièges Plotly en log : le **range est retenu** d'un rendu à l'autre (`autorange` ne suffit pas) et les `shapes` prennent la **valeur brute**. Le filtre « Conformes uniquement » **recalcule** et retrouve les 11 aliquots de QARA §2.5. [reproductibilite_v15_graphe_qc.md](reproductibilite_v15_graphe_qc.md)
 
 ## `/profil-aima` — plus aucune comparaison chiffrée (2026-08-26)
-Tout ce qui mettait un de nos chiffres **en face** d'un chiffre concurrent a été retiré de l'affichage : colonnes **Eux / Nous / Comparabilité** de la Vue d'ensemble, tableau AIMA/concurrent côte à côte des fiches (→ concurrent seul), écart de sensibilité, badge de degré, point de fonctionnement, encart « Différences de mesure », verdict chiffré. Motif Boris : *« il ne sert pas à grand chose d'indiquer l'incomparable »* — nos cohortes ne sont pas les leurs, deux colonnes en regard se lisent comme une mesure commune qui n'existe pas. ⚠ **Ne pas réintroduire** sans demande explicite (3ᵉ itération dans ce sens). ⚠ **`TEINTE_POSITION` conservé** : le bloc « position » est un jugement assumé, pas un chiffre. ⚠ **Backend inchangé** — il renvoie toujours `ecart_sensibilite_pts`/`comparabilite`/`verdict_chiffre`, le retrait est front pur. ⚠ **`/profil-aima` ≠ `/profils`** (Deep dive concurrent). Détails : [profil_aima_sans_comparaison.md](profil_aima_sans_comparaison.md)
+Colonnes Eux/Nous/Comparabilité, écarts et verdicts retirés de l'affichage : nos cohortes ne sont pas les leurs. ⚠ **Ne pas réintroduire** sans demande (3ᵉ itération). ⚠ Backend inchangé, le retrait est **front pur**. ⚠ `/profil-aima` ≠ `/profils`. [profil_aima_sans_comparaison.md](profil_aima_sans_comparaison.md)
 
 ## Couche IA morte (E2BIG) + durcissement /analytics (2026-08-26)
-**Toute la couche IA de la Tower était HS** — `/analytics` (les 2 cartes) ET la synthèse `/survey` : `call_claude` passait `PIPELINE_CONTEXT` (164 Ko de `CLAUDE.md` concaténés) dans **un argument** de commande, au-delà de `MAX_ARG_STRLEN` (128 Ko) → `execve` échoue, `claude` jamais lancé. **Aucun code n'avait changé** : c'est la doc des projets qui a grossi. Fix = `--system-prompt-file` (l'option existe : l'aide l'écrit `--system-prompt[-file]`, un grep littéral la rate). ⚠ **`/overview` › Database était en 500 depuis le cutover v3** — il importait `pages.py`, qui exige Dash, absent de l'image ; basculé sur `filters_view.py`. Durcissement : **sous-processus tuable** pour le code LLM (un `exec()` n'est pas interruptible), **boucle d'auto-réparation** (l'erreur repart au modèle — c'est ça qui rend la page générique), **Opus 5** là où le modèle écrit du code/SQL, allowlist ↔ `requirements.txt` à garder alignées (`statsmodels`). ⚠ 2 tests `exploratory` échouent **et préexistaient** (snapshot 383 vs 416 samples). Détails : [analytics_ia_hardening.md](analytics_ia_hardening.md)
+`PIPELINE_CONTEXT` (164 Ko) passé en **un argument** dépassait `MAX_ARG_STRLEN` → toute la couche IA HS sans qu'aucun code ait changé. Fix : `--system-prompt-file`. Durcissement : sous-processus tuable, boucle d'auto-réparation, Opus 5 là où le modèle écrit du code. [analytics_ia_hardening.md](analytics_ia_hardening.md)
 
 ## Page `/qara` — Exis / Themelio / CUP (2026-08-21)
-**Première page 100 % statique du projet** : zéro backend, zéro requête, valeurs **recopiées** du Google Doc `Aima_QARA` dans `lib/qara-data.ts` (régime `FEATURE_NAMES`). **Ne jamais y dériver une valeur** — un numérateur reconstitué depuis un % est un chiffre inventé (piège corrigé sur CUP §5, qui ne publie que des %). Libellés anglais mot pour mot → ⚠ **pas de `uppercase` CSS** sur les en-têtes, ça réécrit `CV (mVAF v1.4)` en `CV (MVAF V1.4)`. ⚠ **Divergence prouvée dans le doc CUP** : tableaux §4/§5 donnent medium=94/high=95, la figure et la phrase §5 l'inverse ; les matrices somment à 95/95/94 et seuls ces effectifs reproduisent les % publiés (45/95=47,4 % ; 85/94=90,4 %). Rendu **verbatim + encart**, ne pas corriger. Forme finale après 3 itérations = **tableau à colonne barre** partagé par les 3 onglets (le waffle 224 points et les barres de CV ont été supprimés comme décoratifs). Détails : [qara_page.md](qara_page.md)
-
-## Docs externes read-only + réponses courtes (2026-08-21)
-Ne jamais modifier un Google Doc/document externe, même mineur, sans demande explicite pour ce doc précis (contexte : doc réglementaire QARA). Réponses courtes/simples par défaut, pas de synthèse à sections multiples sauf demande. Détails : [feedback_docs_readonly_and_brevity.md](feedback_docs_readonly_and_brevity.md)
-
-## Lecture Google Docs — API, pas navigateur (2026-08-21)
-Pour lire un Google Doc (y compris ses onglets internes) sans risque d'édition : API REST `docs.googleapis.com` + credentials OAuth `~/.config/gspread/authorized_user.json`, même pattern que `qara-tower/scripts/append_gdoc.py`. `includeTabsContent=true` + `tabProperties.tabId` garde son préfixe `t.` (ne pas stripper). Préférer ce chemin à claude-in-chrome pour tout service authentifié ayant déjà un script API dans le repo. Détails : [google_docs_api_read_access.md](google_docs_api_read_access.md) + [feedback_check_existing_access_patterns.md](feedback_check_existing_access_patterns.md)
+Première page **100 % statique**, valeurs recopiées du Google Doc. ⚠ **Ne jamais y dériver une valeur.** ⚠ Pas d'`uppercase` CSS sur les en-têtes. ⚠ Divergence CUP rendue **verbatim + encart** — sa cause est désormais connue (un `max_p` exactement au seuil). [qara_page.md](qara_page.md)
 
 ## Bloc « Performance des produits » — Tableau de bord (2026-08-12)
-5 lignes entre les cartes système et le bento de `Home.tsx` : Exis global, Exis CRC/Lung/Pancreas, THEMELIO. **Aucun recalcul** — même endpoint `/api/competitive/comparaison` et même `pct()` (sorti de `AimaComparaison.tsx` vers `lib/comparaison.ts`) que le Profil AIMA. Seul ajout backend : `n_trace_prod` (via `database_service.get_stats()`), placé à la **racine** du payload car `_perfs_exis` est caché par (cible, cohorte). ⚠ **Piège** : la ligne Exis **globale** exclut vessie/TNE/Nuclear → 82,0 % contre 76,2 % sur `/exploration` aux mêmes réglages ; les 3 lignes par indication correspondent **exactement**. ⚠ La spécificité 95,1 % se répète sur les 4 lignes Exis : seuil unique sur les mêmes 224 sains, une « spécificité du CRC » n'existe pas. ⚠ Premier appel après redémarrage = ~5,5 s (skeleton, ne bloque pas la page) ; `compute.cache_clear()` ne simule PAS un démarrage à froid. Détails : [dashboard_bloc_produits.md](dashboard_bloc_produits.md)
+Aucun recalcul : même endpoint et même `pct()` que le Profil AIMA. ⚠ La ligne Exis **globale** exclut vessie/TNE/Nuclear → 82,0 % contre 76,2 % sur `/exploration`. ⚠ La spécificité est **globale**, elle se répète sur les 4 lignes. [dashboard_bloc_produits.md](dashboard_bloc_produits.md)
 
 ## Seuil Exis 0,0042 sur /reproductibilite (2026-08-12)
-`mvaf_v14` n'est plus binaire : `_category()` bascule à `MVAF_V14_SEUIL = 0.0042` (`>` strict). **Propre à v1.4** — v1.0 sort de `qc_metrics`, autre échelle, aucun seuil calibré, il reste binaire. ⚠ `_category()` alimente **aussi** `_pairwise_agreement` : le taux d'accord bouge (cohorte pure 93,8 % → 85,4 %, Colon_22 perd son unanimité pour un run à 0,0041). La métrique est désormais sensible au voisinage immédiat du seuil. ⚠ À l'échelle linéaire le seuil est invisible (tout est collé à zéro) — l'échelle log le révèle. Détails : [reproductibilite_seuil_exis.md](reproductibilite_seuil_exis.md)
+`_category()` est le point **unique** de décision et alimente aussi `_pairwise_agreement` : déplacer le seuil déplace le taux d'accord. ⚠ Le seuil vaut pour v1.4 et v1.5 (même échelle), **pas pour v1.0**. [reproductibilite_seuil_exis.md](reproductibilite_seuil_exis.md)
 
 ## Alignement Exis 1.1 — /exploration (2026-07-24)
-Page `/exploration` alignée sur le rapport réglementaire **Exis 1.1** (= mVAF v1.4), reproduit au chiffre près. **3 changements** : (1) seuil = quantile **type 1** (`inverted_cdf`, valeur observée sur sains, 0,0042 %) et non type 6/weibull — appliqué à TOUS les scores, **rompt** l'équivalence cell-by-cell vs R main (TestRegressionVsR skip) ; (2) exclusion nommée `CGFL_26BM01841` (`_EXCLUDED_UNIQUE_IDS`) ; (3) **sélecteur Cohorte Avancés/Précoce** (`cohort_mode`, threadé partout comme `score_source`, permalink `?cohort=`). ⚠ mode `early` = §2.3 strict (`active_cancer=Yes`, pas cancer_truth → exclut Lung_132 'probable'). Seul écart accepté vs PDF = `Prostate_21` (donnée MàJ après le PDF). Commits `f3a4783`+`c913356`, tag `pre-exis-alignment`. Détails : [exis_alignment.md](exis_alignment.md)
+Seuil en **quantile type 1** (et non type 6), exclusion nommée `CGFL_26BM01841`, sélecteur Cohorte Avancés/Précoce. ⚠ **Rompt** l'équivalence cell-by-cell vs R main. Seul écart accepté au PDF : `Prostate_21`. [exis_alignment.md](exis_alignment.md)
 
 ## Skill `/qara-tower` (2026-07-24)
-Traçabilité QARA temporelle de la Tower : mesure T_n → compare à T_{n-1} → synthèse horodatée append au Google Doc → journal. **Double** (`Aima-Tower/.claude/skills/` + `~/.claude/skills/`, **même journal** via chemins absolus). Journal immuable `qara/qara_snapshots.jsonl` (**PAS `data/`** = gitignored), versionné. Réglages Exis figés, **aucun recalcul maison** (appelle `compute()`/`compute_cohort_cascade()`). Anti-lock : copie DB avant mesure. `--persist-file` = journalise le point exact comparé. Ordre : append Doc AVANT persist. Baseline T0 (24/07) posée. Commit `6df189d`, tag `pre-qara-skill`. Détails : [qara_tower_skill.md](qara_tower_skill.md)
+Traçabilité temporelle : mesure T_n → compare → append au Doc → journal. ⚠ **Aucun recalcul maison**, réglages Exis figés. ⚠ Journal dans `qara/`, **pas `data/`** (gitignored). ⚠ Ordre : append Doc **avant** persist. [qara_tower_skill.md](qara_tower_skill.md)
 
 ## Page `/reproductibilite` (2026-07-22)
-Dispersion de plusieurs mesures d'un même prélèvement. **2 onglets = 2 protocoles séparés par le `run_id`** : **pure** (`Colon_17..24` CGFL, plusieurs runs, extraction constante) et **extraction** (9 patients, **un seul run**, 2-4 kits). **Sémantique des suffixes trace-prod, non documentée ailleurs** : `bis`/`ter`/`quater` = Promega/Macherey-Nagel/Qiagen ; `_moche` = POD5 rangés hors chemins standards S3 — **PAS un défaut de qualité** (les moche sont souvent plus profonds) ; `_OK` = sous-ensemble du même `run_id` (5-6× moins de reads) → exclus des stats. **Ne pas réutiliser `_get_prepared`** : /exploration élimine les réplicats à 3 niveaux. ⚠ **mVAF v1.4 est une feature d'entrée de themelio** → mesures non indépendantes. Métriques CV + accord (`pairwise_agreement_rate` copié du R). Détails : [reproducibilite_page.md](reproducibilite_page.md)
+2 onglets = 2 protocoles séparés par le `run_id`. ⚠ Sémantique des suffixes : `_moche` ≠ mauvaise qualité, `_OK` = sous-ensemble du même run. ⚠ **Ne pas réutiliser `_get_prepared`** (triple dédup). ⚠ mVAF v1.4 est une feature d'entrée de themelio. [reproducibilite_page.md](reproducibilite_page.md)
 
-## Page `/exploration` — toggle Score mVAF v1 / v1.4 (2026-07-03)
-Sélecteur **Score** (sidebar) pilotant toute la page (tables Sens/Spé + graphes) via param `score_source` (`mvaf_v1` défaut = `qc_metrics` float / `mvaf_v14` = `retd_suivis` VARCHAR virgule FR, `KO` exclu de la cohorte). Swap dans `_prepare_base_dataset` AVANT filtre `score.notna`, threadé comme `dorado_version` (caches + 11 méthodes + `ExplorationFilters`). **Bug pré-existant corrigé** : 4 endpoints graphes (qc-data/mvaf-dotplot/methylation-vaf/bladder) plantaient (mauvais passage d'args) → refonctionnels. Validé live : v1 78.5%/88.4%, v1.4 81.7%/85.3%. Détails : [exploration_score_source_toggle.md](exploration_score_source_toggle.md)
+## `/exploration` — toggle Score mVAF v1 / v1.4 (2026-07-03)
+Une seule colonne `score` pilote toute la page ; le swap se fait dans `_prepare_base_dataset` **avant** le filtre `notna`. `score_source` threadé dans les caches et 11 méthodes. [exploration_score_source_toggle.md](exploration_score_source_toggle.md)
 
 ## Page `/combined` — onglet Suspects (2026-06-25)
-4ᵉ onglet Résultat : dotplot des **25 imageries suspectes** (`scores.csv` unité `suspect`) scorées par le combo sélectionné + ligne de seuil + compteur N au-dessus. **Sans vérité-terrain** (`label` NULL) → **ni sensibilité ni spécificité**, seulement `n_above/n_total`. Seuil = `quantile_type1` healthy train, avec garde `float(label)` pour que les lignes sans vérité n'entrent pas dans la calibration. Backend `dilution_service.get_suspect_scores` + `/api/combined/suspect` ; front `useCombinedSuspect` (lazy) + `SuspectChart` (jitter Weyl déterministe, **pas** `Math.random`). 4 tests verts. Détails : [combined_suspect_tab.md](combined_suspect_tab.md)
+25 imageries **sans vérité-terrain** → ⚠ ni sensibilité ni spécificité, seulement N au-dessus du seuil. ⚠ Le garde `float(label)` empêche les lignes sans vérité d'entrer dans la calibration. Jitter **déterministe**, pas `Math.random`. [combined_suspect_tab.md](combined_suspect_tab.md)
+
+## Page `/combined` — refonte + onglet Dilution (2026-06-22)
+Archi **α** : le pipeline Feature score les Twist, Tower reste **reader**. Source unique `scores.csv`, lookup colonne = `features.replace(",","+")`. ⚠ `FEATURE_NAMES` est une liste figée **à synchroniser à la main**. [combined_dilution_tab.md](combined_dilution_tab.md)
+
+## Page `/combined` — intégration pipeline Feature (2026-06-09)
+Tower est **reader**, pas exécuteur : pas de R dans l'image, `/pipeline` monté `:ro`. ⚠ Même `best_combo` est inlançable (son `connect()` ouvre en write). ⚠ Test de présence d'une feature : `list_contains`, jamais `LIKE '%mvaf_v1%'`. [feature_pipeline_integration.md](feature_pipeline_integration.md)
 
 ## Scission `/database` + ID sample Monitoring (2026-06-24)
-Page `/database` à onglets **scindée en 2 pages autonomes** : **R&D** (`/database`, ex-onglet R&D, `Database.tsx` nettoyé des onglets) + **Plateforme** (`/database-platform`, nouveau `DatabasePlatform.tsx` qui wrappe `PlatformView`). 2 entrées sidebar (groupe monitoring) labels **"R&D"** (FlaskConical) / **"Plateforme"** (Building2), sans le mot "Database". `SamplesView`/`PlatformView` étaient déjà des composants autonomes → simple wrapping, **0 backend** (endpoints `/api/databases/*` R&D et `/api/databases/platform/*` déjà séparés). Route ajoutée dans `App.tsx` (branche `path="*"`, max-w 1280). Pas de redirection. — Monitoring › Récents : **ID sample affiché à droite** de `CompletedRow`, source = **`--patient_id` parsé dans `wf.command_line`** (regex `--patient_id[=\s]+(\S+)`, `—` si absent) — choix Boris : command line Nextflow, **pas** `params_json` (3 vieux workflows sans command_line → `—`). Titres h1 de page gardent "Database R&D"/"Database Plateforme" (seuls les labels sidebar sont raccourcis).
+`/database` scindée en **R&D** et **Plateforme** (`/database-platform`), **zéro backend** — les composants et endpoints étaient déjà séparés. ID sample de Monitoring parsé depuis **`--patient_id` de la command line**, pas `params_json`. [database_scission_pages.md](database_scission_pages.md)
 
-## Page `/combined` (ex-exploration-beta) — refonte + onglet Dilution (2026-06-22)
-`/exploration-beta` renommée `/combined` (fichiers/route/endpoints, commit `0fb9357`). Panneaux Cohorte retirés, défaut SpeedVac (`std_522`), Résultat en onglets (Initial/Lung-DI/**Dilution**, + Suspects ajouté le 2026-06-25), sélecteurs d'éval (Profondeur/Spécificité/Unité) regroupés à gauche. **Onglet Dilution** : courbes Twist pilotées par le combo sélectionné via **source unique** `scores.csv` (unité d'éval `dilution` générée côté pipeline Feature = archi α, Tower reste reader) ; lookup colonne = `features.replace(",","+")` ; marche mono ET multi-features XGBoost. Page `/dilution` autonome **supprimée**. Détails : [combined_dilution_tab.md](combined_dilution_tab.md)
-
-## Page `/combined` — intégration pipeline Feature (2026-06-09, renommée depuis `/exploration-beta` le 2026-06-22)
-Tower lit (read-only) les résultats du pipeline `~/Pipeline/Feature` : sélection de features → CSV sensibilité stratifiée (ligne Combined colorée vert/rouge vs baseline mVAF) + best combos. **Affichage seul** : aucune exécution depuis le conteneur (pas de R, mount `/pipeline:ro`) ; même `feature_db.py best_combo` répliqué en SQL read-only (son `connect()` ouvre la DB en write → KO sur `:ro`). Clé canonique `normalize_features` copiée du pipeline (ordre de sélection indifférent). Endpoints `/api/combined/{result,best-combos,dilution}` (cohort-info retiré, png→410). MAJ DB → pas de restart (bind-mount live). Détails : [feature_pipeline_integration.md](feature_pipeline_integration.md) + [combined_dilution_tab.md](combined_dilution_tab.md)
-
-## Feature `/samples` + `/sample/:id` — Tower v4.2.0 (2026-05-13)
-Deux nouvelles pages : liste tous les samples R&D + détail enrichi 1-sample reproduisant le mockup `aima-tower-sample-detail.html`. Backend `DatabaseService.get_sample_detail()` JOIN 5 tables. Animation `aima-rise` cascade appliquée sur toutes les pages via `key={location.pathname}`. Décisions clés : TF=mvaf_v1, NEGATIVE/POSITIVE strict (==0/>0), depth threshold 0.25×, paths trace-prod `s3://aima-bam-data/processed/MRD/RetD/{type}/{labo}/{sample}/{REPORT|LOG}/`. Détails : [feature_sample_detail.md](feature_sample_detail.md)
+## Feature `/samples` + `/sample/:id` — v4.2.0 (2026-05-13)
+`get_sample_detail()` JOIN 5 tables. Décisions : TF = `mvaf_v1`, Negative/Positive strict (== 0 / > 0), seuil de profondeur **0,25×**. Helper `parseEuFloat()` pour les VARCHAR à virgule. [feature_sample_detail.md](feature_sample_detail.md)
 
 ## Spec ciblée vs Spec réalisée
-Slider `target_specificity` = ce qu'on demande. `Spec_AI` du tableau = ce qu'on obtient (= `nb_healthy_below_threshold / nb_healthy_total`). Diverge à cause de la quantification (seuil discret sur N healthy fini). Détails : [spec_ciblee_vs_realisee.md](spec_ciblee_vs_realisee.md)
+Le slider dit ce qu'on **demande**, `Spec_AI` ce qu'on **obtient**. L'écart vient de la quantification du quantile sur un N healthy fini. [spec_ciblee_vs_realisee.md](spec_ciblee_vs_realisee.md)
 
-## Tower v3.0.0 en prod (2026-05-07) — refonte UI complète
-Stack : FastAPI + Vite + React + Tailwind v4 (remplace Dash). Un seul worktree = `~/Pipeline/Aima-Tower/` sur `main`. Parachute rollback = tag `v2.3.0` (Dash mono-stack). Plan C et Plan G nettoyés (worktrees + branches supprimés le 2026-05-11). Détails : [project_v3_cutover.md](project_v3_cutover.md)
-
-## Todo list — routing par section
-Todo list `~/.claude/projects/-home-blipinski/memory/todo-optimisation.md` a 4 parties : À faire / En cours / Complété / Stand-by. Afficher UNIQUEMENT la partie demandée, pas le fichier complet. Détails : [feedback_todo_sections.md](feedback_todo_sections.md)
-
-## Docker compose Tower — project name figé à `aima-tower`
-Le compose contient `name: aima-tower` (override). Sans ça compose dérive du dossier et taggue une image fantôme distincte des containers historiques. Permet de renommer le worktree sans casser les volumes/réseaux nommés. Détails : [feedback_compose_project_name.md](feedback_compose_project_name.md)
-
-## DuckDB Cross-DB Join Pattern
-
-Quand on doit joindre deux bases DuckDB read-only (ex: platform + trace-workflow), `_query()` ne peut pas ATTACH (connexion read-only). Solution : connexion in-memory avec ATTACH des deux bases :
-```python
-conn = duckdb.connect(":memory:")
-conn.execute(f"ATTACH '{db1}' AS pl (READ_ONLY)")
-conn.execute(f"ATTACH '{db2}' AS wf (READ_ONLY)")
-# Utiliser pl.table et wf.table dans la requete
-```
-Voir `PlatformService.get_samples_overview()` pour l'implementation complete.
-Details : [duckdb-patterns.md](duckdb-patterns.md)
-
-## Liens Scaleway désactivés (2026-06-12)
-
-Tous les liens cliquables vers la console Scaleway ont été retirés (commit `5744647`, tag rollback `pre-disable-scaleway`). Les chemins S3 restent affichés en **texte non cliquable** (`<code>`) sur `/database›Platform`, `/monitoring`, `/sample/:id` (bouton « Exporter rapport » supprimé). Helpers `s3ToScaleway` (front) et `_s3_to_scaleway` (Dash legacy `callbacks.py`) **supprimés** — ne plus s'y référer. Décision Boris : garder le chemin, retirer la navigation web Scaleway.
-
-## Platform Detail Panel (Database > Platform)
-
-- Layout : Donnees (lg=8) gauche, Trace (lg=4) droite
-- Input/Output : liens cliquables vers console Scaleway (classe `detail-value-path`)
-- Rapport : lien Click vers `{input_path}/results/`
-- Log : lien Click vers `{output_path}/{sample_name}/LOG/`
-- Police paths : `0.75rem` (plus petit que le reste)
-
-## Gotcha: Python Closures in Loops
-
-Definir les fonctions helper AVANT leur premier appel dans la boucle. UnboundLocalError si defini apres (Python voit l'assignation dans le scope et considere la variable locale).
-
-## Docker Workflow
-
-Rebuild rapide : `docker compose down && docker compose build && docker compose up -d`
-Restart sans rebuild (si seul CSS change dans assets/) : `docker compose restart`
-Note : `COPY src/` dans Dockerfile invalide le cache a chaque modif src/.
-
-## Page Survey — patterns
-
-Parser extensible, lazy tabs, state atomique, scoring IA découplé, persistence session. Tous les patterns réutilisables consolidés dans [survey_patterns.md](survey_patterns.md).
-
-## Intégration DuckDB Aima-Survey (v6 — 2026-04-20)
-
-Vues `month` et `all` lisent `~/Pipeline/Aima-Survey/data/aima_survey.duckdb` en READ_ONLY (retry backoff), fallback markdown si DB KO. Day/week inchangés. Traduction `queries_matched` (names) → `categories` (descriptions humaines) via `queries.json`. Détails : [survey_duckdb_integration.md](survey_duckdb_integration.md)
-
-## Sécurité Tower (2026-04-21)
-
-Tower accessible via `https://tower.aima-diagnostics.com` (Caddy reverse proxy + basic auth bcrypt + Let's Encrypt). Port 8050 non exposé à Internet. Password dans gestionnaire de mdp AIMA. Détails : [security_setup.md](security_setup.md)
-
-## Sécurité — approche pragmatique
-
-Boris valide le scope discipline en sécu : couches par iteration (Caddy d'abord, Security Group plus tard). Détails : [feedback_security_pragmatism.md](feedback_security_pragmatism.md)
-
-## Incident `.env` tracked dans git
-
-`.env` était tracked dans git jusqu'au 2026-04-21 (repo privé). Retiré via `git rm --cached`. Rotation secrets Anthropic/Seqera **reportée** (repo privé, Boris seul dev). Détails : [project_env_leak.md](project_env_leak.md)
-
-## Backend IA via CLI `claude -p` (2026-04-22)
-
-Tous les appels IA Tower (Survey synthese, Analytics chat, DB Q&A) passent par `src/claude_cli.py` subprocess `claude -p` + `CLAUDE_CODE_OAUTH_TOKEN` (abonnement Max au lieu credits API). `ANTHROPIC_API_KEY` **retire** du container (priorite CLI bypasse OAuth). HOME isole `/app/data/claude-home`. Contexte injecte = 14 CLAUDE.md Pipeline (~20K tokens). Détails : [ia_cli_migration.md](ia_cli_migration.md)
-
-## Vues temporelles Survey pilotees par `first_seen_at` (2026-04-22)
-
-Depuis backfill EDAT Aima-Survey, toutes les vues (Day/Week/Month/Year/All) filtrent sur `first_seen_at` = EDAT PubMed (stable, immuable, non-future). Plus de pub_date. Card UI affiche les 2 dates distinctes ("Indexé : ... • Publié : ..."). Vue Jour migree DuckDB avec `DATE(first_seen_at) = ?` + selecteur conditionnel. Détails : [survey_first_seen_at.md](survey_first_seen_at.md)
-
-## Onglet Concurrence Survey étendu
-
-`is_competitor_article(a)` matche desormais `a.org_name` OR `a.last_author_affiliation` contre `competitors.json` (23 entreprises tier_1/2/3 avec aliases). +IMBdx ajoute comme tier_2 MOYENNE. Passe de 11 a 29 articles concurrents. Reclassification Haiku ciblee en cours (script `reclassify_competitors.py` cote Aima-Survey).
-
-## Guardant Health — stratégie Europe (2026-04-23)
-
-Snapshot : Guardant360 CDx seul IVDR-certifié (mai 2024). Reveal MRD = LDT via labs hospitaliers (VHIO, Royal Marsden, Gemelli) — **aucun partenariat France**. Shield MCED **absent Europe**, priorité Asie 2026 (Manulife). Signatera devance Guardant sur CRC France (CIRCULATE-PRODIGE-70). Fenêtres AIMA : MCED CRC sanguin méthylation + MRD CRC France via UNICANCER/CLCC. IVDR classe C se ferme 2028. Détails : [competitors_guardant_europe.md](competitors_guardant_europe.md)
-
-## Sens_Active redéfini = cancer_truth (2026-05-11, demande Michael)
-Tableau Sensibilité stratifiée VAF colonne "Cancer actif" utilise `cancer_truth` (mutated OR active_cancer) au lieu de `active_cancer_flag` strict. Diverge volontairement du pipeline R. Détails : [project_sens_active_cancer_truth.md](project_sens_active_cancer_truth.md)
-
-## Refonte Exploration v2.3 (2026-04-30)
-
-Tower ≡ R main cell-by-cell validé (target=0.85+0.90, mode=ge5). 2 cohortes distinctes par sub-tab : Sens/Spé (cancer+healthy strict, R02) vs Graphique (tous samples filtrés, R04). Pattern "tout sélectionné = no-op" via `_legacy_set_or_none` / `_active_cancer_param`. Onglet Avancé reuse `build_boxplot()`. TNE/Nuclear et Healthy carve-out asymétriques (tableaux only). Détails : [exploration_v2_3_design.md](exploration_v2_3_design.md)
-
-## Dash 4.1+ gotchas Tower
-
-`allow_direct_input=False` requis sur sliders (sinon input numérique éditable). Persistence ID bumping (`persistence="v2-key"`) pour invalider le cache navigateur. Composants conditionnels → utiliser `dcc.Store` relais. Imports tardifs pour éviter cycles. Détails : [dash_4_gotchas.md](dash_4_gotchas.md)
-
-## Cascade cohorte /exploration — intégrée v3.0.0 (2026-05-07)
-
-Backend `compute_cohort_cascade()` `@lru_cache(64)` + endpoint `/api/exploration/cohort-cascade`. Frontend `useCohortCascade` TanStack Query (lazy `enabled` au premier open) + `useDebouncedValue(250ms)` pour les sliders. Détails : [feature_cohort_cascade_integration.md](feature_cohort_cascade_integration.md)
+## Tower v3.0.0 en prod (2026-05-07)
+FastAPI + Vite + React + Tailwind v4 remplacent Dash. Un seul worktree, `~/Pipeline/Aima-Tower` sur `main`. Parachute de rollback = tag `v2.3.0`. [project_v3_cutover.md](project_v3_cutover.md)
 
 ## UI Tower v3 — multi-utilisateurs (2026-05-07)
+Plus un dashboard perso : références personnelles retirées, **thème light par défaut**. ⚠ `theme-preference` préservé pour ceux qui ont déjà choisi. [ui_v3_multi_utilisateurs.md](ui_v3_multi_utilisateurs.md)
 
-Tower n'est plus un dashboard perso : retrait des références "Boris" / "Plan G" / branche `feat/ui-refresh-g` / "Internal · v3 preview" dans Sidebar + Home + Exploration. Thème **light par défaut** (fallback `getStoredTheme` → `"light"` au lieu de `"system"`, `theme-preference` localStorage préservé pour les users qui ont déjà choisi). Toggle dark/system reste dispo dans la sidebar.
+## Cascade cohorte /exploration — v3.0.0 (2026-05-07)
+`compute_cohort_cascade()` `@lru_cache(64)` + hook lazy TanStack (`enabled` au premier open) et `useDebouncedValue(250ms)` sur les sliders. [feature_cohort_cascade_integration.md](feature_cohort_cascade_integration.md)
+
+## Sens_Active redéfini = cancer_truth (2026-05-11, demande Michael)
+La colonne « Cancer actif » utilise `cancer_truth` (mutated OR active_cancer). ⚠ Diverge **volontairement** du pipeline R — ne pas re-débattre. [project_sens_active_cancer_truth.md](project_sens_active_cancer_truth.md)
+
+## Refonte Exploration v2.3 (2026-04-30)
+Tower ≡ R main cell-by-cell (avant l'alignement Exis). ⚠ **2 cohortes distinctes** par sub-tab : Tableaux = R02, Graphiques = R04 — ne jamais unifier les deux chiffres. Pattern « tout coché = no-op » pour préserver les NULL. [exploration_v2_3_design.md](exploration_v2_3_design.md)
+
+## Dash 4.1+ gotchas Tower
+`allow_direct_input=False` sur les sliders, bump de la clé `persistence` pour invalider le cache navigateur, `dcc.Store` relais pour les composants conditionnels. [dash_4_gotchas.md](dash_4_gotchas.md)
+
+## Docs externes read-only + réponses courtes (2026-08-21)
+⚠ **Ne jamais modifier un Google Doc ou document externe**, même mineur, sans demande explicite pour ce doc précis. Réponses courtes par défaut. [feedback_docs_readonly_and_brevity.md](feedback_docs_readonly_and_brevity.md)
+
+## Lecture Google Docs — API, pas navigateur (2026-08-21)
+GET `docs.googleapis.com` + credentials gspread, jamais claude-in-chrome. ⚠ `includeTabsContent=true`, et le `tabId` garde son préfixe `t.`. ⚠ Chercher d'abord un script d'accès existant dans le repo. [google_docs_api_read_access.md](google_docs_api_read_access.md) · [feedback_check_existing_access_patterns.md](feedback_check_existing_access_patterns.md)
+
+## Todo list — routing par section
+4 parties : À faire / En cours / Complété / Stand-by. ⚠ Afficher **uniquement** la partie demandée. [feedback_todo_sections.md](feedback_todo_sections.md)
+
+## Docker compose Tower — project name figé
+Le compose contient `name: aima-tower`. ⚠ Sans cet override, compose taggue une **image fantôme** et le container tourne avec l'ancien code. [feedback_compose_project_name.md](feedback_compose_project_name.md)
+
+## DuckDB Cross-DB Join Pattern
+Une connexion read-only ne peut pas `ATTACH` : passer par une connexion `:memory:` qui attache les deux bases en READ_ONLY. Reproduire le retry backoff. [duckdb-patterns.md](duckdb-patterns.md)
+
+## Liens Scaleway désactivés (2026-06-12)
+Navigation web Scaleway retirée, chemins S3 gardés en **texte non cliquable**. ⚠ Helpers `s3ToScaleway` et `_s3_to_scaleway` **supprimés** — ne plus s'y référer. [scaleway_links_disabled.md](scaleway_links_disabled.md)
+
+## Backend IA via CLI `claude -p` (2026-04-22)
+Abonnement Max au lieu des crédits API. ⚠ **`ANTHROPIC_API_KEY` interdit** dans le container (le CLI le priorise et bypasse l'abonnement). ⚠ HOME isolé `/app/data/claude-home`. [ia_cli_migration.md](ia_cli_migration.md)
+
+## Page Survey — patterns
+Parser markdown extensible, lazy-render des onglets, écriture d'état atomique (tmp + rename), scoring IA découplé côté Aima-Survey. [survey_patterns.md](survey_patterns.md)
+
+## Intégration DuckDB Aima-Survey (v6 — 2026-04-20)
+`month` et `all` lisent `aima_survey.duckdb` en READ_ONLY avec retry, fallback markdown. Traduction `queries_matched` → descriptions humaines via `queries.json`, chargée au module load (restart requis si le fichier change). [survey_duckdb_integration.md](survey_duckdb_integration.md)
+
+## Vues temporelles Survey pilotées par `first_seen_at` (2026-04-22)
+Pivot = EDAT PubMed : **immuable, jamais dans le futur**, contrairement à `pub_date` qui produisait des dates futures et ratait les indexations tardives. [survey_first_seen_at.md](survey_first_seen_at.md)
+
+## Onglet Concurrence Survey étendu
+Le match se fait sur `org_name` **OR** `last_author_affiliation` : 11 → 29 articles. [survey_competitors_tab.md](survey_competitors_tab.md)
+
+## Sécurité Tower (2026-04-21)
+`https://tower.aima-diagnostics.com` via Caddy + basic auth bcrypt + Let's Encrypt. Port 8050 non exposé. ⚠ Caddy v2 : `basic_auth`, pas `basicauth`. ⚠ Hash bcrypt entre guillemets simples dans `.env`. [security_setup.md](security_setup.md)
+
+## Sécurité — approche pragmatique
+Boris valide l'itération **par couches** plutôt que le durcissement complet en une passe (blast radius). [feedback_security_pragmatism.md](feedback_security_pragmatism.md)
+
+## Incident `.env` tracked dans git
+`.env` tracked jusqu'au 2026-04-21, retiré via `git rm --cached`. ⚠ **Rotation des secrets reportée** (repo privé, dev unique). [project_env_leak.md](project_env_leak.md)
+
+## Guardant Health — stratégie Europe (2026-04-23)
+Snapshot à revalider trimestriellement : Guardant a **délégué l'Europe** aux labs locaux, aucun partenariat France sur le MRD. Fenêtres AIMA identifiées. [competitors_guardant_europe.md](competitors_guardant_europe.md)
+
+## Platform Detail Panel (Database > Platform)
+Layout Données (lg=8) à gauche, Trace (lg=4) à droite. Police des chemins `0.75rem`, plus petite que le reste.
+
+## Docker Workflow
+Rebuild : `docker compose down && docker compose build && docker compose up -d`. Restart simple si seul `assets/` change. ⚠ `COPY src/` invalide le cache à chaque modif de `src/`.
+
+## Gotcha: Python Closures in Loops
+Définir les fonctions helper **avant** leur premier appel dans la boucle — sinon `UnboundLocalError`, Python voyant l'assignation plus bas dans le scope.
