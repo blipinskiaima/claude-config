@@ -1,39 +1,37 @@
-# Context — Bam2Beta — 2026-09-11T09:59
+# Context — Bam2Beta — 2026-09-11
 
 **Branche** : main
-**Dernier commit** : bbbc009 — chore(perf): right-sizing des ressources mesure sur 46 traces, paires dilution en 4 lots
-**Status** : clean (seul `pair_current.tsv` non suivi, temporaire du lanceur)
+**Dernier commit** : bbbc009 — chore(perf): right-sizing des ressources mesuré sur 46 traces, paires dilution en 4 lots
+**Status** : clean (1 non suivi : pair_current.tsv, fichier tournant du lanceur dilution)
 
 ## Où j'en suis
 
-Session d'optimisation des performances, pas de feature. Cartographie du module EXIS puis
-analyse de perf sur **46 traces Nextflow récupérées sur S3** (les lanceurs passent
-`-with-trace` en CLI malgré `trace.enabled=false` — c'est LA source, `cleanup=true` purge
-le workDir local). Right-sizing de `conf/base.config` appliqué et poussé. Fiches mémoire
-écrites : `perf-exis-traces`, `ressources-dimensionnement`, `dependencies-provisioning`.
+Chantier « QC après filtre fragmentomique 80 < L < 1 kb » livré de bout en bout, hors pipeline.
+1378 BAM merged liquid relus (20,96 To, ~15 h, 0 échec) par une passe streaming
+`aws s3 cp - | samtools view -h | mawk` (`/scratch/boris/qc_stat/`). 3 colonnes en base
+(trace-prod schema v35, commit fa96cb0) + import one-shot `dev/import_qc_80_1000.py`, export fait
+dans l'onglet « QC read », et synthèse en 6 parties insérée dans le Google Doc QC, onglet
+Deep Dive > Filtre read entre 80 et 1000Kb. Boris relit le doc.
 
 ## Ce qui marche / ce qui foire
 
-- ✓ Diagnostic solide : `Raima_score_mVAF` = 74-81 % du wall-clock EXIS sur 7 samples de
-  0,4 à 44 Go, queue mono-tâche à 12 % d'occupation ; phase MERGE = 40 % du run
-- ✓ Right-sizing poussé (`0856f3f` + `bbbc009`) : `IV_call` 8→16 G (2 OOM réels corrigés),
-  ternaire `Mosdepth_qc` rendu cohérent à 16 G, ~20 sur-allocations ramenées à 2 G,
-  MERGE monté à 16 cpus (`BAM_sort` 40 G)
-- ✓ Déterminisme prouvé : `samtools sort` entre threads (md5 SAM identique) et
-  `GNU sort -S/--parallel` (hôte 9.4 + container 8.32)
-- ✗ **Optimisation de la boucle de tri jamais appliquée** — mesurée 10,82 → 4,96 s par
-  chromosome, contenu md5-identique, ≈ −300 s sur Lung_9. C'est le seul levier restant
-  dans notre code
-- ✗ `Raima_score_mVAF` passé à 8 cpus **sans A/B** : `--ncores` pilote `setDTthreads`, qui
-  agit sur des sommes flottantes de raima → peut changer une sortie qualifiée. Et les
-  workers étaient déjà affamés (2,2 cœurs sur 4), donc gain douteux
-- ✗ `Read_Start_Time` commenté dans `qc.nf` — supprime aussi `sequencing_time.tsv`
-  (chemin rapide trace-prod). Réactivation prévue par Boris
-- ✗ `ichorCNA/` (5 fichiers) n'existe que sur ce serveur, absent de `s3://aima-resources`
-- ✗ Machine sursouscrite : jusqu'à 9 runs Nextflow simultanés, load 119 sur 32 cœurs
+- ✓ Conventions validées **bit à bit** sur Lung_9 : molécules = cramino `num_reads` à l'unité,
+  bases = mosdepth à l'unité (M/=/X seuls, les délétions ne comptent pas), depth et coverage
+  identiques aux valeurs publiées
+- ✓ Résultat : le filtre coupe du **court** (écartés 78,5 pb vs 177,2 conservés) → comptages
+  −7,4 %, depth −3,2 %, coverage −0,96 %. 50 bascules de statut Exis / 46 Themelio, toujours par
+  le seul comptage de molécules (jamais depth ni coverage)
+- ✓ La perte de depth suit la masse > 1 kb (facteur 30) → le filtre révèle le gDNA (`TNE_2`
+  0,66 → 0,13×)
+- ✗ **16 flux = optimum, 32 s'effondre** (96 Go de RAM, débit ÷ 6). Ne pas réessayer
+- ✗ `qc_metrics.coverage_percent` n'a qu'**1 point de précision** (entier rond 1378/1378) —
+  découvert ici, dépasse ce chantier
+- ⚠ **`Read_Start_Time` est commenté dans `workflow/qc.nf:27` et c'est commité (bbbc009)** : ni
+  `read_start_time.tsv` ni `sequencing_time.tsv` ne sont plus produits. Volontaire pour alléger
+  les runs de dilution, mais à re-basculer avant un run prod nominal
+- ⚠ Dilutions de Boris toujours en cours : 115/220 paires, 5 tmux (LUNG, LUNG_D1..D4)
 
 ## Prochaine étape
 
-Appliquer l'optimisation de la boucle de tri dans `workflow/beta_28M.nf` (~ligne 166) :
-`sort -S 2G --parallel=${task.cpus}`, `gzip -1`, et `xargs -P` sur les 22 itérations.
-`xargs` est dans le container raima, `pigz` non.
+Attendre les retours de Boris sur l'onglet du Google Doc. Puis trancher le sort de
+`Read_Start_Time` (réactiver ou documenter la coupure) avant tout run de production.
