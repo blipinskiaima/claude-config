@@ -2,6 +2,7 @@
 
 ## Memories
 - [BAM merged path](bam_merged_path.md) — Les BAM finaux sont dans `processed/MRD/RetD/liquid/HCL/{sample}/BAM/`, PAS dans `data/HCL/liquid/`
+- [NANO28 arrival](nano28_arrival.md) — Run 96-plex reçu le 2026-09-11, 5 samples barcode09-13, noms inconnus (pas dans gsheet), raw non purgé
 
 ## Project Overview
 - Single Bash script (`SampleSheetChecker.sh`, ~317 lines) — no dependencies, no build system

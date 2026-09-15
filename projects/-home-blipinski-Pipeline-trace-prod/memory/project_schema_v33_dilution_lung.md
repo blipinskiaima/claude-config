@@ -60,7 +60,7 @@ Suffixe `_dilution_lung` sur statuts/métriques/probs ; les 5 colonnes d'identit
 
 | Onglet | Col | Contenu |
 |---|---|---|
-| `mVAF` | **21** (depuis le 10/09, 17 avant) | `ID complet` (= `sample_name`, déjà concaténé) · `ID Lung` · `ID Healthy` + **un triplet par métrique** parent lung / parent healthy / dilué (`Nb lignes total`, `Nb molécule`, `Depth`, `Coverage`, `mVAF v1.4`, `mVAF v1.5`, suffixes ` lung` / ` healthy` / ` dilution`). Les `% Lung` / `% Healthy` (toujours 50) ont été **retirés de l'onglet**, pas de la base |
+| `mVAF` | **24** (17 -> 21 le 10/09 -> 24 le 15/09) | `ID complet` (= `sample_name`, déjà concaténé) · `ID Lung` · `ID Healthy` + **un triplet par métrique** parent lung / parent healthy / dilué (`Nb lignes total`, `Nb molécule`, `Depth`, `Coverage`, `mVAF v1.4`, `mVAF v1.5`, suffixes ` lung` / ` healthy` / ` dilution`). Les `% Lung` / `% Healthy` (toujours 50) ont été **retirés de l'onglet**, pas de la base. Puis 3 colonnes en **fin de tableau** (schema v36, 15/09) : `Mode1`, `Mode2`, `Frag Score v2` |
 | `Prop` | 52 | 5 identité + 47 probs, en-têtes nus, **point** décimal |
 
 Valeurs initiales : deux jointures `lung_id` et `healthy_id` → `samples` avec **`labo = 'HCL'` en dur**
@@ -76,6 +76,33 @@ couples). BAM 33/33 · PROD 12 (Lung_100 10/10, Lung_102 2/10, Lung_104 0, Lung_
 métriques QC + Loyfer 13 · mVAF + epic 12 (un couple a `QC/` sans `BETA/`, vague de production).
 Somme des 16 epic = 1,0000 sur les 12. Relecture gsheet : **0 écart sur 578 (mVAF) + 1768 (Prop)
 cellules**. `compact()` testé sur copie : table + PK préservées.
+
+## Schema v36 (15/09/2026) — 3 métriques fragmentomiques softclipped
+
+`frag_mode1_sc_dilution_lung`, `frag_mode2_sc_dilution_lung`, `frag_score_v2_sc_dilution_lung`
+(VARCHAR, virgule préservée). **Aucun code d'extraction écrit** : `extract_metrics` appelle les
+`check_frag_mode1_sc` / `check_frag_mode2_sc` / `check_frag_score_v2_sc` de `BaseChecker`,
+exactement comme `RarefactionChecker` le fait déjà. Sources
+`Fragmentomics/filtered_softclipped/{s}.fragmentomics_modes.tsv` (`cols[0]`/`cols[1]`) et
+`.fragmentomics_score.V2.tsv` (`cols[0]`).
+
+**Export** : 3 colonnes en fin de l'onglet `mVAF` (positions 22/23/24). `Mode1`/`Mode2`
+**arrondis à 2 décimales** (choix Boris, cohérent avec `ROUND2_HEADERS` en liquid et avec les
+exports `Dilution`/`Rarefaction` qui ont leurs propres constantes) ; `Frag Score v2` en pleine
+précision. Le helper partagé `_export_rarefaction_horaire` a reçu un paramètre optionnel
+`round2_cols=frozenset()` — les 4 autres appelants (horaire et threshold, mVAF et Prop) sont
+inchangés, vérifié par ré-export (16 et 52 colonnes identiques).
+
+⚠ **Les 3 colonnes ne se remplissent pas en même temps** : les 3 `update-column` enchaînés à
+06:20 / 06:33 / 06:39 ont vu 144, 149 puis 152 couples renseignés. Les 8 couples partiels ont
+tous eu leur `fragmentomics_modes.tsv` écrit sur S3 **entre les passes** (06:30 à 06:42) —
+décalage de production, pas un bug, même mécanique que [[feedback_probs_loyfer_lag]]. Hors ces
+8, cohérence parfaite : 144 couples avec les 3 valeurs, 68 sans aucune.
+⚠ Un `update-column-dilution-lung` sur les 220 prend **~5 min par colonne** (lecture S3
+séquentielle, le `-j` n'est pas utilisé par la branche metric).
+
+Tag `checkpoint-pre-dilution-lung-frag` (sur `ab3ec25`), backup
+`samples_status.backup-pre-dilution-lung-frag-20260915_061747.duckdb`.
 
 ## Gotchas / observations données
 
