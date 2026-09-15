@@ -71,3 +71,4 @@
 - [Versioned template swap](feedback_versioned_template_swap.md) — jamais modifier en place un fichier référencé par un workflow actif
 - [Google Doc — jamais de réécriture de section](feedback_gdoc_no_overwrite.md) — remplacements de chaînes exactes uniquement (incident 2026-08-14)
 - [Concision dans les docs de restitution](feedback_doc_concision.md) — une case incomprise se retire, ne se ré-explique pas
+- [Small_Fragment dégrade la mVAF](small-fragment-mvaf-degradation.md) — 990 éch. appariés : 0 gain de sensibilité, ×3 de faux positifs, −36 % de profondeur. Le biais GC n'affecte pas la mVAF (r=−0,18)

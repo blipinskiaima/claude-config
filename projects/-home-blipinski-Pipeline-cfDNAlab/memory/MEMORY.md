@@ -1,1 +1,2 @@
 - [cfdnalab install & gotchas](cfdnalab_install.md) — Miniforge+cargo install done; ONT BAMs need --reads-are-fragments or silent 0-fragment output
+- [Évaluation cfdnalab par commande](cfdnalab_evaluation.md) — verdict mesuré sur 28 échantillons : rien n'y bat Bam2Beta ; 3 signaux nets effondrés sous leur contrôle
