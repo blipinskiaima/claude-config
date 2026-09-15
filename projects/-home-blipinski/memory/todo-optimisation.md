@@ -31,6 +31,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Aima-Survey — `events_pending_email` n'a aucun filtre de date** — un rattrapage de collecte avec une fenêtre large fait entrer des dépôts historiques dans la file de notification. Vécu le 2026-08-27 : `--days 2400` a collecté 93 dépôts SEC de 2020-2025 jamais vus, tous partis par mail au cron de 08:01. Borner `--days` côté CLI, ou filtrer la file par `event_date`, ou les deux. `lib/db.py:425`.
 
 
+- [ ] **trace-platform — débloquer `BEN_Dav_29_11_1983`** — patient réel en FAILED à tort (V2.2.0, `2/3 : BioIT KO [has_failed]`) : le pipeline a été relancé avec succès mais le statut terminal n'est jamais relu. Un recheck ciblé le passe SUCCESSED : `check_platform.py check <uuid> --sample BEN_Dav_29_11_1983`. **Jamais `check <uuid>` seul** — recalculerait les anciens samples du compte et les ferait basculer FAILED.
+- [ ] **trace-platform — le statut FAILED terminal ne se répare jamais** — un run qui touche FAILED puis est relancé avec succès reste FAILED indéfiniment (`get_active_sample_keys()` ne remonte que WAITING/RUNNING, `lib/platform_db.py:615`). Constaté sur 3 runs `TEST_V230_*` et 1 patient réel. Trancher : ajouter FAILED aux statuts re-scannés (coût = scan S3 sur ~142 samples par passage, aucun risque de régression) ou garder un déblocage manuel au cas par cas.
+
 ### Skills bioinformatiques
 - [ ] **Améliorer skills v1 avec /meta-skills-creator** — sample, debug-nf, check-consistency sont fonctionnels mais créés sans le processus rigoureux. Raffiner après usage.
 
@@ -63,6 +66,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-09-15 — trace-platform : réalignement sur Bam2Beta V2.3.0
+
+- [x] **trace-platform aligné sur Bam2Beta V2.3.0** — `bioit_status` exigeait `bedMethyl.gz` et `raima_score.V2.tsv`, sorties coupées en V2.3.0 : 12 runs bloqués en FAILED, 0 SUCCESSED. Repointé sur `raima_score.V1.4.tsv` → 11 corrigés (KO2 reste un vrai Upload KO), anciens samples intacts ; détails dans la mémoire trace-platform.
 
 ## 2026-09-11 — Aima-Tower : charte graphique du site officiel (v5.6.0) · trace-prod : schema v32 threshold, lot clos · Bam2Beta : où passe le temps dans EXIS + right-sizing des ressources · Bam2Beta + trace-prod : QC post-filtre 80 pb – 1 kb (v35) · /qara comparaison au point figé (v5.7.0) · trace-prod : audit active_cancer (gsheet CGFL)
 - [x] **`MEMORY.md` d'Aima-Tower consolidé** — **29,9 Ko → 14,8 Ko** (−50 %), sous la limite de chargement de ~24 Ko. Les 46 entrées sont conservées, réduites à « titre + le ⚠ qui évite une erreur + lien » ; la narration est partie dans les topic files, dont 4 créés pour les entrées qui n'en avaient pas. Vérifié : aucune entrée perdue, 44 liens tous valides.
