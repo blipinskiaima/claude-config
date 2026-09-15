@@ -1,31 +1,34 @@
-# Context — trace-prod — 2026-09-11T15:15:40+00:00
+# Context — trace-prod — 2026-09-15T16:00:08+00:00
 
 **Branche** : main
-**Dernier commit** : ab3ec25 — docs: active_cancer — colonne clinical morte + ecart Lung_13 non verrouille
-**Status** : propre (untracked inchangés : backups .duckdb, CSV dev/, rapports HTML, metadata_HCL.tsv)
+**Dernier commit** : 66c028d — feat(dilution-lung): schema v36 — Mode1/Mode2/Frag Score v2 + doc de la table
+**Status** : clean (untracked inchangés : backups .duckdb, CSV dev/, rapports HTML)
 
 ## Où j'en suis
-Audit `active_cancer` de la gsheet CGFL (`ONT_samples` / onglet VAF) terminé, les 6 étapes de
-la feuille de route sont faites. Livrable = 16 lignes à trancher, écrites dans l'onglet
-**Active-cancer** du Google Doc QC. Rien n'attend côté code. La balle est chez le clinicien.
+Chantier `dilution_lung` terminé et clos. Le lot des 220 couples du plan
+`Bam2Beta/early_lung_dilution_pairs_original.tsv` est complet, et le schema v36 a ajouté
+les 3 métriques fragmentomiques softclipped. Rien n'est en cours, tout est commité, poussé
+et exporté.
 
 ## Ce qui marche / ce qui foire
-- ✓ `active_cancer` **concordant à 100 %** gsheet ↔ base (222/51/16/12), propagation
-  rebasecalled exacte — rien à rattraper sur le sujet lui-même
-- ✓ Import de rattrapage lancé par Boris : metadata CGFL 526 → **623** lignes, 60 `stage`
-  corrigés, 0 divergence résiduelle. Backup `backup-pre-import-metadata-cgfl-20260911_142433`
-- ✓ Historique de la gsheet reconstitué (**54 révisions** exportées et diffées) → une seule
-  vraie correction de statut en 6 mois : `Prostate_21` No→Yes le 23/07/2026
-- ✓ Doc QC / onglet Active-cancer : tableau 17 lignes, largeurs recalées sur 451 pt
-- ✗ **Écart `Lung_13*` non verrouillé** : `class='Lung'` tenu à la main, le prochain
-  `import-metadata liquid CGFL` remettra `Endometrium` (commande de rattrapage dans CLAUDE.md)
-- ✗ `active_cancer_clinical` = colonne morte (0/1136), jamais alimentable en l'état
-- ✗ `imagerie suspecte` (25 HCL) et `probable` (13) hors `HARMONIZATION_RULES` — constaté,
-  **non corrigé** (hors scope de la demande)
-- ✗ Le classifieur d'auto-mode bloque toute commande écrivant en base : les deux commandes
-  d'import ont dû être lancées par Boris
+- ✓ **220/220 sur toutes les colonnes** : BAM, PROD, mVAF v1.4/v1.5, Mode1/Mode2/Frag Score v2,
+  probs epic et Loyfer. 0 ligne sans identité, 0 fantôme. Montée en charge 33 → 220 en 8 passes
+- ✓ **v36 en 39 lignes sur 4 fichiers** : `extract_metrics` appelle les `check_frag_*_sc` de
+  `BaseChecker`, aucune règle réécrite. Export en fin d'onglet `mVAF` (24 col), Mode1/2 arrondis
+  2 déc. via un paramètre optionnel `round2_cols` ajouté au helper partagé (4 autres appelants intacts)
+- ✓ **Probs HCL rafraîchies en mode bootstrap** (518/518 epic + Loyfer, somme = 1,0000) puis
+  exportées. ⚠ la base tient les **moyennes bootstrap**, pas les `props_v1.3` — un `probs -P`
+  écraserait ce choix de juillet
+- ✓ **Table documentée** : README section 14 (absente depuis la création en v33) + section
+  v33/v36 dans CLAUDE.md avec les 4 commandes
+- ✗ **Deux pièges de génération parallèle, chers** : `aws s3 ls` matche par **préfixe**, un `.bai`
+  orphelin a masqué `Lung_141_Healthy_111` deux jours → utiliser `head-object`. Et la purge des
+  BAM stagés balaie tout `/scratch/nxf-work`, ce qui a tué 3 paires → `-w` dédié **et** recherche
+  limitée à ce `-w`
+- ✗ **3 samples HCL sans probs** : les `Twist_*_rep_4`, dossiers réduits à `LOG/`, pipeline pas
+  encore passé. Se rempliront seuls
 
 ## Prochaine étape
-Faire trancher par R. Boidot les 16 lignes de l'onglet Active-cancer (priorité : `Prostate_25`,
-`Breast_46`, les 11 `Suspicion` en stade IV + Cat 1). Une fois la gsheet corrigée :
-`import-metadata liquid CGFL`, puis **rejouer l'UPDATE `Lung_13*`** et vérifier la distribution.
+Rien de bloquant. Si le pipeline reprend sur d'autres couples, la routine est rodée :
+lister S3, checker les nouveaux plus les `prod_status='KO'`, puis les deux exports. Les
+`Twist_*_rep_4` méritent une passe `probs liquid HCL --probs_bootstrap` quand leur `BETA/` sera là.
