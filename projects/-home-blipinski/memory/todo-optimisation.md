@@ -67,9 +67,12 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-09-15 — trace-platform : réalignement sur Bam2Beta V2.3.0
+## 2026-09-15 — trace-platform : réalignement sur Bam2Beta V2.3.0 · cfdnalab : évaluation complète · Bam2Beta : Small_Fragment dégrade la mVAF
 
 - [x] **trace-platform aligné sur Bam2Beta V2.3.0** — `bioit_status` exigeait `bedMethyl.gz` et `raima_score.V2.tsv`, sorties coupées en V2.3.0 : 12 runs bloqués en FAILED, 0 SUCCESSED. Repointé sur `raima_score.V1.4.tsv` → 11 corrigés (KO2 reste un vrai Upload KO), anciens samples intacts ; détails dans la mémoire trace-platform.
+
+- [x] **cfdnalab évalué — rien à intégrer** — les 4 commandes de features testées sur une cohorte de 28 échantillons (15 sains CGFL+HCL, 13 tumoraux) : `fcoverage` reproduit la CNV et ne remonte que des artefacts de mappabilité à 10 kb (27/27 négatifs), `ends` a un bruit de réplicat égal à son signal (2,24 vs 2,69 pt) et reste corrélé au biais GC résiduel (r=+0,52) malgré correction, `midpoints` voit 76 % de son écart sain/tumoral expliqué par la longueur de fragment, et `lengths` — meilleur ratio signal/bruit (4,0) — duplique le module FRAG existant. ⚠ Obstacle structurel identifié : sains et tumoraux ne partagent jamais un run, donc effet batch confondu avec le groupe par construction. Détails dans la mémoire cfDNAlab.
+- [x] **`Small_Fragment` dégrade la mVAF** — mesuré sur **990 échantillons appariés** de trace-prod : zéro gain de sensibilité (delta −0,02, 46 % en hausse = pile ou face) et **×3 de faux positifs** chez les sains (8 → 25 sur 286), à cause de **36 % de profondeur perdue** par le filtre 75-200 pb. Résultat annexe : le biais GC n'affecte pas la mVAF (r=−0,18), l'absence de correction GC dans la chaîne méthylation n'est donc pas un manque. Détails dans la mémoire Bam2Beta.
 
 ## 2026-09-11 — Aima-Tower : charte graphique du site officiel (v5.6.0) · trace-prod : schema v32 threshold, lot clos · Bam2Beta : où passe le temps dans EXIS + right-sizing des ressources · Bam2Beta + trace-prod : QC post-filtre 80 pb – 1 kb (v35) · /qara comparaison au point figé (v5.7.0) · trace-prod : audit active_cancer (gsheet CGFL)
 - [x] **`MEMORY.md` d'Aima-Tower consolidé** — **29,9 Ko → 14,8 Ko** (−50 %), sous la limite de chargement de ~24 Ko. Les 46 entrées sont conservées, réduites à « titre + le ⚠ qui évite une erreur + lien » ; la narration est partie dans les topic files, dont 4 créés pour les entrées qui n'en avaient pas. Vérifié : aucune entrée perdue, 44 liens tous valides.

@@ -69,13 +69,34 @@ Valeurs initiales : deux jointures `lung_id` et `healthy_id` → `samples` avec 
 la raréfaction »). Depuis le refactor v34 (`19923c1`, 08/09) les colonnes DB s'appellent aussi
 `nb_lignes_total_dilution_lung` / `nb_molecule_dilution_lung` (renommage global, toutes tables).
 
-## État (07/09/2026)
+## État (15/09/2026, lot CLOS)
 
-**33 lignes** (32 au listing du matin, 33 au check : le lot grossit, `Lung_106` n'a que 3
-couples). BAM 33/33 · PROD 12 (Lung_100 10/10, Lung_102 2/10, Lung_104 0, Lung_106 0) ·
-métriques QC + Loyfer 13 · mVAF + epic 12 (un couple a `QC/` sans `BETA/`, vague de production).
-Somme des 16 epic = 1,0000 sur les 12. Relecture gsheet : **0 écart sur 578 (mVAF) + 1768 (Prop)
-cellules**. `compact()` testé sur copie : table + PK préservées.
+**220 lignes** = le plan complet de `Bam2Beta/early_lung_dilution_pairs_original.tsv`
+(22 lungs × 10 healthys, aucun doublon, aucune paire hors plan). **BAM, PROD, mVAF v1.4/v1.5,
+Mode1/Mode2/Frag Score v2, probs epic et Loyfer : 220/220** — aucune valeur manquante,
+0 ligne sans identité, 0 ligne fantôme `LOG`. Somme des 16 epic = 1,0000.
+Relectures gsheet successives : 0 écart (578 puis 1768, 5304 cellules).
+`compact()` testé sur copie : table + PK préservées.
+
+Montée en charge (07/09 → 15/09) : 33 → 41 → 67 → 74 → 89 → 107 → 196 → 220 lignes ;
+PROD 12 → 15 → 24 → 26 → 69 → 91 → 181 → 220. Le lot a grossi **pendant** tout le suivi :
+aucun décompte intermédiaire n'était définitif, la routine « nouveaux + PROD KO puis exports »
+rattrape à chaque passe.
+
+## Génération des BAM — deux pièges qui ont coûté cher
+
+La boucle de génération (hors repo, `~/Run/dl/gen.sh`) teste la présence du BAM avec
+`aws s3 ls "{prefix}/BAM/{name}.merged.bam"`. ⚠⚠ **`aws s3 ls` matche par PRÉFIXE** : un `.bai`
+orphelin suffit à déclencher un faux `[SKIP]`. `Lung_141_Healthy_111` est resté invisible deux
+jours pour cette raison (dossier créé avec l'index seul). **`aws s3api head-object` teste la clé
+exacte** — c'est lui qu'il faut.
+
+⚠⚠ Sa purge des BAM stagés balaie **tout** `/scratch/nxf-work`, pas le workdir de la boucle.
+Deux boucles lancées sur un même parent se suppriment mutuellement le fichier en cours de
+lecture → `Failed to open file "lung.merged.bam"`. A tué 3 paires. Correctif : un `-w` dédié
+par boucle **et** la recherche limitée à ce `-w`. ⚠ Un `-w` dédié ne protège que des autres
+boucles corrigées : une boucle restée sur la version non restreinte efface quand même tout,
+y compris à l'interruption (son nettoyage tourne après le `Ctrl-C` du run).
 
 ## Schema v36 (15/09/2026) — 3 métriques fragmentomiques softclipped
 
