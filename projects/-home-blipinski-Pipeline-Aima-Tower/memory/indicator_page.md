@@ -4,7 +4,7 @@ description: "Page /indicator : périmètre production de trace-platform, jointu
 metadata: 
   node_type: memory
   type: project
-  modified: 2026-09-18T13:45:48.456Z
+  modified: 2026-09-18T14:05:02.333Z
   originSessionId: b486e4ec-8e81-4f3a-ab7e-dd938e21bf46
 ---
 
@@ -33,6 +33,32 @@ Deux erreurs commises en route, toutes deux silencieuses :
 
 ℹ `PROD_CUTOFFS` (`check_platform.py:683`) ne couvre qu'un client (CGFL, prod depuis le
 2026-06-15) : c'est lui qui pose les 11 `samples.case = 'PROD'` au niveau échantillon.
+
+## Le seul écart assumé avec trace-platform : `_OVERRIDE_CASE_IGNORE`
+
+Demande Boris en fin de session : **ne pas compter les échantillons de rboidot comme de
+la production, dans la Tower seulement**. Constat qui la fonde — ses **deux** comptes
+sont déclarés **DEV** dans `labs_users` ; ce sont les `PROD_CUTOFFS` qui forcent à PROD
+les échantillons déposés après le 15/06.
+
+```
+16342fc9-…  rboidot@cgfl.fr  CGFL  case=DEV   11 forcés PROD + 12 restés DEV
+060f70e8-…  rboidot@cgfl.fr  CGFL  case=DEV   16, déjà tous DEV
+```
+
+⚠ **L'override est neutralisé, pas remplacé** : `samples.case` est mis à NULL pour ces
+comptes, puis la règle normale s'applique et `labs_users.case` décide. Si le TSV les
+déclare PROD un jour, leurs échantillons reviennent d'eux-mêmes. Rien n'est modifié en
+base — retirer les deux lignes de la constante rend la règle du projet à l'identique.
+
+⚠ L'expression `_CASE_EFF_SQL` est **partagée par les deux requêtes** : un périmètre
+différent entre les échantillons et leurs étapes ferait des nœuds de diagramme calculés
+sur une autre population que les figures. Deux tests le verrouillent, et j'ai vérifié
+qu'ils tombent bien quand on retire la garde (51 au lieu de 40).
+
+Effet au 18/09 : **51 → 40 PROD**. ⚠ Imagenome Labosud pèse alors **32 sur 40**, soit
+80 % du périmètre — celui-là même dont la nomenclature (`Sample4_2`…) ressemble à de la
+validation, et que Boris a choisi de garder au motif que la base fait foi.
 
 ⚠ Les 32 échantillons d'Imagenome Labosud (63 % du périmètre) se nomment `Sample4_2`,
 `Sample5`… — nomenclature de validation, mais le compte est déclaré PROD. **Décision
