@@ -31,6 +31,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [ ] **Aima-Survey — `events_pending_email` n'a aucun filtre de date** — un rattrapage de collecte avec une fenêtre large fait entrer des dépôts historiques dans la file de notification. Vécu le 2026-08-27 : `--days 2400` a collecté 93 dépôts SEC de 2020-2025 jamais vus, tous partis par mail au cron de 08:01. Borner `--days` côté CLI, ou filtrer la file par `event_date`, ou les deux. `lib/db.py:425`.
 
 
+- [ ] **trace-platform — `.tsv` générique dans `_STAGE_CONTENT_SUFFIXES`** — `read_start_time.tsv` pèse **1,6 Go** et vit dans `QC/Samtools/`, donc `_stage_sample_s3` le télécharge **intégralement à chaque `check` de sample**, pour rien (10 Go sur les seuls 9 samples Imagenome). Exactement le piège que le commentaire au-dessus de la constante documente pour `.read_lengths.csv`, contourné là-bas par le suffixe complet `.themelio_predictions.csv` — mais `.tsv` est resté large. Fix : filtre sur le nom complet, ou garde sur `o["size"]`. `check_platform.py:165`.
 - [ ] **trace-platform — débloquer `BEN_Dav_29_11_1983`** — patient réel en FAILED à tort (V2.2.0, `2/3 : BioIT KO [has_failed]`) : le pipeline a été relancé avec succès mais le statut terminal n'est jamais relu. Un recheck ciblé le passe SUCCESSED : `check_platform.py check <uuid> --sample BEN_Dav_29_11_1983`. **Jamais `check <uuid>` seul** — recalculerait les anciens samples du compte et les ferait basculer FAILED.
 - [ ] **trace-platform — le statut FAILED terminal ne se répare jamais** — un run qui touche FAILED puis est relancé avec succès reste FAILED indéfiniment (`get_active_sample_keys()` ne remonte que WAITING/RUNNING, `lib/platform_db.py:615`). Constaté sur 3 runs `TEST_V230_*` et 1 patient réel. Trancher : ajouter FAILED aux statuts re-scannés (coût = scan S3 sur ~142 samples par passage, aucun risque de régression) ou garder un déblocage manuel au cas par cas.
 
@@ -66,6 +67,14 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-09-18 — trace-prod : statuts QC v34 comblés · Bam2Beta : flag RETRO_QC_ONLY · plateforme : QC et temps de séquençage disponibles
+
+- [x] **trace-prod — statuts QC v34 comblés (44 NULL → 10)** — 34 samples liquid rattrapés (24 CGFL, 10 HCL) via `--RETRO_REPORT` puis `update-column exis_qc_status` (n'importe laquelle des 4 clés met à jour les 4 colonnes). Les 10 restants n'ont pas les fichiers d'entrée : 6 dossiers RetD **vidés** — leurs samples ont été traités sur la plateforme —, 3 `Bam2Beta.failed`, 1 sans `THEMELIO/`. Commit `f653ac0`.
+- [x] **Piège retenu : `--RETRO_REPORT` écrit DEUX fichiers** — le module publie le `qc_status.tsv` **et** réécrit `REPORT/metadata.json`, où `version_raima` retombe à `null` (il force `raima_version.txt` à vide). Repéré seulement après coup sur les 34 samples RetD, et non restaurable : versioning S3 `Suspended`, et la valeur n'est dans aucun log. **Lire le `publishDir` de chaque process d'un workflow avant un retro sur un périmètre client** — `Read_Start_Time` a le même piège (`pattern ${ID}.*_time.tsv` matche aussi le fichier de 1,6 Go).
+- [x] **Bam2Beta — flag `RETRO_QC_ONLY`** — met `Raima_report` sous condition pour ne publier que le TSV. Validé par snapshot S3 avant/après sur les 10 samples plateforme : `164 → 165` objets, **1 ajout, 0 modifié, 0 supprimé**. Patch non commité. ⚠ Ne jamais lancer un retro avec `-profile liquid` (10 modules à `true`), et le module retro n'est **pas dans le tag `V2.3.0`** du launcher de prod.
+- [x] **Plateforme — statuts QC et temps de séquençage disponibles** — 10 `qc_status.tsv` et 10 `sequencing_time.tsv` générés sans toucher à l'existant (le second par balayage du `read_start_time.tsv` déjà présent, 10 Go en 1 min, avec le code de trace-prod et un `head_object` de garde). ⚠ Seuls **9 samples PROD sur 51** sont éligibles : les versions < V2.3.0 n'ont ni `idxstats`, ni `n50_ratio`, ni `amplitude` — limite de données, pas d'outillage. 2 prompts livrés pour l'intégration en base côté trace-platform ; la source y sera **le TSV, jamais le `metadata.json`** resté à 29 champs.
+- [x] **`MEMORY.md` de trace-prod compacté** — **25,2 → 9,8 Ko** (hook de saturation), les 47 entrées conservées, aucun topic file orphelin. Le détail est parti dans les topic files, l'index garde « titre + le ⚠ qui évite une erreur + lien ».
 
 ## 2026-09-15 — trace-platform : réalignement sur Bam2Beta V2.3.0 · cfdnalab : évaluation complète · Bam2Beta : Small_Fragment dégrade la mVAF · trace-prod : lot dilution_lung clos (schema v36)
 
