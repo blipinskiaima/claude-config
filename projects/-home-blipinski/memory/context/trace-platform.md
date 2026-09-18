@@ -1,27 +1,34 @@
-# Context — trace-platform — 2026-09-15T13:44:56+00:00
+# Context — trace-platform — 2026-09-18T10:23:39+00:00
 
 **Branche** : main
-**Dernier commit** : dc47c87 — docs: aligne README, S3 et CLAUDE.md sur le contrat Bam2Beta V2.3.0
+**Dernier commit** : b66b98f — feat(db): sequencing_time (schema v22) + documentation alignee sur v22
 **Status** : clean (seuls backups .duckdb / logs cron / captures en untracked, comme d'habitude)
 
 ## Où j'en suis
-Réalignement de trace-platform sur Bam2Beta V2.3.0 TERMINÉ et déployé. La condition
-`bioit_status` exigeait `bedMethyl.gz` et `raima_score.V2.tsv`, deux sorties coupées en
-V2.3.0 : tous les runs V2.3.0 tombaient en FAILED. Corrigé (raima_score pointe désormais
-sur `raima_score.V1.4.tsv`, bedmethyl retiré, extraction score_cnv supprimée), 12 samples
-rejoués en base, export gsheet relancé. Reste 3 décisions ouvertes, aucune bloquante.
+Session longue du 17/09 : la base est passée de v14 à v22 en 8 migrations, la gsheet de 30 à
+47 colonnes en 8 rubriques. Tout est committé, poussé, exporté et documenté (README + CLAUDE.md
++ MEMORY.md). Rien n'est en cours — point d'arrêt propre.
 
 ## Ce qui marche / ce qui foire
-- ✓ 11 des 12 runs V2.3.0 passés FAILED → SUCCESSED ; KO2 reste FAILED (vrai Upload KO)
-- ✓ Anciens samples intacts : comptages par version identiques avant/après
-- ✓ Tag de sauvegarde `pre-v230-realign` poussé sur GitHub
-- ✗ `BEN_Dav_29_11_1983` (V2.2.0, vrai patient) toujours FAILED à tort — pipeline relancé
-  avec succès mais statut terminal jamais relu. Un recheck ciblé le passe SUCCESSED
-- ✗ Piège structurel non corrigé : un run qui touche FAILED puis est relancé n'est jamais
-  relu. Piste = ajouter FAILED à `get_active_sample_keys()` (lib/platform_db.py:615)
-- ✗ Token Seqera en clair dans Bam2Beta/nextflow.config (tâche séparée déposée, non traitée)
+- ✓ Timestamps : 254 corrections + 8 comblages, 150 valeurs faussées par le bug de fuseau
+  s3fs redressées. 0 changement de statut, 0 changement de métrique
+- ✓ Chronologie v15 en 6 horodatages, découverte que `data/` est une copie et que le vrai
+  upload client se passe sous `bulk/` — conservé seulement depuis le 2026-09-14
+- ✓ TOO, versions produits, `version_mvaf`, `product`, statuts QC Exis/Themelio,
+  `sequencing_time` : tous remplis par UPDATE ciblé, jamais par `check <UUID>`
+- ✓ Fusions de la ligne méta du gsheet désormais synchronisées automatiquement (elles
+  masquaient silencieusement la catégorie BAM)
+- ✗ **Staging générique non corrigé** : `.tsv`/`.txt`/`.log` rendent 60,66 Go éligibles au
+  téléchargement à chaque scan, dont des `read_start_time.tsv` de 3 Go que personne ne lit.
+  Correctif proposé (garde de taille à 1 Mo dans `_stage_sample_s3`), volontairement écarté
+- ✗ `BEN_Dav_29_11_1983` toujours FAILED à tort — piège du statut terminal jamais relu,
+  hérité de la session précédente
+- ✗ Compte `f3fd87cd…` sans lab déclaré dans `labs_users` (1 sample dans la gsheet)
+- ✗ Token GitHub PAT en clair dans l'historique git de Bam2Beta (commit `c1453da`) — tâche
+  déposée, non traitée
 
 ## Prochaine étape
-Débloquer BEN_Dav_29_11_1983 :
-`check_platform.py check <uuid> --sample BEN_Dav_29_11_1983` — jamais `check <uuid>` seul,
-qui recalculerait les anciens samples du compte et les ferait basculer FAILED.
+Décider du staging : appliquer la garde de taille `_STAGE_MAX_BYTES = 1_000_000` dans
+`_stage_sample_s3` (check_platform.py), qui ferme les 60 Go d'un coup — ou s'en tenir à
+l'exclusion nominale de `read_start_time.tsv`. Mesure et correctif déjà instruits dans
+MEMORY.md, section « Dette ouverte ».
