@@ -28,6 +28,8 @@ Trois décisions de reformatage, chacune trouvée parce que le gate échouait �
 
 **v1.5 = v1.4 au-dessus de ~2 M reads EPIC**, ce n'est pas un bug. `transfo_mvaf_by_cov` est une pénalité de faible couverture : `vmin = exp(−0,55 − 0,64 × nb_read_epic × 21)`. À 4,66 M, `vmin ≈ 4e−28`, la correction s'annule. Le short-read est plus couvert que l'ONT (médiane 1,96 M) donc jamais pénalisé. `nb_read_epic` n'existe pas en short-read : calculé par `samtools view -c -q 20 -F 3844 -L epic850K.extended.100.clean.bed`, divisé par 1e6.
 
+**Chimie 5base tranchée** : c'est bien du TAPS (C méthylé → T), vérifié par pileup contre le `CX_report`. `rastair` est donc le bon caller sur le 5base, et le r = +0,97 est cohérent. Voir [[5base-illumina-est-une-chimie-taps]].
+
 **Limite connue** : `rastair per-read` n'a pas `--min-baseq` (contrairement à `call`), donc les variantes BQ30/BQ40 ne sont pas reproductibles — les 9 variantes methylseq tombent à 3. `--min-mapq` existe, donc QC20/QC30 passent.
 
 Voir [[project_taps_igv_inversion]] pour la question voisine des tags MM/ML.

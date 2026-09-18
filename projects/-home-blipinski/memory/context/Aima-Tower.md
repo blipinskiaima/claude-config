@@ -1,50 +1,42 @@
-# Context — Aima-Tower — 2026-09-11 (clôture session)
+# Context — Aima-Tower — 2026-09-18 (clôture session)
 
-**Branche** : main (poussé, origin/main = ccfdaf7)
-**Dernier commit** : ccfdaf7 — feat(qara): comparaison au point fige — v5.7.0
+**Branche** : main (poussé, origin/main = ef54b3b)
+**Dernier commit** : ef54b3b — feat(indicator): page de performance du pipeline
+en production — v5.8.0
 **Status** : clean (hors untracked `Exis 1.1.pdf` et `.claude/worktrees/`,
 hors scope depuis le 24/07)
 
 ## Où j'en suis
-Session en deux temps. D'abord une **enquête** : peut-on recalculer les chiffres
-du doc QARA depuis trace-prod ? Réponse établie produit par produit, en lisant
-le document par l'API **et** les artefacts figés du pipeline. Puis
-l'**implémentation** : `/qara` gagne un interrupteur qui déplie une seconde
-rangée de trois box, mesurées sur trace-prod, alignées sur les box figées.
-Déployé en v5.7.0, container `healthy`.
+Page `/indicator` créée de bout en bout et déployée (container `healthy`,
+v5.8.0) : indicateurs de performance du pipeline sur trace-platform ×
+trace-workflow, en deux parties — 10 figures et un diagramme de flux SVG.
+Deux refontes après retours de Boris en fin de session : le diagramme rendu
+graphique et homogène, puis la dimension « version », qui était câblée dans cinq
+figures, remplacée par un **mécanisme de déclinaison unique éteint par défaut**.
 
 ## Ce qui marche / ce qui foire
-- ✓ **Exis** : aucun calcul maison, `exploratory_service.compute()` aux réglages
-  figés. Un seul écart au doc : **+1 cancer prostate** (`Prostate_21`, passé
-  cancer le 23/07 après l'émission du PDF). Spécificité identique au chiffre
-  près, les 224 sains n'ayant pas bougé.
-- ✓ **CUP** : **284/284 mVAF v1.4 identiques** au fichier figé du pipeline,
-  aucun changement de strate. Et la **divergence 94/95 du document est
-  résolue** : `CGFL_Bladder_Blood_02_094` a un `max_p` exactement au seuil, le
-  `>` strict donne les chiffres publiés, le `>=` donne ceux des tableaux.
-- ✓ **Alignement structurel** : la carte dynamique réutilise le composant `Kpi`
-  et itère sur `p.kpis`. Les deux rangées ne peuvent pas se désaligner.
-- ✗ **CUP balanced accuracy 72,9 → 81,3 (+8,4 pt)** : plus gros écart de la
-  page, **non expliqué**. La composition par classe de la cohorte a changé, ce
-  qui déplace beaucoup une moyenne de rappels.
-- ✗ **Cohorte CUP 284 vs 522** : le 284 du doc est un jeu de développement figé,
-  pas un filtre reproductible. Les effectifs de strates comparent donc des
-  populations de tailles différentes. Documenté, pas résolu.
-- ✗ Les 2 tests `test_exploratory_compute.py` restent rouges (383 vs 416),
-  **inchangés depuis le 26/08**.
-- ⚠ **Themelio n'est pas comparable, et ce n'est pas un défaut** :
-  `clinical_config.rds` déclare calibration « 5-fold OOF » (le doc) contre
-  production « transfer (full model, not OOF) » (la base) — 54,5 % vs 62,3 % sur
-  les mêmes 301 échantillons, **même bundle des deux côtés**.
-- ⚠ **Deux erreurs de méthode commises, corrigées** : j'ai joint par
-  `sample_name` (non unique : 1531 lignes / 1456 noms) et pris le mauvais
-  fichier de référence Themelio, concluant à tort à un score recalculé.
-- ⚠ `MEMORY.md` fait **29,6 Ko** pour une limite de chargement de ~24,4 Ko :
-  une partie n'est plus lue au démarrage. Signalé deux sessions de suite.
+- ✓ **Le détecteur trouve du réel** : `score_cnv` passe de 100 % à 55 % puis
+  **0 % à partir de Bam2Beta V2.3.0** — le pipeline a cessé d'écrire la métrique.
+  Visible en une case de la grille de couverture, sans l'avoir cherché.
+- ✓ **Le flux est mesuré, pas supposé** : `Merge` rang 1 sur 117 workflows, cinq
+  branches à 67-100 % de chevauchement, fin de chaîne aux rangs 5-8.
+- ✓ 16 tests verts. Les 2 échecs de `test_exploratory_compute` reproduits à
+  l'identique sur `pre-indicator` → préexistants, pas de régression.
+- ✓ Trouvé en chemin : `/database-platform` était **morte depuis le 17/09**
+  (colonne `upload_date` droppée, erreur avalée). Corrigée en session séparée,
+  mergée dans main (`081a03f`).
+- ✗ **Boris n'a pas encore jugé la page en conditions réelles.** Les deux
+  questions de l'étape 5 restent sans réponse : la section A permet-elle de
+  repérer une divergence sans la chercher, le diagramme se lit-il sans
+  explication.
+- ⚠ **Périmètre production = 51 échantillons seulement**, dont 32 d'un compte
+  (Imagenome) à la nomenclature de validation. Décision Boris : la base fait foi.
+  Les vues par groupe reposent souvent sur 2 à 13 points.
+- ⚠ L'endpoint coûte **3,3 s à chaque chargement**, aucun cache serveur.
 
 ## Prochaine étape
-Comprendre le **+8,4 pt de balanced accuracy CUP** — recalculer les rappels par
-classe côté figé et côté base pour voir quelle classe bouge. Puis consolider
-`MEMORY.md`, qui dépasse sa limite depuis deux sessions. Toujours en suspens
-depuis le 26/08 : trancher les 2 snapshots `exploratory` (416/374 en référence,
-ou comprendre les +33 samples).
+Recueillir le jugement de Boris sur la page en conditions réelles. Puis, selon sa
+réponse, les deux points laissés ouverts : ajouter le **taux de succès** comme
+figure déclinée (10 `FAILED` en production, écartée à tort à l'étape 2 sur une
+affirmation fausse de ma part), et décider du **cache serveur** sur
+`/api/indicator/data`.

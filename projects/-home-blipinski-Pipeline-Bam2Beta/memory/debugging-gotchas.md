@@ -16,6 +16,15 @@ metadata:
   NF `-ue` ; verifie sur un `.command.sh` reel) : une commande qui echoue a mi-script ne stoppe pas
   le process, seul le dernier exit compte. Poser `set -e` en tete du script quand chaque etape doit
   bloquer (fait dans `Dilution_Lung_Merge`, voir [[dilution-lung]]).
+- **Seqera Platform plafonne `tasks.script` a 10 240 caracteres** (`tower-schema.properties:59`,
+  codé en dur dans le plugin nf-tower, aucun override possible par `nextflow.config`). Au-dela, le
+  plugin tronque et emet `WARN i.s.tower.plugin.TowerJsonGenerator - ... exceeds expected size`.
+  Le WARN sort sur le **`Tower-thread`**, donc APRES la ligne `Success : true` du resume — il
+  parait venir de la fin du run alors que sa cause est le script d'un process. Vecu sur
+  `Raima_report` en V2.3.0 (14 755 car.), resorbe par le refactor `csv_to_kv` (8 369 car.) et
+  verifie absent des logs de la qualif V2.3.1. **Effet purement cosmetique** (apercu du script
+  tronque dans l'UI Seqera) : aucune sortie n'est affectee. A resurveiller quand le heredoc de
+  `metadata.json` grossira.
 - **Container assigne par `withName:` dans `conf/base.config`**, pas dans le process : tout
   nouveau process raima sans entree `withName` herite du defaut `bam2beta:latest`.
 - **`raima:latest` doit etre rebuild** apres modification du Dockerfile, sinon Docker sert

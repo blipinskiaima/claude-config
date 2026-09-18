@@ -48,13 +48,38 @@ Ces sommes sont **sensibles a l'ordre** — c'est d'ailleurs la raison d'etre du
 => **changer les `cpus` d'un process raima peut changer une sortie qualifiee**
 (mVAF v1.4/v1.5, `props_loyfer.tsv` -> TOO, THEMELIO, `metadata.json`).
 data.table affecte des groupes entiers par thread, donc c'est *probablement* stable, mais
-**non verifie empiriquement**. Exiger un A/B (`ncores=4` vs `8` sur Healthy_826 + Lung_9,
+**VERIFIE le 2026-09-18** : la qualif V2.3.1 a compare Healthy_826 + Lung_9 a 8 cpus contre la QUALIF
+V2.3.0 produite a 4 -> mVAF v1.4 (0.58), fragmento, les 5 probas TOO, le sexe et themelio_score
+(0.855261) **strictement identiques**. Le risque est leve POUR `Raima_score_mVAF` seul ;
+`Raima_process_loyfer` (4 cpus) n'a pas ete soumis au meme A/B. Protocole si besoin (`ncores=4` vs `8`,
 comparaison des TSV) avant tout changement.
 
 Les process qui n'utilisent PAS `task.cpus` dans leur script (`Check_Input`, `Raima_report`,
 `IchorCNA_*`, `Mito_qc`) sont sans risque : la directive n'y est que comptable.
 
 Durcissement possible non applique : figer `--ncores` independamment de `task.cpus`.
+
+
+## ⚠⚠ DEUX MACHINES, DEUX PROFILS — la lecon de V2.3.2 (2026-09-18)
+
+| profil | machine | lanceur | plafonds |
+|---|---|---|---|
+| `prod` | **plateforme client, 8 cpus / 32 Go** (31,3 vus par NF) | `dev/PLT/Bam2Beta_SCW_plateforme.sh` | `cpus_max=8`, `memory_max=24.GB`, `executor.cpus=8` |
+| `liquid` | **serveur de calcul, 32 cpus / 125 Go** | `dev/SCW/*.sh` (`-profile ...,$TYPE,...`) | `cpus_max=32`, `memory_max` herite |
+
+Le right-sizing de V2.3.1 a porte `prod.config` a 16 cpus / 48 Go **d'apres des traces prises sur le
+serveur de calcul**. Resultat en production : `Process requirement exceeds available memory --
+req: 40 GB; avail: 31.3 GB` sur `BAM_sort`. Le commentaire d'en-tete de `prod.config` disait
+pourtant deja « CPU max 8, RAM max 32GB » — il n'a pas ete lu.
+
+- **`BAM_sort` consomme `task.cpus x samtools_memory`** : 33,3 Go mesures a 16 cpus (`-m 2G`),
+  ~16 Go a 8. Baisser ses cpus baisse sa RAM d'autant — ce n'est pas une privation.
+- **Sur-allocations revelees par les peak_rss de la QUALIF V2.3.1** (trace S3, `{sample}/LOG/`) :
+  `Raima_score_mVAF` 10,3 Go pour 32 alloues, `Raima_process_loyfer` 13,7/16, `Mosdepth_qc` 10,5/16.
+- **`executor.cpus` de `conf/base.config` vaut 32 pour TOUS les profils** : a override par profil,
+  sinon NF admet 4x trop de taches sur la machine de prod (seul le gate memoire l'en empeche).
+- ⚠ **Ne jamais reporter des mesures d'une machine vers les plafonds de l'autre.** Toute trace
+  analysee doit etre rattachee au profil qui l'a produite.
 
 ## Plafond != allocation
 
@@ -77,7 +102,7 @@ mosdepth** (moyenne mesuree 7,8 Go, max 11,5 Go). Audit : 1 incoherence sur 40 b
 ## Etat applique le 2026-09-11 (commit `0856f3f` + suite)
 
 Correctifs : `Mosdepth_qc` ternaire coherent a 16 Go (cpus 4->2) · `IV_call` 8->16 Go ·
-`Raima_score_mVAF` 16->24 Go (puis 8 cpus/32 Go par Boris, **sans A/B**).
+`Raima_score_mVAF` 16->24 Go (puis 8 cpus/32 Go par Boris ; **A/B fait a posteriori par la qualif V2.3.1, sans ecart**).
 Sur-allocations ramenees a 2 Go : `BAM_mergering` (24), `BAM_index` (16), `BAM_Subsampling` (8),
 `Modkit_pileup_28M` (8), `TOO_score` (8), `IchorCNA_run` (8), `BAM_Count`/`Preprocess_28M`/
 `Check_Input`/`Raima_report`/`IchorCNA_readCounter`/`THEMELIO_score` (4) et les 7 process CNV.

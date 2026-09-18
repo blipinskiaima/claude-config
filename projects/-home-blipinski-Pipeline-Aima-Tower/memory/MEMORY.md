@@ -4,6 +4,12 @@
 > La narration vit dans les topic files, jamais ici — sinon l'index dépasse la limite de
 > chargement (~24 Ko) et ses dernières entrées cessent d'être lues.
 
+## Page `/indicator` — performance du pipeline en production (2026-09-18, v5.8.0)
+⚠ **Le `case` par défaut est PROD** dans trace-platform : un compte non déclaré compte comme production (51 PROD / 322 DEV). ⚠ Jointure aux tâches Seqera par **(client_uuid, patient_name, sample_name)** — `sample_name` seul fabrique des lignes. ⚠ Plusieurs workflows par échantillon **ne sont pas des relances**, ils se complètent → garder la dernière exécution **de chaque module**. ⚠ Les temps **ne s'additionnent pas** : 5 branches parallèles après `Merge`. Déclinaison = `grouper(rows, dim)`, éteinte par défaut. [indicator_page.md](indicator_page.md)
+
+## Migration trace-platform v15 — `/database-platform` vide (2026-09-18)
+`upload_date` droppée → `COALESCE(copy_stop, created_at) as arrivee`, la substitution que trace-platform s'applique à lui-même (`43089a3`) ; ⚠ **sans le COALESCE, 121/373 samples (32 %) s'affichent vides**. ⚠ Le vrai défaut était le `except Exception: return []` : la page **affirmait** « Aucune analyse correspondante. » — une panne indiscernable d'un filtre. ⚠ **Lever au backend ne suffit pas** sans branche `isError` dans l'UI, sinon même message. ⚠ `PlatformRow` est un `Record<string, unknown>` : le typecheck ne voit **aucun** renommage. [migration_platform_v15_upload_date.md](migration_platform_v15_upload_date.md)
+
 ## `/qara` — comparaison au point figé (2026-09-11, v5.7.0)
 Toggle → seconde rangée mesurée sur trace-prod. Alignement **structurel** : la carte dynamique réutilise le composant `Kpi` et itère sur `p.kpis`. ⚠ **Seul Exis est comparable.** Themelio ET CUP scorent avec un **modèle déployé** là où le doc publie de l'**out-of-fold** — CUP sort 3 classes à 100 % exactement, et son **top-1 masque la fuite** (−1,3 pt) pendant que la balanced monte de 8,4. ⚠ `sample_name` n'est pas unique (1531/1456) : joindre par `unique_id`. [qara_comparaison_dynamique.md](qara_comparaison_dynamique.md)
 
