@@ -26,9 +26,12 @@ s3://aima-bam-data/processed/MRD/RetD/liquid/HCL/{sample}/BAM/
 → Pour vérifier la présence du BAM final d'un sample, toujours regarder dans `processed/MRD/RetD/liquid/HCL/{sample}/BAM/`, pas dans `data/HCL/liquid/`.
 
 ## Autres sous-dossiers de `processed/MRD/RetD/liquid/HCL/{sample}/`
-- `BAM/`, `BETA/`, `BETA_28M/`, `BETA_FILTER/`
+(observé sur Healthy_178-182 le 2026-09-17)
+- `BAM/`, `BETA/`, `BETA_28M/`, `BOOTSTRAP/`
 - `CNV/`, `EXTRACT_FULL_28M/`, `Fragmentomics/`, `IV/`
-- `LOG/`, `QC/`, `REPORT/`, `ichorCNA/`
+- `LOG/`, `METHYL_FEATURES/`, `MITO/`, `QC/`, `REPORT/`
+- `THEMELIO/`, `TOO/`, `ichorCNA/`
+- `BETA_FILTER/` existait sur les anciens samples, absent des récents
 - Marqueurs : `Bam2Beta.start`, `Bam2Beta.done`, `restart.sh`
 
 ## Versions rebasecalled

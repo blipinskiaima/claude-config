@@ -1,34 +1,30 @@
-# Context — trace-prod — 2026-09-15T16:00:08+00:00
+# Context — trace-prod — 2026-09-18T10:12:34+00:00
 
 **Branche** : main
-**Dernier commit** : 66c028d — feat(dilution-lung): schema v36 — Mode1/Mode2/Frag Score v2 + doc de la table
+**Dernier commit** : f653ac0 — docs: rattrapage retrospectif des statuts QC v34 (gotchas RETRO_REPORT)
 **Status** : clean (untracked inchangés : backups .duckdb, CSV dev/, rapports HTML)
 
 ## Où j'en suis
-Chantier `dilution_lung` terminé et clos. Le lot des 220 couples du plan
-`Bam2Beta/early_lung_dilution_pairs_original.tsv` est complet, et le schema v36 a ajouté
-les 3 métriques fragmentomiques softclipped. Rien n'est en cours, tout est commité, poussé
-et exporté.
+Rattrapage rétrospectif des statuts QC Exis/Thémélio (schema v34) terminé côté R&D,
+et portage de la même information sur le bucket plateforme. Deux prompts livrés pour
+la session parallèle trace-platform (statuts QC + sequencing_time). Rien en cours.
 
 ## Ce qui marche / ce qui foire
-- ✓ **220/220 sur toutes les colonnes** : BAM, PROD, mVAF v1.4/v1.5, Mode1/Mode2/Frag Score v2,
-  probs epic et Loyfer. 0 ligne sans identité, 0 fantôme. Montée en charge 33 → 220 en 8 passes
-- ✓ **v36 en 39 lignes sur 4 fichiers** : `extract_metrics` appelle les `check_frag_*_sc` de
-  `BaseChecker`, aucune règle réécrite. Export en fin d'onglet `mVAF` (24 col), Mode1/2 arrondis
-  2 déc. via un paramètre optionnel `round2_cols` ajouté au helper partagé (4 autres appelants intacts)
-- ✓ **Probs HCL rafraîchies en mode bootstrap** (518/518 epic + Loyfer, somme = 1,0000) puis
-  exportées. ⚠ la base tient les **moyennes bootstrap**, pas les `props_v1.3` — un `probs -P`
-  écraserait ce choix de juillet
-- ✓ **Table documentée** : README section 14 (absente depuis la création en v33) + section
-  v33/v36 dans CLAUDE.md avec les 4 commandes
-- ✗ **Deux pièges de génération parallèle, chers** : `aws s3 ls` matche par **préfixe**, un `.bai`
-  orphelin a masqué `Lung_141_Healthy_111` deux jours → utiliser `head-object`. Et la purge des
-  BAM stagés balaie tout `/scratch/nxf-work`, ce qui a tué 3 paires → `-w` dédié **et** recherche
-  limitée à ce `-w`
-- ✗ **3 samples HCL sans probs** : les `Twist_*_rep_4`, dossiers réduits à `LOG/`, pipeline pas
-  encore passé. Se rempliront seuls
+- ✓ **R&D : 44 NULL → 10.** 34 samples comblés (24 CGFL, 10 HCL) via `--RETRO_REPORT`
+  puis `update-column exis_qc_status`. Les 10 restants sont irrécupérables : 6 dossiers
+  RetD vidés (samples traités sur la plateforme), 3 `Bam2Beta.failed`, 1 sans THEMELIO
+- ✓ **Plateforme : 10 `qc_status.tsv` + 10 `sequencing_time.tsv` créés**, diff S3 vérifié
+  par sample (`164 → 165`, 1 ajout, 0 modifié). Aucun `metadata.json` touché
+- ✓ Patch `RETRO_QC_ONLY` dans Bam2Beta (saute `Raima_report`) — **non commité**
+- ✗ **Le run RetD a réécrit les 34 `metadata.json`** et y a perdu `version_raima` → `null`.
+  Repéré seulement après coup, sur question de Boris. Sans impact en base (trace-prod ne lit
+  pas ce champ) mais non restaurable (versioning S3 `Suspended`)
+- ✗ **38 trous `sequencing_time` restent en R&D** (28 CGFL + 10 HCL), comblables par
+  `update-column sequencing_time liquid {labo}` — ~95 Go, ~10 min. Non lancé
+- ⚠ Bug repéré dans trace-platform : `.tsv` générique dans `_STAGE_CONTENT_SUFFIXES` fait
+  télécharger `read_start_time.tsv` (1,6 Go) à chaque `check`
 
 ## Prochaine étape
-Rien de bloquant. Si le pipeline reprend sur d'autres couples, la routine est rodée :
-lister S3, checker les nouveaux plus les `prod_status='KO'`, puis les deux exports. Les
-`Twist_*_rep_4` méritent une passe `probs liquid HCL --probs_bootstrap` quand leur `BETA/` sera là.
+Lancer `update-column sequencing_time liquid CGFL` puis `HCL` (tmux, séquentiel) pour les
+38 trous. Et décider du sort du patch `RETRO_QC_ONLY` : le commiter dans Bam2Beta, ou le
+laisser en working tree.

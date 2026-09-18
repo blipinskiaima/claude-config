@@ -234,7 +234,7 @@
       "/home/blipinski/Run"
     ]
   },
-  "model": "fable[1m]",
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -274,5 +274,6 @@
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "skipWorkflowUsageWarning": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "effortLevel": "max"
 }
