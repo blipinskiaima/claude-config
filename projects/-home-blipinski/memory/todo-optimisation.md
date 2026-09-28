@@ -68,6 +68,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-09-21 — Aima-Tower : revue de la page Indicateurs (v5.9.0)
+
+- [x] **Aima-Tower — revue de la page Indicateurs** — page unique, diagramme de flux en frise par mode sur les 8 horodatages de trace-platform, détail bulk en flèches sur le temps réel, barre d'outils du Gantt ; revue menée élément par élément dans un aperçu commenté.
+- [x] **Aima-Tower — durées de la frise en moyennes** — les médianes par segment ne s'additionnaient pas au temps affiché : moyennes sur les seuls parcours complets (bulk 4h56 sur 9 échantillons, sample alone 75 min sur 12), plus un N.B. sur la faible taille d'échantillon. Détails dans `indicator_page.md`.
+
 ## 2026-09-18 — trace-prod : statuts QC v34 comblés · Bam2Beta : flag RETRO_QC_ONLY · plateforme : QC et temps de séquençage disponibles · trace-platform : v14 → v22 · Aima-Tower : page Indicateurs (v5.8.0)
 
 - [x] **trace-prod — statuts QC v34 comblés (44 NULL → 10)** — 34 samples liquid rattrapés (24 CGFL, 10 HCL) via `--RETRO_REPORT` puis `update-column exis_qc_status` (n'importe laquelle des 4 clés met à jour les 4 colonnes). Les 10 restants n'ont pas les fichiers d'entrée : 6 dossiers RetD **vidés** — leurs samples ont été traités sur la plateforme —, 3 `Bam2Beta.failed`, 1 sans `THEMELIO/`. Commit `f653ac0`.
