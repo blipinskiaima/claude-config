@@ -62,6 +62,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 2 — En cours
 
+## 2026-09-28 — Bam2Beta : la file de production ne se gèle plus
+
+- [x] **Bam2Beta — timeout 6h sur le lanceur plateforme** — le run figé `AIMA_013` (upload S3 bloqué, 25/09) gelait toute la file séquentielle sans alerte. `timeout --kill-after=5m 6h` (max observé 2h49) → sortie 124/137, `Bam2Beta.failed` + email, la file continue.
+
 - [ ] **Prise en charge nouveau client** — premier mail envoyé, en attente de retour.
 
 ---
@@ -85,6 +89,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 - [x] **trace-platform — `data/` n'est pas l'upload client mais une copie** — le vrai transfert se passe sous `bulk/{date}/{client}/{session}/`, jamais scanné jusqu'ici. Sur `Sample1_2` : session ouverte à 14:08, transfert 14:32→14:44, clôture par timeout à 16:55, **copie vers `data/` à 17:06→17:07** — et c'est cette copie de 80 s que la gsheet appelait « upload ». `bulk/` n'est conservé que depuis le 14/09 (2 sessions sur 11), le reste est purgé.
 - [x] **trace-platform — export refondu, 47 colonnes en 8 rubriques** — QC scindé en métriques brutes / Interprétation, rubriques Timestamp et Version ajoutées. ⚠ Les fusions de la ligne méta **survivent au `clear()`** : restées sur l'ancien découpage, une catégorie tombe dans la fusion voisine et **disparaît sans erreur** (`BAM` s'est volatilisée). Corrigé : défusionner avant d'écrire, refusionner depuis `META_ROW`.
 - [x] **Aima-Tower — page Indicateurs (v5.8.0)** — performance du pipeline sur les données de plateforme en deux parties (10 figures + diagramme de flux du parcours d'un échantillon), première page à joindre trace-platform et trace-workflow. Le détecteur a trouvé du réel dès la mise en ligne : `score_cnv` tombe de 100 % à **0 % à partir de Bam2Beta V2.3.0**. Commit `ef54b3b`, détails `indicator_page.md`.
+
+- [x] **Bam2Beta V2.3.1 qualifiée** — 14 commits depuis V2.3.0 inventoriés et publiés (sequencing_time, statuts QC Exis/Thémélio en 33 champs, RETRO_REPORT, right-sizing). TEST OK puis QUALIF OK 54/54 vs V2.3.0.
+- [x] **Bam2Beta — `--ncores` prouvé sans effet sur raima** — la qualif compare `Raima_score_mVAF` à 8 cpus contre 4 en V2.3.0 : 200 scores bootstrap identiques au `cmp`, mVAF et TOO/THEMELIO inchangés. Lève le ⚠ « A/B non fait » de `ressources-dimensionnement`.
+- [x] **Bam2Beta — warning Seqera de fin de run élucidé** — script de `Raima_report` à 14 755 car. contre le plafond `tasks.script = 10240` du plugin nf-tower. Déjà corrigé par le refactor `csv_to_kv` (7858fe7) : 0 ligne à écrire.
+- [x] **Bam2Beta V2.3.2 — profil prod recalibré** — `cpus_max` 16→8, `memory_max` 48→24 Go, `executor.cpus`=8 après l'échec `req: 40 GB; avail: 31.3 GB` sur BAM_sort : le right-sizing avait été calibré sur le serveur de calcul (32c/125 Go) et appliqué à la plateforme (8c/32 Go). QUALIF OK 54/54.
 
 ## 2026-09-15 — trace-platform : réalignement sur Bam2Beta V2.3.0 · cfdnalab : évaluation complète · Bam2Beta : Small_Fragment dégrade la mVAF · trace-prod : lot dilution_lung clos (schema v36)
 
