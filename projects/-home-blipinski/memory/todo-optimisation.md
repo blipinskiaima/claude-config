@@ -71,6 +71,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## 2026-09-28 — Bam2Beta : la file de production ne se gèle plus
 
 - [x] **Bam2Beta — timeout 6h sur le lanceur plateforme** — le run figé `AIMA_013` (upload S3 bloqué, 25/09) gelait toute la file séquentielle sans alerte. `timeout --kill-after=5m 6h` (max observé 2h49) → sortie 124/137, `Bam2Beta.failed` + email, la file continue.
+- [x] **Les 3 skills todo realignes sur les 4 parties du fichier** — `maj-todo-list` visait « Partie 2 — Complété » (c'est « En cours ») et `standby-todo-list` « Partie 3 — En stand-by » (c'est « Complété ») : une section datée s'est retrouvée dans les tâches en cours. Les 3 déclarent désormais les 4 parties, marquent la leur et imposent un `grep -n '^# Partie'` avant insertion.
 
 ## 2026-09-21 — Aima-Tower : revue de la page Indicateurs (v5.9.0)
 
