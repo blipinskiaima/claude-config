@@ -62,15 +62,15 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 2 — En cours
 
-## 2026-09-28 — Bam2Beta : la file de production ne se gèle plus
-
-- [x] **Bam2Beta — timeout 6h sur le lanceur plateforme** — le run figé `AIMA_013` (upload S3 bloqué, 25/09) gelait toute la file séquentielle sans alerte. `timeout --kill-after=5m 6h` (max observé 2h49) → sortie 124/137, `Bam2Beta.failed` + email, la file continue.
-
 - [ ] **Prise en charge nouveau client** — premier mail envoyé, en attente de retour.
 
 ---
 
 # Partie 3 — Complété (par jour)
+
+## 2026-09-28 — Bam2Beta : la file de production ne se gèle plus
+
+- [x] **Bam2Beta — timeout 6h sur le lanceur plateforme** — le run figé `AIMA_013` (upload S3 bloqué, 25/09) gelait toute la file séquentielle sans alerte. `timeout --kill-after=5m 6h` (max observé 2h49) → sortie 124/137, `Bam2Beta.failed` + email, la file continue.
 
 ## 2026-09-21 — Aima-Tower : revue de la page Indicateurs (v5.9.0)
 
