@@ -1,21 +1,26 @@
 ---
 name: standby-todo-list
-description: "Déplace une tâche bloquée de la Partie 1 (À faire) vers la Partie 3 (En stand-by) du fichier todo-optimisation.md, avec mention explicite de la raison du blocage et de la condition de déblocage. Peut aussi faire l'inverse (reprendre une tâche stand-by vers À faire). Use when the user says standby, stand-by, mettre en pause, bloqué, standby-todo-list, sandby, reprendre standby, or asks to park/pause/unpark a task in his to-do list."
+description: "Déplace une tâche bloquée de la Partie 1 (À faire) vers la Partie 4 (En stand-by) du fichier todo-optimisation.md, avec mention explicite de la raison du blocage et de la condition de déblocage. Peut aussi faire l'inverse (reprendre une tâche stand-by vers À faire). Use when the user says standby, stand-by, mettre en pause, bloqué, standby-todo-list, sandby, reprendre standby, or asks to park/pause/unpark a task in his to-do list."
 allowed-tools: Read, Edit, Grep
 ---
 
 # Skill : Standby Todo
 
-Gère la **Partie 3 — En stand-by** du fichier todo : déplace une tâche bloquée depuis Partie 1 (À faire) ou la ramène vers Partie 1 quand débloquée.
+Gère la **Partie 4 — En stand-by** du fichier todo : déplace une tâche bloquée depuis Partie 1 (À faire) ou la ramène vers Partie 1 quand débloquée.
 
 ## Fichier cible
 
 `~/.claude/projects/-home-blipinski/memory/todo-optimisation.md`
 
-Structure à 3 parties :
+Structure — **le fichier a QUATRE parties**, vérifier par `grep -n '^# Partie' <fichier>`
+avant toute insertion (elles ont déjà été renumérotées une fois) :
 - **Partie 1 — À faire** (haute/moyenne/basse)
-- **Partie 2 — Complété** (par jour)
-- **Partie 3 — En stand-by** (tâches bloquées)
+- **Partie 2 — En cours** (tâches démarrées, bullets à plat)
+- **Partie 3 — Complété** (par jour, sections `## YYYY-MM-DD`, gérée par `/maj-todo-list`)
+- **Partie 4 — En stand-by** (tâches bloquées) ← cible de ce skill
+
+⚠ **Ne jamais viser « la Partie 3 » de mémoire** : c'est « Complété ». Une tâche bloquée posée
+là se retrouve au milieu de l'historique des tâches faites.
 
 ## Format strict d'un bullet stand-by
 
@@ -30,7 +35,7 @@ Règles :
 
 ## Modes d'utilisation
 
-### Mode A — Mettre en stand-by (Partie 1 → Partie 3)
+### Mode A — Mettre en stand-by (Partie 1 → Partie 4)
 
 C'est le mode par défaut.
 
@@ -38,17 +43,17 @@ C'est le mode par défaut.
 2. **Demander la raison du blocage** si non fournie : dépendance / info manquante / décision / technique.
 3. **Demander la condition de déblocage** si non fournie.
 4. **Reformuler** au format stand-by strict.
-5. **Retirer** le bullet de Partie 1 et **insérer** à la fin de Partie 3.
+5. **Retirer** le bullet de Partie 1 et **insérer** à la fin de Partie 4.
 6. **Confirmer** : titre + raison + condition.
 
-### Mode B — Reprendre (Partie 3 → Partie 1)
+### Mode B — Reprendre (Partie 4 → Partie 1)
 
 Déclenché par "reprendre", "débloquer", "unstandby", ou si l'utilisateur dit que la condition est remplie.
 
-1. **Identifier la tâche** dans Partie 3.
+1. **Identifier la tâche** dans Partie 4.
 2. **Demander la priorité** de reprise (haute/moyenne/basse).
 3. **Reformuler** au format todo strict (retirer la raison/condition, garder le titre + contexte pertinent).
-4. **Retirer** de Partie 3 et **insérer** dans la bonne section de Partie 1.
+4. **Retirer** de Partie 4 et **insérer** dans la bonne section de Partie 1.
 
 ## Invocation sans argument
 
@@ -69,7 +74,7 @@ Si l'utilisateur invoque `/standby-todo-list` **sans nommer de tâche** :
 
    Lesquels mettre en stand-by ? (numéros, "tous", ou "aucun")
    ```
-4. **Détecter aussi** les tâches en Partie 3 dont la condition semble levée dans la session → proposer reprise vers Partie 1.
+4. **Détecter aussi** les tâches en Partie 4 dont la condition semble levée dans la session → proposer reprise vers Partie 1.
 5. **Attendre confirmation** avant édition.
 6. Si aucun candidat : "Rien de bloqué détecté. Dis-moi quelle tâche mettre en stand-by ou reprendre."
 
@@ -81,7 +86,7 @@ Utilisateur : "standby-todo expérience Apostle vs Maxwell, Romain dispo que dan
 
 Action :
 - Retire de Partie 1 / Haute priorité
-- Ajoute à Partie 3 :
+- Ajoute à Partie 4 :
   ```
   - [ ] **Expérience Apostle vs Maxwell** — prérequis préparation aliquotes par Romain (indispo 3 semaines). **Débloquer quand :** Romain a les aliquotes prêtes.
   ```
@@ -91,7 +96,7 @@ Action :
 Utilisateur : "reprendre l'expérience Apostle vs Maxwell, Romain a fini les préparations"
 
 Action :
-- Retire de Partie 3
+- Retire de Partie 4
 - Ajoute à Partie 1 / Haute priorité :
   ```
   - [ ] **Expérience Apostle vs Maxwell** — même plasma sain, 2 aliquotes, comparer scores raima pour trancher le driver du batch effect.
@@ -102,4 +107,5 @@ Action :
 - ❌ Utiliser stand-by comme "basse priorité bis" → si ce n'est pas **bloqué**, ça reste en Partie 1
 - ❌ Raison floue ("c'est compliqué", "à voir") → toujours nommer la dépendance
 - ❌ Condition non observable ("quand on sera prêts") → toujours un événement concret
-- ❌ Oublier de retirer le bullet de Partie 1 / Partie 3 (doublon)
+- ❌ Oublier de retirer le bullet de Partie 1 / Partie 4 (doublon)
+- ❌ Écrire en **Partie 3 (Complété)** au lieu de la **Partie 4 (En stand-by)** — toujours `grep -n '^# Partie'` avant d'écrire, la numérotation a déjà bougé
