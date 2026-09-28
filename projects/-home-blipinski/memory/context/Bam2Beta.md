@@ -1,37 +1,37 @@
-# Context — Bam2Beta — 2026-09-11
+# Context — Bam2Beta — 2026-09-28 14:25
 
 **Branche** : main
-**Dernier commit** : bbbc009 — chore(perf): right-sizing des ressources mesuré sur 46 traces, paires dilution en 4 lots
-**Status** : clean (1 non suivi : pair_current.tsv, fichier tournant du lanceur dilution)
+**Dernier commit** : 777aa9b — fix(prod): plafonner un run plateforme a 6h
+**Status** : clean (2 non suivis : pair_current.tsv, qualifStatus.txt — résidus de run)
 
 ## Où j'en suis
 
-Chantier « QC après filtre fragmentomique 80 < L < 1 kb » livré de bout en bout, hors pipeline.
-1378 BAM merged liquid relus (20,96 To, ~15 h, 0 échec) par une passe streaming
-`aws s3 cp - | samtools view -h | mawk` (`/scratch/boris/qc_stat/`). 3 colonnes en base
-(trace-prod schema v35, commit fa96cb0) + import one-shot `dev/import_qc_80_1000.py`, export fait
-dans l'onglet « QC read », et synthèse en 6 parties insérée dans le Google Doc QC, onglet
-Deep Dive > Filtre read entre 80 et 1000Kb. Boris relit le doc.
+Deux versions livrées et qualifiées d'affilée. **V2.3.1** : inventaire des 14 commits
+depuis V2.3.0, diagnostic du warning Seqera de fin de run. **V2.3.2** : recalibrage du
+profil `prod` sur la machine de production (8 cpus / 32 Go) après l'échec
+`req: 40 GB; avail: 31.3 GB` sur BAM_sort. Les deux qualifiées 54/54, releases publiées,
+`QUALIF/V2.3.2` est la référence. Le 28/09, ajout d'un `timeout 6h` sur le lanceur
+plateforme après le run figé AIMA_013.
 
 ## Ce qui marche / ce qui foire
 
-- ✓ Conventions validées **bit à bit** sur Lung_9 : molécules = cramino `num_reads` à l'unité,
-  bases = mosdepth à l'unité (M/=/X seuls, les délétions ne comptent pas), depth et coverage
-  identiques aux valeurs publiées
-- ✓ Résultat : le filtre coupe du **court** (écartés 78,5 pb vs 177,2 conservés) → comptages
-  −7,4 %, depth −3,2 %, coverage −0,96 %. 50 bascules de statut Exis / 46 Themelio, toujours par
-  le seul comptage de molécules (jamais depth ni coverage)
-- ✓ La perte de depth suit la masse > 1 kb (facteur 30) → le filtre révèle le gDNA (`TNE_2`
-  0,66 → 0,13×)
-- ✗ **16 flux = optimum, 32 s'effondre** (96 Go de RAM, débit ÷ 6). Ne pas réessayer
-- ✗ `qc_metrics.coverage_percent` n'a qu'**1 point de précision** (entier rond 1378/1378) —
-  découvert ici, dépasse ce chantier
-- ⚠ **`Read_Start_Time` est commenté dans `workflow/qc.nf:27` et c'est commité (bbbc009)** : ni
-  `read_start_time.tsv` ni `sequencing_time.tsv` ne sont plus produits. Volontaire pour alléger
-  les runs de dilution, mais à re-basculer avant un run prod nominal
-- ⚠ Dilutions de Boris toujours en cours : 115/220 paires, 5 tmux (LUNG, LUNG_D1..D4)
+- ✓ `--ncores` 4→8 **prouvé sans effet** sur raima : 200 scores bootstrap identiques au
+  `cmp`. Lève le ⚠ « A/B non fait » qui traînait dans `ressources-dimensionnement`
+- ✓ Warning Seqera élucidé : script de `Raima_report` à 14 755 car. contre un plafond
+  `tasks.script = 10240` du plugin nf-tower. **Déjà corrigé** par le refactor `csv_to_kv`
+  (7858fe7) — 0 ligne à écrire, confirmé absent des 4 runs de validation
+- ✓ Cause racine de la panne prod : le right-sizing V2.3.1 avait été calibré sur le serveur
+  de calcul (32c/125 Go) et appliqué au profil de la plateforme. Leçon écrite dans CLAUDE.md
+  et `ressources-dimensionnement`
+- ✗ Le commentaire d'en-tête de `prod.config` disait déjà « CPU max 8, RAM max 32GB » — il
+  n'avait pas été lu avant de remonter les plafonds
+- ⚠ `Raima_process_loyfer` reste à 14 Go pour 16 alloués (87 %), inchangé dans les 3
+  versions — le plus tendu du pipeline, cédera en premier sur un sample hors norme
+- ⚠ Les tags `pre-*` locaux sont partis sur GitHub avec le `git push --tags`
+- ⚠ `Modkit_adjust`, `Modkit_pileup`, `Raima_score_epic` toujours définis dans `beta.nf`
+  sans appelant depuis V2.3.0 (les autres retraits sont dans `workflow/ARCHIVES/`)
 
 ## Prochaine étape
 
-Attendre les retours de Boris sur l'onglet du Google Doc. Puis trancher le sort de
-`Read_Start_Time` (réactiver ou documenter la coupure) avant tout run de production.
+Rien de bloquant. Deux points ouverts au choix : retirer les tags `pre-*` du remote, et
+archiver les 3 process EPIC morts dans `workflow/ARCHIVES/`.
