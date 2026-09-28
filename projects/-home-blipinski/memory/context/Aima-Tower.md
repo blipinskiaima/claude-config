@@ -15,10 +15,11 @@ tous les fils traités sauf un. 9 commits poussés (`3ddc7d1..ef18387`).
   affiché (bulk 4h56 sur 9 échantillons, sample alone 75 min sur 12).
 - ✓ Gantt : mode / tri / sens / nombre, vérifiés en headless sur 7 cas.
 - ✓ Aperçu commenté (`frontend/.apercu/`, jamais commité) : boucle de revue efficace, à réutiliser.
-- ✗ **La 5.9.0 n'est pas déployée** : le conteneur tourne sur `6a97cff`, le pied de page affiche v5.8.0.
+- ✓ **5.9.0 déployée** le 28/09 : pied de page et API en 5.9.0, démarrage sans erreur.
 - ✗ trace-workflow n'enregistre plus rien depuis le 15/08 : `/monitoring` et le détail par module
   ignorent tout ce qui a tourné depuis.
 - ✗ Un fil de commentaire reste ouvert : retirer ou non les petits compteurs sous les indicateurs clés.
 
 ## Prochaine étape
-Reconstruire et redémarrer le conteneur pour déployer la 5.9.0.
+Rien en attente sur /indicator. Reste ouvert : retirer ou non les petits compteurs
+sous les indicateurs clés (fil de commentaire non tranché).
