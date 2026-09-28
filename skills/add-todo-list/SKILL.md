@@ -12,7 +12,12 @@ Ajoute une tâche synthétique à la todo list personnelle.
 
 `~/.claude/projects/-home-blipinski/memory/todo-optimisation.md`
 
-Structure fixe : **Partie 1 — À faire** (par priorité : Haute / Moyenne / Basse), **Partie 2 — Complété** (par jour).
+Structure — **le fichier a QUATRE parties**, vérifier par `grep -n '^# Partie' <fichier>`
+avant toute insertion (elles ont déjà été renumérotées une fois) :
+- **Partie 1 — À faire** (par priorité : Haute / Moyenne / Basse) ← cible de ce skill
+- **Partie 2 — En cours** (tâches démarrées, bullets à plat)
+- **Partie 3 — Complété** (par jour, gérée par `/maj-todo-list`)
+- **Partie 4 — En stand-by** (tâches bloquées, gérée par `/standby-todo-list`)
 
 ## Format strict d'un bullet
 
