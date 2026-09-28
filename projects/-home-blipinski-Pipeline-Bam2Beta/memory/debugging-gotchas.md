@@ -12,6 +12,13 @@ metadata:
 
 ## Nextflow / pipeline
 
+- **Un upload S3 qui fige laisse Nextflow tourner indefiniment et gele toute la file de prod.**
+  Vecu sur `AIMA_013` le 2026-09-25 : le run ne sortait jamais, donc le lanceur plateforme
+  (`dev/PLT/Bam2Beta_SCW_plateforme.sh`, boucle sequentielle sur les samples) restait bloque et
+  aucun sample suivant n'etait traite. Fix : `timeout --kill-after=5m 6h` autour du run (max
+  observe 2 h 49) -> sortie 124/137, branche `else`, `Bam2Beta.failed` + email, la file continue.
+  ⚠ `timeout` n'execute que des **binaires** : il ne peut pas appeler la fonction shell
+  `nextflow-scw`, d'ou `AWS_PROFILE=scw` passe explicitement en ligne.
 - **Le shell des process est `bash -o pipefail` SANS `-e`** (`conf/base.config:11` remplace le defaut
   NF `-ue` ; verifie sur un `.command.sh` reel) : une commande qui echoue a mi-script ne stoppe pas
   le process, seul le dernier exit compte. Poser `set -e` en tete du script quand chaque etape doit

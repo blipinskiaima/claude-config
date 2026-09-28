@@ -2,7 +2,7 @@
 
 ## Key Facts
 
-- **Version courante : V2.3.2** (2026-09-18) — recalibrage du profil `prod` sur la **machine de production (8 cpus / 32 Go)** : `cpus_max` 16→8, `memory_max` 48→24 Go, `executor.cpus`=8. Corrige `req: 40 GB; avail: 31.3 GB` sur `BAM_sort`. Aucun `--ncores` ne bouge → 200 scores bootstrap **bit-à-bit identiques**. Voir [ressources-dimensionnement.md](ressources-dimensionnement.md)
+- **Version courante : V2.3.2** (2026-09-18) — recalibrage du profil `prod` sur la **machine de production (8 cpus / 32 Go)** : `cpus_max` 16→8, `memory_max` 48→24 Go, `executor.cpus`=8. Corrige `req: 40 GB; avail: 31.3 GB` sur `BAM_sort`. Aucun `--ncores` ne bouge → 200 scores bootstrap **bit-à-bit identiques** ; TEST OK puis **QUALIF OK 54/54**, `QUALIF/V2.3.2` est la reference. Voir [ressources-dimensionnement.md](ressources-dimensionnement.md)
 - Historique : **V2.3.1** `sequencing_time`, statut QC Exis/Thémélio (metadata.json 33 champs), rétro `RETRO_REPORT`/`RETRO_QC_ONLY`, right-sizing ([qc-status-exis-themelio.md](qc-status-exis-themelio.md))
 - Historique : **V2.3.0** restructuration EXIS, raima 0.5.6, amplitude, coupe des scores EPIC + CNV raima ([restructuration-v2.3.0.md](restructuration-v2.3.0.md)) · **V2.2.0** THEMELIO + metadata.json contrat unique ([themelio-module.md](themelio-module.md)) · **V2.1.0** TOO ([too-module.md](too-module.md)) · **V2.0.x** tf = mVAF v1.4 bootstrap, tri déterministe ([bootstrap-model-v1.md](bootstrap-model-v1.md))
 - Containers : `bam2beta:latest` + `raima:latest` (**0.5.6** depuis V2.3.0, locale non poussée ; 0.5.3/0.5.4 en rollback) + `too:0.4.1` + `themelio:1.0.0`. ⚠️ Scripts R de TOO hors image (chargés via `${projectDir}`)
@@ -54,6 +54,7 @@
 - [Soft clipping & longueur FRAG](softclip-fragmentomics-length.md) — FRAG = length(SEQ) − softclips depuis V1.3.2
 - [Coverage CGFL vs HCL](coverage-analysis-cgfl-hcl.md) — couverture équivalente, trous = non-mappable
 - [covdepth QC valorization](covdepth-qc-valorization.md) — Fig.1/2 livrées ; finding 067 requalifié (reads non alignées)
+- [Panels Twist x whitelist v1](twist-panels-coverage.md) — Human Methylome couvre 97 % des CpG du modèle, Alliance Pan-cancer 3 % (top 1 % des poids : 16 %) ; BED hg38 publics, `pos` whitelist = C 0-based
 - [Reads non alignés des urines](unmapped-reads-urines.md) — 2 populations, 6 espèces bactériennes, souches distinctes → pas une contamination labo ; référence d'alignement = MinKNOW/GRCh38 no_alt (PAS le hg38 UCSC des modules)
 
 ## Debugging Insights

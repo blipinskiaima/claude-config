@@ -23,3 +23,8 @@ Deux consignes données ensemble le 2026-08-21, après lecture du doc `Aima_QARA
 **How to apply:** pour toute lecture de document externe (Docs/Sheets/Drive), rester en API
 GET pure. Pour toute réponse, préférer 3-5 lignes factuelles à une synthèse structurée à
 sections/puces multiples, sauf si Boris demande explicitement le détail complet.
+
+**Rappel du 2026-09-21** : consigne répétée (« messages beaucoup plus simples, clairs, précis et
+concis ») après des comptes rendus d'étape de 60+ lignes, avec tableaux fichier:ligne. Elle vaut
+aussi pour les comptes rendus d'une feuille de route : l'essentiel en quelques lignes, un schéma
+court, les chiffres clés — le détail (lignes de code, cas marginaux) seulement sur demande.

@@ -180,3 +180,79 @@ C'est ce qui a motivé le choix de **laisser remonter l'erreur** dans le router 
 
 Voir aussi : [[qara_comparaison_dynamique]] (clé `unique_id`), [[duckdb-patterns]]
 (ATTACH in-memory), [[migration_v34_colonnes_reads]] (renommages silencieux).
+
+## Chronologie des étapes plateforme — corrigée le 2026-09-21 (commit `3d9f9d8`)
+
+Ordre de trace-platform, confirmé sur les données : Session Start → Transfer Start →
+Transfer Stop → Session Stop → Copy Start → Copy Stop → Pipeline Start → Pipeline Stop.
+La page affiche 5 étapes : **Transfert → Attente copie → Copie → Attente pipeline → Pipeline**
+(`PLATFORM_STEPS`). Une attente est un écart calculé, pas un horodatage.
+
+⚠ **En `sample alone`, la copie n'existe pas** : trace-platform écrit `copy_* = transfer_*`
+(`check_platform.py:279-283`, « le transfert EST l'écriture dans data/ »). Avant le correctif,
+la page comptait le transfert deux fois (Copie = Transfert, 26/26). Désormais `min_copie`
+n'est calculée qu'en bulk et `min_attente_copie` vaut NULL d'elle-même (copy_start = transfer_start).
+Sample alone = bulk sans la copie : un seul temps mort, fin du transfert → début du pipeline.
+
+⚠ **Bulk ne repose que sur 9 échantillons, une seule session (14/09)** : `bulk/` n'est conservé
+sur S3 que depuis cette date (commit trace-platform `43089a3`). Le mode est fiable en PROD :
+vérifié sur S3, les 31 sample alone n'ont pas de `bulkSessionId`, les 9 bulk en ont un.
+Médianes bulk : transfert 14 min · attente copie 110 min · copie 1 min · attente pipeline 105 min.
+
+- Le Gantt empile les durées : avec les 5 segments le cumul retombe sur les vrais horodatages.
+  Son filtre « parcours complet » dépend du mode (copie et attente copie exigées en bulk seulement).
+- Diagramme : `COLS = 5`, trait vers le détail du pipeline accroché au dernier nœud (`xDernier`).
+- `DUREES` de `Croisements.tsx` est une copie séparée de la liste : à tenir alignée à la main.
+- ⚠ Aperçu : le `chrome` complet de ms-playwright **reste bloqué** en `--headless=new` (même avec
+  `--timeout`) ; utiliser `chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell`.
+- ⚠ `docker compose build` a consommé ~2,7 Go : disque à 99 % → builder AVANT `down`, pour que la
+  Tour reste en ligne si le build échoue.
+
+## Diagramme de flux par mode d'upload — 2026-09-21 (commit `1499c05`)
+
+Demande Boris : une rangée plateforme **par mode**, pas une seule rangée mêlée. Bulk =
+5 étapes ; sample alone = Transfert → Attente pipeline → Pipeline (« la copie est juste
+immédiate », donc ni attente copie ni copie affichées). Chaque étape garde sa colonne de la
+chronologie bulk (flèche longue en sample alone) ; les deux rangées partagent la même échelle.
+Règle dans `Flux.tsx` : `MODES` + `BULK_SEULEMENT` ; une rangée sans échantillon disparaît.
+Durées ≥ 90 min affichées « 1h50 » (`fmtMin`), plus « 1.8 h » — Boris lisait mal l'heure décimale.
+
+## Frise des 8 horodatages + détail bulk — 2026-09-21 (commits `0436f57`, `67f86c4`)
+
+⚠ **Remplace la section « par mode d'upload » ci-dessus** : la plateforme n'est plus en nœuds
+d'étape mais en **frise** — un point par horodatage (Session Start … Pipeline Stop), une frise par
+mode, l'écart médian entre deux points ; trait plein = étape active, pointillé = temps mort,
+espacement régulier. Sample alone saute les 2 points Copy. Écarts calculés en SQL
+(`min_session_transfert`, `min_transfert_session`, `min_session_copie`, `min_session_pipeline`).
+Bulk : 41 min · 14 min · **1h50 (avant la clôture de session)** · 6.8 min · 1.3 min · 1h45 · 25 min.
+
+⚠ **Les attentes médianes du bulk sont des files d'attente**, pas des temps morts : transferts en
+série, session fermée par `system_timeout` 30 min après le dernier transfert (lu dans le
+`.dl-complete.txt` de session sur S3 — **pas en base**), pipelines un par un. D'où le menu
+déroulant « Pourquoi l'attente est longue en bulk » (`SessionBulk.tsx`) : dernière session bulk,
+un échantillon par ligne dans l'ordre d'arrivée, axe en heure réelle (UTC), calcul à l'ouverture.
+
+- ⚠ trace-workflow n'enregistre plus rien depuis le **15/08** (dernière soumission en base) :
+  le détail par module du diagramme et `/monitoring` ignorent tout ce qui a tourné depuis.
+- Capture d'un état ouvert (menu `<details>`) : protocole DevTools via `websocket-client` installé
+  en `--target` dans le scratchpad, `suppress_origin=True` sinon Chrome refuse (403).
+
+## Revue en aperçu commenté + page unique — 2026-09-21 (commit `e97c0b7`, déployé)
+
+Page revue élément par élément dans un artifact commenté (aperçu Vite hors serveur, fetch
+intercepté par un instantané pseudonymisé, `frontend/.apercu/`, **jamais commité**). Résultat
+décrit dans CLAUDE.md : plus d'onglets ; frise = sections nommées une fois + pointillés
+verticaux au milieu des points (pas d'encadré, pas de dégradé — refusés) ; détail bulk en
+flèches sur le temps réel ; Gantt avec menus mode / tri / ordre / nombre.
+
+⚠ **Les pastilles de la frise ne s'additionnent pas au « Temps médian »** — question de Boris :
+1. une médiane n'est pas additive : chaque échantillon est exact (ses segments somment à son
+   total, écart 0), mais le segment lent change d'un échantillon à l'autre. Bulk : 5h04 de
+   pastilles contre 4h57 ; sample alone, sur ses 12 chaînes complètes : 59 min contre 1h27.
+2. en sample alone, pas les mêmes échantillons derrière chaque chiffre : 13/31 PROD sans
+   `session_start` (donc sans total), et des segments NULL par la comparaison stricte `>` :
+   `transfer_start` tronqué à la seconde, 57 ms **avant** `session_start` (×3) ;
+   `transfer_start = transfer_stop` (×2, l'échantillon à ~99 h en fait partie) ; pas de transfert (×1).
+Seule la **moyenne sur un même ensemble** s'additionne (bulk 4h56, sample alone 1h15 sur les
+chaînes complètes). **Boris a choisi les moyennes** (2026-09-21) : `mesure()` de `Flux.tsx`
+sur les seuls parcours complets du mode ; le bandeau du haut reste en médianes.

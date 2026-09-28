@@ -1,0 +1,2 @@
+- [Synthèses : science seule](syntheses-science-seule.md) — pas de photo/heure/qualité dans le Doc ; figures complémentaires seulement ; « Do not post » sous bandeau ⚠
+- [Google Doc EACR](eacr-google-doc.md) — ID, 13 sous-onglets, gdoc_write.py, images collées via Chrome (API = URL publique refusée)

@@ -56,3 +56,7 @@ remote/
 # Runtime session data (PID/sessionId/cwd, ephemeral)
 sessions/
 teams/
+
+# Skills synchronisés (4,6 Mo, noms en UUID) et état runtime de la machine
+skills/synced/
+state/
