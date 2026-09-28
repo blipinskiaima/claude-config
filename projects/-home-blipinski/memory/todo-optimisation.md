@@ -20,6 +20,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## Haute priorité
 
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
+- [ ] **Bam2Beta — contrôle tags MM/ML dans Check_Input** — faire échouer tôt, avec un message explicite, tout BAM d'entrée sans méthylation. Cas déclencheur : **IRCCS RC24 (2026-09-28)**, BAM réalignés sans `-y` → erreur `semi_join` cryptique dans `Raima_score_mVAF` après 6 min.
 
 ## Moyenne priorité
 
