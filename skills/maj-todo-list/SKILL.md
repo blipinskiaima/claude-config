@@ -1,20 +1,26 @@
 ---
 name: maj-todo-list
-description: "Déplace une tâche de la Partie 1 (À faire) vers la Partie 2 (Complété) du fichier todo-optimisation.md, sous la section datée d'aujourd'hui. Reformule le bullet en version done synthétique (résultat/conclusion en 1 phrase). Use when the user says maj-todo, maj todo, marque comme fait, tâche terminée, done, maj-todo-list, or asks to move/close/complete a task in his to-do list."
+description: "Déplace une tâche de la Partie 1 (À faire) vers la Partie 3 (Complété) du fichier todo-optimisation.md, sous la section datée d'aujourd'hui. Reformule le bullet en version done synthétique (résultat/conclusion en 1 phrase). Use when the user says maj-todo, maj todo, marque comme fait, tâche terminée, done, maj-todo-list, or asks to move/close/complete a task in his to-do list."
 allowed-tools: Read, Edit, Bash(date*)
 ---
 
 # Skill : Maj Todo (move to done)
 
-Déplace une tâche de la Partie 1 (À faire) vers la Partie 2 (Complété), sous la date du jour, en reformulant en bullet synthétique.
+Déplace une tâche de la Partie 1 (À faire) vers la Partie 3 (Complété), sous la date du jour, en reformulant en bullet synthétique.
 
 ## Fichier cible
 
 `~/.claude/projects/-home-blipinski/memory/todo-optimisation.md`
 
-Structure fixe :
+Structure fixe — **le fichier a QUATRE parties**, vérifier par `grep -n '^# Partie' <fichier>`
+avant toute insertion (elles ont déjà été renumérotées une fois) :
 - **Partie 1 — À faire (par priorité)** : Haute / Moyenne (sous-sections) / Basse
-- **Partie 2 — Complété (par jour)** : sections `## YYYY-MM-DD — Titre du jour`
+- **Partie 2 — En cours** : tâches démarrées, bullets `- [ ]` à plat, PAS de sections datées
+- **Partie 3 — Complété (par jour)** : sections `## YYYY-MM-DD — Titre du jour` ← cible de ce skill
+- **Partie 4 — En stand-by** : tâches bloquées (gérées par `/standby-todo-list`)
+
+⚠ **Ne jamais viser « la Partie 2 » de mémoire** : c'est « En cours », pas « Complété ». Une
+section datée posée là se retrouve mélangée aux tâches en cours (incident du 2026-09-28).
 
 ## Format strict d'un bullet done
 
@@ -52,7 +58,7 @@ Si l'utilisateur invoque le skill **sans nommer de tâche** (juste `/maj-todo-li
 
    Lesquels valides-tu ? (numéros, "tous", ou "aucun")
    ```
-4. **Détecter aussi les tâches faites NON présentes dans la todo** (réalisation mais pas de bullet correspondant). Les proposer comme "nouvelles entrées done" avec thème de la journée, à insérer directement en Partie 2.
+4. **Détecter aussi les tâches faites NON présentes dans la todo** (réalisation mais pas de bullet correspondant). Les proposer comme "nouvelles entrées done" avec thème de la journée, à insérer directement en Partie 3.
 5. **Attendre la confirmation** avant d'éditer le fichier.
 6. Si **aucun candidat**, dire : "Rien d'évident de terminé dans la session. Dis-moi quelle tâche marquer done."
 
@@ -64,9 +70,9 @@ Si l'utilisateur invoque le skill **sans nommer de tâche** (juste `/maj-todo-li
    - Conserver le titre en gras (le raccourcir si besoin).
    - Remplacer la description "à faire" par le résultat/conclusion.
    - Si le résultat n'est pas évident, demander à l'utilisateur en 1 phrase.
-4. **Insérer dans Partie 2** :
+4. **Insérer dans Partie 3 (Complété)** :
    - Si la section `## YYYY-MM-DD — ...` du jour existe : ajouter le bullet à la fin de cette section.
-   - Sinon : créer une nouvelle section juste après `# Partie 2 — Complété (par jour)` avec le format `## YYYY-MM-DD — {thème court du jour}`. Demander à l'utilisateur le thème si non déduit (ex : "Setup skills", "Debug Bam2Beta").
+   - Sinon : créer une nouvelle section juste après `# Partie 3 — Complété (par jour)` avec le format `## YYYY-MM-DD — {thème court du jour}`. Demander à l'utilisateur le thème si non déduit (ex : "Setup skills", "Debug Bam2Beta").
 5. **Supprimer** le bullet correspondant dans Partie 1.
 6. **Confirmer** à l'utilisateur : ancien emplacement → nouveau bullet + date.
 
@@ -99,4 +105,5 @@ Action :
 - ❌ Recopier verbatim le bullet "à faire" avec juste `[x]` au lieu de `[ ]` → reformuler en **résultat**
 - ❌ Dupliquer l'historique détaillé dans la todo → le détail va en mémoire, la todo garde le résumé
 - ❌ Oublier de retirer le bullet de Partie 1 (doublon à faire/fait)
+- ❌ Insérer la section datée en **Partie 2 (En cours)** au lieu de la **Partie 3 (Complété)** — toujours `grep -n '^# Partie'` avant d'écrire, la numérotation a déjà bougé
 - ❌ Créer plusieurs sections `## YYYY-MM-DD` pour le même jour → fusionner
