@@ -69,6 +69,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-10-02 — Methylseq : batch WM 2 + export QC
+- [x] **Methylseq — batch WM 2 traité (48 samples)** — 4 lots de 12 depuis `aima-pod-data/data/CGFL/WM/`, tous OK (~9 h 30/lot), pipeline identique au batch 1 (même Script ID, outils, params) ; TrimGalore passé à 12 CPU (−1 h/lot). Commit `b429809`.
+- [x] **Methylseq — export QC vers gsheet (64 samples)** — `methylseq_qc.py` (S3 ou `--local`, CSV de cache) → onglet `Watchmaker - Methylseq - Element`, 16 colonnes définies une à une : Nb reads = 2×(A+D+E), Nb molécules = A+D+E, % mappés, Depth/Coverage raccord ONT + variantes « utile méthylation » (filtre rastair). Détail dans `memory/qc-export-methylseq.md`.
+- [x] **Methylseq — écart Depth DRAGEN vs methylseq élucidé** — l'ancien tableau batch 1 venait de DRAGEN (BP_Watchmaker) : Depth ~25 % plus haute (chevauchement R1/R2 compté deux fois), Coverage identique. mosdepth (définition Bam2Beta) retenu.
+
 ## 2026-10-01 — Pod2Bam : coût opérationnel + deck CEO
 - [x] **Pod2Bam — perfs de référence multiplex V5.0.0** — 24 flowcells 4-plex (traces + logs S3, mars 2026) : moyenne 3h52/flowcell (download 21 min, basecall 2h06, demux+align+sort 1h23, upload 2 min) sur Scaleway H100-1-80G → €11,1/flowcell, €2,78/échantillon. Corrige l'ancien « 5,5 min/Go » (faux). Mémoire `perf-multiplex-v5.md`.
 - [x] **Deck CEO coût opérationnel Pod2Bam** — PDF 10 slides 16:9 (charte du deck « 2027 Path ») : machine, protocole, temps, coût unitaire, coût opérationnel (qualification 1 sem. temps plein), plans à façon vs industrialisé (route POD5 avec DevOps), avertissements, coût indicatif. `Bam2Beta/docs/Pod2Bam_cout_operationnel.pdf`, commit Bam2Beta `9b13bb6`.
