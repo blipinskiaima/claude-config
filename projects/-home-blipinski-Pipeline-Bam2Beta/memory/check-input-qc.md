@@ -88,3 +88,19 @@ utiles et le chemin gracieux fonctionne avec eux. Voir [[too-module]] et [[theme
   publie avec status + reason listant les 2 KO.
 - Chemin OK (Healthy_826) : `/test_bam2beta` **TEST OK 3/3** (RUN CONFORME + QUALIFICATION CONFORME
   bit-a-bit vs QUALIF V1.3.2).
+
+## Controles methylation + modele Dorado (branche feat/check-input-methylation-model, 2026-09-29)
+
+Declencheur : IRCCS RC24 (BAM realignes sans `-y`, cf. [[bam-sans-tags-mm-ml]]). 2 statuts ajoutes,
+priorite `FAILED_QC_INPUT` > `FAILED_QC_METHYLATION` > `FAILED_QC_BASECALL_MODEL` (1 seul statut,
+`reason` cumule tous les problemes). Le lanceur plateforme route desormais sur `grep FAILED_QC_`.
+
+- **Methylation : verdict PAR SAMPLE**, pas par fichier — des BAM horaires VHIO ne portent qu'**1 read**
+  (3,9 Ko) : un read sans MM ferait bloquer un sample valide. 10 000 premiers reads, arret au 1er BAM
+  methyle ; `head` vers fichier temporaire (SIGPIPE + pipefail, meme piege que Dilution).
+- **Modele : par fichier, TOUTES les @RG** (pas la 1re comme trace-platform/trace-prod), version
+  `@v5.0.0|@v5.2.0` (hac et sup acceptes), @RG absente ou sans `basecall_model` = bloque.
+  **Actif seulement si `params.mode == 'PROD'`** : Healthy_826 (TEST/QUALIF) est en `hac@v4.3.0`.
+  TEST = `--mode DEV`, QUALIF = `--mode QUALIF` (ajoute a run-qualif.sh + dev/SCW/Bam2Beta_qualif.sh),
+  R&D = `--mode RetD`. Defaut `PROD` : un script sans `--mode` sur des donnees v4.x sera bloque.
+- Valide : 11 cas x 2 modes (dont RC24/AIMA_020/pt100 reels) + `/test_bam2beta` TEST OK 54/54 (V2.3.3 DEV).

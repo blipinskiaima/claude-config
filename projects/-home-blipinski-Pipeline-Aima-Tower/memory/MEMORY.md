@@ -4,6 +4,9 @@
 > La narration vit dans les topic files, jamais ici — sinon l'index dépasse la limite de
 > chargement (~24 Ko) et ses dernières entrées cessent d'être lues.
 
+## `/database-platform` — menu = onglet Platform + frise par échantillon (2026-09-28)
+Les 47 colonnes de l'onglet `Platform` (écrit par **trace-platform** `lib/gsheets.py`, pas trace-prod) en deux côtés, puis la frise d'`/indicator` aux durées du sample. ⚠ Liste **recopiée à la main** : resynchroniser à chaque ajout de colonne à l'export. ⚠ Durées **lues** dans `/api/indicator/data`, jamais recalculées. [platform_menu_onglet_export.md](platform_menu_onglet_export.md)
+
 ## Page `/indicator` — performance du pipeline en production (2026-09-21, v5.9.0)
 ⚠ **Le `case` par défaut est PROD** dans trace-platform : un compte non déclaré compte comme production. ⚠ **Un seul écart assumé** : `_OVERRIDE_CASE_IGNORE` neutralise l'override `PROD_CUTOFFS` pour les comptes `rboidot@cgfl.fr` (déclarés DEV) — affichage seulement, 51 → **40 PROD**, dont 32 pour un seul labo. ⚠ Jointure aux tâches Seqera par **(client_uuid, patient_name, sample_name)** — `sample_name` seul fabrique des lignes. ⚠ Plusieurs workflows par échantillon **ne sont pas des relances**, ils se complètent → garder la dernière exécution **de chaque module**. ⚠ Les temps **ne s'additionnent pas** : 5 branches parallèles après `Merge`. Déclinaison = `grouper(rows, dim)`, éteinte par défaut. ⚠ **Deux attentes** (copie, pipeline) ; en `sample alone`, trace-platform recopie `transfer_*` dans `copy_*` → copie et attente copie NULL, sinon le transfert compte deux fois. ⚠ **La frise affiche des moyennes, pas des médianes**, sur les seuls parcours complets du mode : une médiane ne s'additionne pas, alors que là la somme des segments redonne le temps affiché — sur 9 échantillons en bulk et 12 en sample alone, d'où le N.B. sous les diagrammes. [indicator_page.md](indicator_page.md)
 

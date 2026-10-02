@@ -1,18 +1,18 @@
-# Context — Pod2Bam — 2026-06-05T08:30+02:00
+# Context — Pod2Bam — 2026-10-01T16:18+00:00
 
 **Branche** : main
-**Dernier commit** : c60e998 — Set RUNS_FR to complete HCL V6.0.0 batch (11 samples, all done)
-**Status** : clean
+**Dernier commit** : e2b7745 — Extend retrim Colon CGFL script to 5 runs with sync retry
+**Status** : 8 fichiers modifiés/non suivis (préexistants à la session, non commités)
 
 ## Où j'en suis
-Batch HCL simplex V6.0.0 **terminé** : 11/11 samples basecallés avec Dorado 2.0.0, BAM sur S3, sync vérifié. Image `pod2bam:2.0.0` buildée et validée. `Pod2Bam.sh` devenu le launcher unique bi-mode (simplex/multiplex) avec retry-loop upload/download, détection BAM final, upload auto GLOBAL_LOG. 319 GB de résultats locaux encore dans `/scratch/results/` (doublons de S3).
+Session analyse coût/temps Pod2Bam : extraction des perfs des 24 flowcells 4-plex multiplex V0.9.6_V5.0.0 (mars 2026) depuis les traces + logs globaux S3, puis deck CEO 10 slides livré dans `Bam2Beta/docs/Pod2Bam_cout_operationnel.pdf` (commit Bam2Beta 9b13bb6). Référence : H100-1-80G à €2,8665/h → 3h52 et €11,1 par flowcell (€2,78/sample), calcul seul hors Bam2Beta.
 
 ## Ce qui marche / ce qui foire
-- ✓ Dorado 2.0.0 + modèle V6.0.0 fonctionnent sur H100 PCIe (driver 580, CUDA 13)
-- ✓ Mode simplex pipeline (basecall+align en 1 étape, 2 process) OK
-- ✓ Retry-loop upload S3 fonctionne (tous UPLOAD OK 1ère tentative)
-- ✓ 3 logs globaux archivés sur S3 (dont 1 auto via le nouveau code)
-- ✓ Sort/index 16 CPU (au lieu de 4) — pas de problème de ressources
+- ✓ Métriques de référence sauvées dans `memory/perf-multiplex-v5.md` (source, périmètre, machine, décisions)
+- ✓ PDF généré sans install via chrome-headless-shell (`~/.cache/ms-playwright`)
+- ✗ Repo local en retard : travail V6.0.0 (commit c60e998, Dockerfile.2.0.0, Pod2Bam.sh bi-mode) absent ici et du remote
+- ✗ Sorties `demux/` + `align/` de mars absentes de S3 pour PBE25131 (seuls basecall/ + *_trimmed/ restent) — non investigué
+- ✗ Aucun log de simplex V5.x disponible (BAM seuls dans data/HCL/liquid/)
 
 ## Prochaine étape
-Nettoyer `/scratch/results/` (319 GB de doublons S3) si besoin de place. Sinon, le projet est prêt pour un prochain batch (multiplex CGFL en V6.0.0, ou nouveaux samples HCL). Penser à lancer dans tmux la prochaine fois.
+Décider du sort des modifs préexistantes non commitées (launch.sh, 3 TSV 3b1c780b, PLAN_ACTION_PROD.md, dev/*) et récupérer le travail V6.0.0 depuis l'instance GPU si elle existe encore.

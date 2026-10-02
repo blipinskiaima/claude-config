@@ -68,3 +68,11 @@ ecrits dans les DEUX blocs → toute evolution du schema doit toucher `rapport.n
 (process `QC_status`). Statut SUCCESS/WARNING/FAILED/NA, raison chaine anglaise ou `null`. Voir
 [[qc-status-exis-themelio]]. Le retro `--RETRO_REPORT` a regenere les 1366 JSON liquid (`version_raima`
 = null faute de fichier publie, `version_bam2beta` = manifest du run retro).
+
+## JSON degrade aligne sur le nominal (branche feat/check-input-methylation-model, 2026-09-29)
+
+Le JSON de `Check_Input` n'avait pas les 4 champs QC ajoutes au nominal en V2.3.1 (31 vs 33 champs,
+le piege de duplication ci-dessus s'est produit). Corrige : 35 champs = les 33 du nominal dans le meme
+ordre + `status` + `reason`. `exis_qc_status` = `themelio_qc_status` = `"FAILED"`, `*_qc_reason` = le
+statut d'entree (`FAILED_QC_INPUT` | `FAILED_QC_METHYLATION` | `FAILED_QC_BASECALL_MODEL`) : un
+consommateur qui lit la QC sans tester `status` voit bien un echec (choix de Boris).

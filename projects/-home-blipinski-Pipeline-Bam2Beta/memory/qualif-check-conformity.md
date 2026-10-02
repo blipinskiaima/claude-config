@@ -113,3 +113,17 @@ en $4, Lung_9 hardcode dans le script). L'ordre positionnel n'a pas change avec 
   fragmentomics, redondance Lung_9 (score+seuils lus 2x sans intention).
 
 **Non commite au 2026-07-22** (Boris garde la main -> /save-code ou maj-bam2beta). 479 -> 526 lignes.
+
+## V2.3.4 (2026-09-29) — Healthy_826 remplace par Healthy_64 (HCL)
+
+Le sample « process » est desormais **Healthy_64** (`s3://aima-bam-data/data/HCL/liquid/Healthy_64`,
+73 BAM horaires, `hac@v5.0.0` MinKNOW 6.5.14, jamais rebasecalle, 21 M molecules, QC SUCCESS) : plus aucun
+Dorado 4.x en qualification. Healthy_826 n'est plus utilise du tout. Tout ce qui precede cite Healthy_826
+= historique. Valeurs figees re-figees : mVAF v1.4 `2.5e-07` (:169), fragmentomics `-0.126594559311046`
+(:181), `tf` `2.5e-07` (:290). `run-qualif.sh` : `DATA` = `HCL/liquid` (Lung_9 aussi en HCL).
+- 1re qualif avec le nouveau sample : **51/51** (les 3 comparaisons vs PROD de Healthy_64 en WARNING, absent
+  de QUALIF/V2.3.3). **54 attendus a partir de V2.3.5** (QUALIF/V2.3.4 contient Healthy_64).
+- Healthy_64 reproductible bit a bit sur 3 runs (DEV 15:05, TEST 16:04, QUALIF 17:05).
+- Healthy_826 V4 vs rebasecalle V5 (meme sous-echantillon) : mVAF 0.58 -> 2.12, non interpretable a 0,11 M
+  molecules (107/200 bootstraps a 0) ; decisions inchangees. Ne pas utiliser Healthy_826 pour juger une
+  stabilite chiffree V4/V5.

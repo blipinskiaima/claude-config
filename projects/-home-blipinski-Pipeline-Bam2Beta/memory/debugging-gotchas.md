@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 330ade70-5566-438a-a5d4-abcaab9e189a
-  modified: 2026-09-02T15:51:36.229Z
+  modified: 2026-09-29T08:43:19.003Z
 ---
 
 # Gotchas outils & debugging (detail de l'index MEMORY.md)
@@ -19,6 +19,13 @@ metadata:
   observe 2 h 49) -> sortie 124/137, branche `else`, `Bam2Beta.failed` + email, la file continue.
   ⚠ `timeout` n'execute que des **binaires** : il ne peut pas appeler la fonction shell
   `nextflow-scw`, d'ou `AWS_PROFILE=scw` passe explicitement en ligne.
+  Recidive le 2026-09-29 sur `p02/AIMA_004` : morceau 19/37 du `merged.bam` jamais arrive (les 36 autres
+  en 8 s), aucun renvoi en 2 h alors que `socketTimeout` = 1 h → le timeout socket n'a probablement
+  jamais tire, cause reelle inconnue (logs des 2 runs figes perdus). Pris en reponse (non release au
+  2026-09-29) : `socketTimeout` 1 h → 10 min (valeur de janvier avant 2 hausses non documentees) et
+  plafond lanceur 6 h → 3 h (max observe 2 h 49). Prochaine fois : `jstack <PID>` AVANT de tuer (ou est
+  bloque le thread de publication), et ne tuer QUE le Nextflow, jamais le bash du lanceur — c'est lui
+  qui pose `.failed` et deplace le log vers `LOG/` sur S3.
 - **Le shell des process est `bash -o pipefail` SANS `-e`** (`conf/base.config:11` remplace le defaut
   NF `-ue` ; verifie sur un `.command.sh` reel) : une commande qui echoue a mi-script ne stoppe pas
   le process, seul le dernier exit compte. Poser `set -e` en tete du script quand chaque etape doit

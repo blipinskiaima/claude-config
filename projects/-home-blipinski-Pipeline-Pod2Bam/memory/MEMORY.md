@@ -50,23 +50,13 @@
 - **Reporting Nextflow** : report, trace, timeline, dag activés dans `nextflow.config`
 - **Profils** : `-profile docker,tower,scw`
 
-### Validation pré-lancement (2026-03-10)
-- 10 TSV FR : OK (4 samples chacun)
-- 13 TSV WS : OK (4-5 samples)
-- 10 S3 POD5 FR : OK (vérifié aws ls)
-- 13 S3 POD5 WS : OK (vérifié aws ls)
-- Reference GRCh38 + .fai : OK (/scratch/dependencies/)
-- Docker pod2bam:0.9.6 : OK (10.7 GB)
-- GPU H100 80GB : OK
-- CPU oversubscription lors du chevauchement : impact minimal (basecall GPU-bound, overlap ~30 min)
-
 ## Bugs fixes (2026-03-10)
 - **wait $NF_PID dans subshell** : `wait` ne peut attendre qu'un enfant direct → fix : poll `kill -0`
 - **Samtools_sort_index absent base.config** : process renommé mais config pas mise à jour → ajouté (16 CPU, 16 GB, 6h)
 - **Tous les timeouts** : uniformisés à `6.hour * task.attempt`
 
 ## Serveur GPU
-- **Scaleway H100-1-80G** : 1x H100 80GB, 24 vCPU, 240 GB RAM
+- **Scaleway H100-1-80G** (GPU-compute-1/2) : 1x H100 80GB, AMD EPYC 9334 24 vCPU, 236 GB RAM
 - Images : `pod2bam:0.9.6` (Dorado 0.9.6), `pod2bam:1.4.0` (Dorado 1.4.0), `pod2bam:0.7.4` (Dorado 0.7.4)
 - Dorado 100% GPU-bound, CPU n'accélère pas
 
@@ -82,10 +72,7 @@
 - **Détails benchmark 5 versions** : voir `memory/investigation-read-loss.md`
 - **Benchmark Q9** : voir `memory/benchmark-q9.md`
 
-### Minimap2 preset lr:hq vs map-ont
-- **lr:hq** (défaut Dorado ≥0.6.0) : k=19, w=19, strict, pour Q20+
-- **map-ont** : k=15, w=10, permissif, pour ONT classique
-- **Choix** : lr:hq (défaut) pour cohérence MinKNOW. map-ont = alternative positive documentée dans README
+- **Minimap2** : lr:hq (défaut, cohérent MinKNOW) ; map-ont = alternative documentée README
 
 ### Benchmark Q9 (--min-qscore 9, PBE25131)
 - Filtre 13.5% reads, unclass 10.3%→3.2%, map rate +2pts, perte nette -4.9% classifiés
@@ -106,36 +93,14 @@
 ## Production batch FR (2026-03-11) — TERMINÉ
 - **10/10 runs** traités, **0 erreur**, tous sync S3 vérifiés OK (fichiers + taille identiques)
 - **Durée totale** : ~21h (20:22 → 17:20), moyenne ~2h31/run
-- **Ratio basecall** : ~5.5 min/Go de POD5 sur H100
+- **Perf/coût de référence** : 3h52 et €11.1 par flowcell 4-plex → voir `perf-multiplex-v5.md`
 - **Smart scheduling** : fonctionne parfaitement (prefetch, GPU handoff, finalize background)
 - **Log global** : `s3://aima-bam-data/processed/Pod2Bam/RetD/Pod2Bam_20260310_202241.log`
-- **Bug connu non corrigé** : `EXIT_CODE=0` hardcodé dans finalize() ligne 72 — à corriger avant batch WS
+- Bug `EXIT_CODE=0` hardcodé : corrigé dans le Pod2Bam.sh V6.0.0 (instance GPU juin, pas dans ce repo)
 - **Résultats locaux** supprimés après vérification sync S3
 - **Vérification sync** : `find -type f | wc -l` + `du -sb` local vs `aws s3 ls --recursive --summarize` S3
 
-### Prochaine étape : batch WS (13 runs)
-- Décommenter RUNS_WS dans Pod2Bam.sh, commenter RUNS_FR
-- Corriger le bug EXIT_CODE dans finalize() avant lancement
-- Serveur FR libre et nettoyé (scratch 4%)
-
-### Timings par run (basecall + demux + align + sort + upload)
-| Run | POD5 | Durée |
-|-----|------|-------|
-| PBE25131 | 88 Go | 44 min |
-| PBA88487 | 311 Go | 2h19 |
-| PBA89966 | 321 Go | 2h25 |
-| PBA39351 | 451 Go | 3h49 |
-| PAY45185 | 303 Go | 2h29 |
-| PBE05840 | 330 Go | 2h37 |
-| PBA39359 | 436 Go | 3h34 |
-| PAY45111 | 565 Go | ~2h33 |
-| PBE96775 | 622 Go | ~4h57 |
-| PBE35117 | 643 Go | ~4h41 |
-
-## Tests terminés (2026-03-10)
-- **Test 2** : V0.9.6_V5.0.0 standard PBE29634 — terminé, résultats en local
-- **Test 3** : V0.9.6_V5.0.0 Q9 PBE29634 — terminé, résultats en local
-- NB : ces tests utilisent l'ancien code (map-ont, anciens noms de process)
+- Batch WS (13 runs, GPU-compute-2) : fait 2026-03-10/12. Timings détaillés → `perf-multiplex-v5.md`
 
 ## Batch Colon (2026-03-12) — voir `memory/batch-colon.md`
 - 4 runs (f181e139, b4caa48f, 05ab4dea_rep1, 05ab4dea_rep2) — terminé 23:32, ~11h35
@@ -143,11 +108,7 @@
 - S3 sync vérifié OK (386 fichiers), résultats locaux nettoyés
 - 877aac92 (Colon_21-24) : complété 2026-03-19 (rep1+rep2, POD5 copiés manuellement)
 
-## Investigation Trim Demux (2026-03-24) — voir `memory/trim-investigation.md`
-- Test impact retrait `--no-trim` au demux sur l'alignement (secondary/supplementary)
-- Script `trim_gate_test.sh`, données dans `/scratch/trim_gate/`
-- Run 3b1c780b_sub, V4.3.0, Lung_10 + Breast_1
-- Comparaison flagstat condition trim vs BAMs existants (baseline notrim)
+## Investigation Trim Demux (2026-03-24) — voir `trim-investigation.md`
 
 ## Batch 3b1c780b_sub (2026-03-19) — voir `memory/batch-3b1c780b-sub.md`
 - Run 3b1c780b, subset Breast_1 + Lung_10 en V4.3.0 et V0.7.4_V4.3.0
@@ -168,6 +129,10 @@
 ## Scaleway S3 — gotchas (2026-04-09)
 - **`aws s3 sync` skip silencieusement des fichiers** (3-5 sur 23-90, aléatoire) → TOUJOURS retry en loop jusqu'à `local_count == s3_count`. Pattern dans `dev/Pod2Bam_retrim_colon_cgfl.sh:prefetch()`
 - **Préfixe bucket `aima-pod-data`** : les POD5 CGFL sont sous `data/CGFL/liquid/...` et NON `CGFL/liquid/...`. Toujours vérifier avec `aws s3 ls` avant de coder un path
+
+## Perf multiplex V5.0.0 (2026-10-01) — voir `perf-multiplex-v5.md`
+- Moyenne/flowcell 4-plex (n=24) : download 21 min, basecall 2h06, demux+align+sort 1h23, NF total 3h29, upload 2 min, total 3h52
+- Machines : GPU-compute-1/2, 1× H100 80GB, EPYC 9334 24 vCPU, 236 GB RAM
 
 ## Autres projets
 - **Bam2Beta** : BAM → modkit → RAIMA. Containers `blipinskiaima/bam2beta:latest`, `blipinskiaima/raima:latest`
