@@ -69,6 +69,10 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
+## 2026-10-01 — Pod2Bam : coût opérationnel + deck CEO
+- [x] **Pod2Bam — perfs de référence multiplex V5.0.0** — 24 flowcells 4-plex (traces + logs S3, mars 2026) : moyenne 3h52/flowcell (download 21 min, basecall 2h06, demux+align+sort 1h23, upload 2 min) sur Scaleway H100-1-80G → €11,1/flowcell, €2,78/échantillon. Corrige l'ancien « 5,5 min/Go » (faux). Mémoire `perf-multiplex-v5.md`.
+- [x] **Deck CEO coût opérationnel Pod2Bam** — PDF 10 slides 16:9 (charte du deck « 2027 Path ») : machine, protocole, temps, coût unitaire, coût opérationnel (qualification 1 sem. temps plein), plans à façon vs industrialisé (route POD5 avec DevOps), avertissements, coût indicatif. `Bam2Beta/docs/Pod2Bam_cout_operationnel.pdf`, commit Bam2Beta `9b13bb6`.
+
 ## 2026-09-28 — Bam2Beta : la file de production ne se gèle plus
 
 - [x] **Bam2Beta — timeout 6h sur le lanceur plateforme** — le run figé `AIMA_013` (upload S3 bloqué, 25/09) gelait toute la file séquentielle sans alerte. `timeout --kill-after=5m 6h` (max observé 2h49) → sortie 124/137, `Bam2Beta.failed` + email, la file continue.
