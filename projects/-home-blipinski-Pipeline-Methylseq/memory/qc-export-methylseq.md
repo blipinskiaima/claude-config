@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 08f7a23b-e69f-4f22-a31a-236ff313703e
-  modified: 2026-10-01T12:29:14.100Z
+  modified: 2026-10-02T13:14:28.952Z
 ---
 
 `~/Pipeline/Methylseq/methylseq_qc.py` (créé 2026-09-29/10-01) extrait le QC des sorties methylseq
@@ -38,6 +38,16 @@ onglet `Watchmaker - Methylseq - Element`. 64 samples au 2026-10-01 (batch1 16 +
 Depth / Coverage % = mosdepth (défauts, -F 1796, chevauchement R1/R2 compté 1 fois) sur BAM dédup —
 définition Bam2Beta. ≠ DRAGEN (BP_Watchmaker_summary.tsv) dont la depth est ~25 % plus haute
 (chevauchement compté 2 fois). Coverage plafonne à 94,67 % (165 M de N dans la réf iGenomes 3,10 Gb).
+
+**État au 2026-10-02** : S3 `batch1/` (16, fév.), `batch2_1..2_3/` (36) ; **`batch2_4/` pas encore sur S3**
+(local `/scratch/methylseq/batch2_4`, traité via `--local`). Export : colonne `Batch` simplifiée
+(`batch1`/`batch2`), CSV garde `batch2_N` (clé de cache). En suspens : `Taille insert moy.` NA pour
+Colon_12, Colon_13, Colon_50, Healthy_637, Lung_13 (pas de `.stats` publié en batch1) → samtools stats
+sur BAM dédup, à valider d'abord sur Colon_3 (le `.stats` du pipeline est pré-dédup).
+À surveiller : **Lung_13** (coverage 68 %, % utiles 79,9, supplémentaires 0,48 %), **Healthy_772**
+(méthylation CpG globale 0,625 vs 0,69-0,75 chez les autres Healthy).
+Pont short-read : `mvaf14_short_read/05_bootstrap.sh:24` compte NREADS en `-q 20 -F 3844` alors que
+rastair per-read garde `-f 3 -F 3852 -q 1` → dénominateur ≠ reads réellement utilisées.
 
 **Why:** Boris revoit les 4 notions une à une (Nb molécule ✓, puis % mappés, Depth, Coverage %).
 **How to apply:** ne pas réintroduire un « Nb molécule » = reads ; la garde gsheet bloque si l'onglet a des

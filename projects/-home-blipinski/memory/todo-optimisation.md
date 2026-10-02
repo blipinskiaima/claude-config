@@ -20,7 +20,6 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## Haute priorité
 
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
-- [ ] **Bam2Beta — contrôle tags MM/ML dans Check_Input** — faire échouer tôt, avec un message explicite, tout BAM d'entrée sans méthylation. Cas déclencheur : **IRCCS RC24 (2026-09-28)**, BAM réalignés sans `-y` → erreur `semi_join` cryptique dans `Raima_score_mVAF` après 6 min.
 
 ## Moyenne priorité
 
@@ -72,6 +71,11 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## 2026-10-01 — Pod2Bam : coût opérationnel + deck CEO
 - [x] **Pod2Bam — perfs de référence multiplex V5.0.0** — 24 flowcells 4-plex (traces + logs S3, mars 2026) : moyenne 3h52/flowcell (download 21 min, basecall 2h06, demux+align+sort 1h23, upload 2 min) sur Scaleway H100-1-80G → €11,1/flowcell, €2,78/échantillon. Corrige l'ancien « 5,5 min/Go » (faux). Mémoire `perf-multiplex-v5.md`.
 - [x] **Deck CEO coût opérationnel Pod2Bam** — PDF 10 slides 16:9 (charte du deck « 2027 Path ») : machine, protocole, temps, coût unitaire, coût opérationnel (qualification 1 sem. temps plein), plans à façon vs industrialisé (route POD5 avec DevOps), avertissements, coût indicatif. `Bam2Beta/docs/Pod2Bam_cout_operationnel.pdf`, commit Bam2Beta `9b13bb6`.
+
+## 2026-09-29 — Bam2Beta : contrôles d'entrée V2.3.3 + qualification Healthy_64 V2.3.4
+- [x] **Diagnostic IRCCS RC24** — BAM réalignés par le client (`minimap2` sans `-y`) : 0 read avec MM/ML, aucune `@RG` → tables extract_full vides et erreur `semi_join` dans `Raima_score_mVAF`. Mémoire `bam-sans-tags-mm-ml.md`.
+- [x] **Bam2Beta V2.3.3 — contrôles MM/ML et modèle Dorado dans Check_Input** — `FAILED_QC_METHYLATION` (verdict par sample) et `FAILED_QC_BASECALL_MODEL` (v5.0.0/v5.2.0, mode PROD), JSON dégradé aligné à 35 champs, timeout 4 h + `socketTimeout` 10 min ; 22/22 cas testés, QUALIF OK 54/54. Mémoire `check-input-qc.md`.
+- [x] **Bam2Beta V2.3.4 — Healthy_64 sample de qualification** — Healthy_826 (v4.3.0) retiré, Healthy_64 HCL (`hac@v5.0.0` MinKNOW) et 3 valeurs figées re-figées ; reproductible bit à bit sur 3 runs, QUALIF OK 51/51.
 
 ## 2026-09-28 — Bam2Beta : la file de production ne se gèle plus
 
