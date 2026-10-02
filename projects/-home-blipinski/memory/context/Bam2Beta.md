@@ -1,26 +1,23 @@
-# Context — Bam2Beta — 2026-09-28T14:41
+# Context — Bam2Beta — 2026-10-02T13:13
 
 **Branche** : main
-**Dernier commit** : 777aa9b — fix(prod): plafonner un run plateforme a 6h pour ne plus geler la file
-**Status** : clean (2 non suivis : docs/pair_current.tsv, qualifStatus.txt)
+**Dernier commit** : 9b13bb6 — docs: add Pod2Bam operational cost deck for CEO
+**Status** : 6 fichiers modifiés/non suivis hors session (dilution_lung.sh, PDF rapports, note.txt, pair_current.tsv), volontairement non commités
 
 ## Où j'en suis
-Incident prod du 25/09 réglé : AIMA_013 figé 7 h (morceau 7/20 de l'envoi du merged.bam jamais
-arrivé sur S3, socketTimeout 1 h × 20 retries), file plateforme bloquée. Relancé depuis zéro le
-26/09 (conforme en 11 min, mVAF 0,98 / Thémélio 0,966574 identiques). Correctif commité et poussé :
-lanceur plateforme sous `timeout --kill-after=5m 6h` → code 124/137 → branche else (.failed + email,
-code de sortie dans le log), sans livraison du metadata.json (choix ISO de Boris).
-En parallèle, R&D end motifs 5' cfDNA dans /scratch/boris/end_motif/ (scripts + figures).
+V2.3.3 (Check_Input bloque FAILED_QC_METHYLATION / FAILED_QC_BASECALL_MODEL en mode PROD, JSON dégradé 35 champs,
+lanceur grep FAILED_QC_ + timeout 4h, socketTimeout 10 min) et V2.3.4 (sample de qualification Healthy_826 → Healthy_64
+HCL hac@v5.0.0, 3 valeurs figées re-figées) sont releasées et QUALIF OK (V2.3.3 54/54, V2.3.4 51/51).
+Déclencheur : IRCCS RC24 (BAM réalignés minimap2 sans -y → pas de MM/ML ni @RG).
 
 ## Ce qui marche / ce qui foire
-- ✓ End motifs ONT : 5' sans clip à 91-93 % (le 3' clippé à 61 %), CCCA en 1re position chez les sains
-- ✓ Cohorte HCL séquencée le même jour (8 H / 20 L) : pas de biais GC ; effet dose MDS ρ=+0,62, CCCA ρ=−0,61 avec la mVAF
-- ✗ Signal invisible sous ~30 % de TF (variabilité entre individus 10 fois le signal à 2 %) → pas de gain en détection
-- ✗ Cohorte CGFL 5/5 inexploitable : groupe confondu avec le run (Lung le même jour, 6× plus d'ADN chargé) + biais GC
-- ✗ FLARE : code inutilisable (pas de licence, top 20 seulement, module méthylation faux) → réimplémenté
-- ⚠ Timeout 6 h testé en simulation seulement, pas sur un vrai run Nextflow
-- ⚠ socketTimeout 1 h (nextflow.config:79) non modifié : passer à 10 min = V2.3.3 + test + qualif
-- ⚠ AIMA_016 : aucun BAM reçu, le client doit renvoyer ; client bdcb0133 absent de labs_users
+- ✓ Check_Input : 22/22 cas testés (dont RC24, AIMA_020, pt100 réels) ; TEST et QUALIF OK
+- ✓ Healthy_64 reproductible bit à bit sur 3 runs ; QUALIF/V2.3.4 = référence (54 contrôles dès V2.3.5)
+- ✗ Lanceur V2.3.4 PAS encore copié sur la machine plateforme → la prod tourne encore en V2.3.2
+- ✗ Le pipeline peut démarrer avant la fin de la copie des BAM (.dl-complete posé en premier au re-dispatch) :
+  AIMA_002 (29/09) et AIMA_004 (28/09) livrés sur données partielles — non corrigé
+- ✗ Cause des uploads S3 figés (AIMA_013, AIMA_004) non prouvée (logs perdus) ; socketTimeout 10 min = pari
+- ✗ Token Seqera en clair dans nextflow.config:59
 
 ## Prochaine étape
-`git pull` sur la VM plateforme pour activer le timeout 6 h, puis décider du socketTimeout (V2.3.3).
+Copier dev/PLT/Bam2Beta_SCW_plateforme.sh (VERSION=V2.3.4) sur la machine plateforme, puis vérifier le 1er run prod.
