@@ -20,6 +20,7 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 ## Haute priorité
 
 - [ ] **Sécurité secrets — étape 1** : migrer `~/Pipeline/export/` vers des fichiers `.env` avec `chmod 600`. Documenter le pattern pour les autres projets (tokens Tower dans nextflow.config).
+- [ ] **Bam2Beta — lancer seulement après copie complète** — le lanceur plateforme doit attendre que le nombre de BAM/BAI présents égale `summary.total` du `.dl-complete`, posé **avant** les BAM au re-dispatch. **AIMA_002** (29/09, 1,69 M reads au lieu de 5,06 M) et **AIMA_004** (28/09) ont été livrés sur données partielles.
 
 ## Moyenne priorité
 
