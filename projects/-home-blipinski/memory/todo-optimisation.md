@@ -72,12 +72,16 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
 
 # Partie 3 — Complété (par jour)
 
-## 2026-10-02 — Methylseq : batch WM 2 + export QC · Aima-Tower : page Plateforme (v5.10.0)
+## 2026-10-02 — Methylseq : batch WM 2 + export QC · Aima-Tower : page Plateforme (v5.10.0) · trace-platform : rapport de production
 - [x] **Methylseq — batch WM 2 traité (48 samples)** — 4 lots de 12 depuis `aima-pod-data/data/CGFL/WM/`, tous OK (~9 h 30/lot), pipeline identique au batch 1 (même Script ID, outils, params) ; TrimGalore passé à 12 CPU (−1 h/lot). Commit `b429809`.
 - [x] **Methylseq — export QC vers gsheet (64 samples)** — `methylseq_qc.py` (S3 ou `--local`, CSV de cache) → onglet `Watchmaker - Methylseq - Element`, 16 colonnes définies une à une : Nb reads = 2×(A+D+E), Nb molécules = A+D+E, % mappés, Depth/Coverage raccord ONT + variantes « utile méthylation » (filtre rastair). Détail dans `memory/qc-export-methylseq.md`.
 - [x] **Methylseq — écart Depth DRAGEN vs methylseq élucidé** — l'ancien tableau batch 1 venait de DRAGEN (BP_Watchmaker) : Depth ~25 % plus haute (chevauchement R1/R2 compté deux fois), Coverage identique. mosdepth (définition Bam2Beta) retenu.
 - [x] **Aima-Tower — menu Plateforme aligné sur l'onglet Platform (v5.10.0)** — les 47 colonnes de l'onglet Platform (trace-platform `lib/gsheets.py`) dans le menu de chaque analyse, rangées en deux côtés (résultats du pipeline / parcours), statuts aux couleurs de la Tour ; colonne Analysis = produit (EXIS, EXIS CUP, THEMELIO) au lieu de MRD. Commits `434036b..d7e39ab`, détails dans `platform_menu_onglet_export.md`.
 - [x] **Aima-Tower — diagramme de flux par échantillon** — la frise de `/indicator`, déclinée sur la page Plateforme avec les durées mesurées du sample (bulk ou sample alone), lues dans `/api/indicator/data` sans recalcul.
+- [x] **trace-platform — rapport de production PDF + skill `/create-rapport-prod`** — gabarit `rapports/` : sélection des runs PROD par période, fraîcheur base vs S3, re-check par clé exacte avec backup ; testé sur le 01/10 (8 runs IRCCS) et la semaine du 23-29/09 (40 samples). Commit `44a3d37`.
+- [x] **trace-platform — `.failed` résiduel après relance** — si `.done` et `.failed` coexistent, le plus récent gagne : les 6 RC24 IRCCS repassent de FAILED à WARNING (3/3 OK, BAM sans `.bai`).
+- [x] **Rétrospective prod 15-30/09** — onglet `Prod 15-30/09` du Google Doc EACR + diaporama Google Slides : 43 analyses, 32 rapports, 11 échecs, QC 0/22/10, 40 min upload → rapport en médiane hors incidents.
+- [x] **trace-platform — compte VHIO rattaché** — ligne `labs_users` sans `user_id` (23 samples sans labo) corrigée le 28/09, gsheet ré-exportée.
 
 ## 2026-10-01 — Pod2Bam : coût opérationnel + deck CEO
 - [x] **Pod2Bam — perfs de référence multiplex V5.0.0** — 24 flowcells 4-plex (traces + logs S3, mars 2026) : moyenne 3h52/flowcell (download 21 min, basecall 2h06, demux+align+sort 1h23, upload 2 min) sur Scaleway H100-1-80G → €11,1/flowcell, €2,78/échantillon. Corrige l'ancien « 5,5 min/Go » (faux). Mémoire `perf-multiplex-v5.md`.
