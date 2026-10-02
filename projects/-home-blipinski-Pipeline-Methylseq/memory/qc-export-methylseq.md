@@ -39,11 +39,10 @@ Depth / Coverage % = mosdepth (défauts, -F 1796, chevauchement R1/R2 compté 1 
 définition Bam2Beta. ≠ DRAGEN (BP_Watchmaker_summary.tsv) dont la depth est ~25 % plus haute
 (chevauchement compté 2 fois). Coverage plafonne à 94,67 % (165 M de N dans la réf iGenomes 3,10 Gb).
 
-**État au 2026-10-02** : S3 `batch1/` (16, fév.), `batch2_1..2_3/` (36) ; **`batch2_4/` pas encore sur S3**
-(local `/scratch/methylseq/batch2_4`, traité via `--local`). Export : colonne `Batch` simplifiée
-(`batch1`/`batch2`), CSV garde `batch2_N` (clé de cache). En suspens : `Taille insert moy.` NA pour
-Colon_12, Colon_13, Colon_50, Healthy_637, Lung_13 (pas de `.stats` publié en batch1) → samtools stats
-sur BAM dédup, à valider d'abord sur Colon_3 (le `.stats` du pipeline est pré-dédup).
+**État au 2026-10-02** : S3 `batch1/` (16, fév.), `batch2_1..2_3/` (36) ; `batch2_4/` (12, qualimap en plus). Export : colonne `Batch` simplifiée
+(`batch1`/`batch2`), CSV garde `batch2_N` (clé de cache). Taille insert des 5 samples batch1 sans `.stats` (Colon_12, Colon_13, Colon_50, Healthy_637, Lung_13) comblée le
+2026-10-02 par `samtools stats` sur BAM dédup (repli automatique dans `bam_metrics`) ; validé sur Colon_3 : 163,8 = `.stats` pipeline.
+Tous les batchs sur S3 (batch2_2/2_4 synchronisés 2026-10-02) ; logs dans `Methylseq/log/{nextflow,qc,sync}/`.
 À surveiller : **Lung_13** (coverage 68 %, % utiles 79,9, supplémentaires 0,48 %), **Healthy_772**
 (méthylation CpG globale 0,625 vs 0,69-0,75 chez les autres Healthy).
 Pont short-read : `mvaf14_short_read/05_bootstrap.sh:24` compte NREADS en `-q 20 -F 3844` alors que

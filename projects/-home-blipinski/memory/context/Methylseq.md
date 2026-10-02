@@ -1,24 +1,22 @@
-# Context — Methylseq — 2026-10-02T13:14+00:00
+# Context — Methylseq — 2026-10-02T13:53+00:00
 
 **Branche** : main
-**Dernier commit** : b429809 — feat: QC export script + WM batch2 (48 samples) launch traceability
+**Dernier commit** : f4aa601 — feat(qc): fill insert size from dedup BAM when samtools .stats is missing
 **Status** : 1 fichier non suivi (samplesheet_alone.csv, test Breast_26 volontairement exclu)
 
 ## Où j'en suis
-Les 48 samples WM (batch2, 4 lots de 12) sont passés dans methylseq. Le QC des 64 samples
-(batch1 + batch2) est exporté dans la gsheet, onglet "Watchmaker - Methylseq - Element",
-via methylseq_qc.py (16 colonnes, définitions validées une à une : Nb reads = 2×(A+D+E),
-Nb molécules = A+D+E, % mappés, Depth et Coverage version ONT + "utile méthylation"
-avec le filtre rastair). Arrêt après l'export avec la colonne Batch simplifiée (batch1/batch2).
+Batch WM complet et clos : 64 samples (batch1 16 + batch2 48) traités par methylseq,
+archivés sur S3 (5 batchs + logs dans Methylseq/log/), QC exporté dans la gsheet
+"Watchmaker - Methylseq - Element" sans aucun NA (64 × 16). Plus rien en cours sur ce projet.
 
 ## Ce qui marche / ce qui foire
-- ✓ Script QC : S3 ou --local, CSV de cache, garde anti-écrasement de la Sheet, 64/64 samples, non-régression vérifiée
-- ✓ Définitions raccord ONT (même référence hg38, 195 contigs, mosdepth par défaut = Bam2Beta)
-- ✗ Taille insert moy. = NA pour 5 samples batch1 (Colon_12, Colon_13, Colon_50, Healthy_637, Lung_13) : pas de .stats publié
-- ✗ batch2_4 pas encore remonté sur S3 (local seulement : /scratch/methylseq/batch2_4)
-- ✗ À surveiller : Lung_13 (4 indicateurs hors norme), Healthy_772 (méthylation globale 0,625)
+- ✓ methylseq_qc.py : S3 ou --local, CSV de cache, repli taille d'insert sur BAM dédup, garde anti-écrasement gsheet
+- ✓ Définitions QC validées une à une, raccord ONT (même réf hg38 195 contigs, mosdepth = Bam2Beta)
+- ✓ batch2_2 / batch2_4 identiques local/S3 fichier par fichier → ~395 Go libérables sur /scratch/methylseq (décision de Boris)
+- ✗ À surveiller : Lung_13 (coverage 68 %, % utiles 79,9, supplémentaires 0,48 %), Healthy_772 (méthylation globale 0,625)
+- ✗ Lots 1-3 sans qualimap (lot 4 seul) : laissé tel quel, le script ne l'utilise pas
 
 ## Prochaine étape
-Synchroniser batch2_4 vers S3 (boucle jusqu'à local = S3), puis combler la taille d'insert
-des 5 samples batch1 via samtools stats sur le BAM dédupliqué, après validation sur Colon_3
-(le .stats du pipeline est calculé avant dédup).
+Côté projet short-read : mesurer l'écart NREADS du bootstrap mVAF v1.4 (`05_bootstrap.sh:24`,
+-q 20 -F 3844) vs filtre rastair (-f 3 -F 3852 -q 1) sur EPIC. Côté Methylseq : relancer
+methylseq_qc.py --gsheet quand de nouveaux samples arriveront.
