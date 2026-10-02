@@ -50,6 +50,9 @@ originSessionId: 129fb3f7-7613-4550-adf0-9392306d8a85
   - [ ] **Cron alertes dérive (/qualite)** — actuellement les snapshots sont manuels. Ajouter un cron hebdo qui appelle `check_drift()` et envoie email/Slack si alerte (prerequis : SMTP ou webhook configuré).
   - [ ] **Pytest en CI** — les 11 tests tournent en local, les intégrer à un workflow GitHub Actions ou hook pre-commit.
   - [ ] **Feedback itératif** sur usage réel : layout Confrontation, ergonomie des 4 filtres avancés, pertinence des bins VAF, lisibilité ISO 15189 report.
+- [ ] **Methylseq — sync S3 de `batch2_4`** — `/scratch/methylseq/batch2_4` (12 samples) pas encore sur `s3://aima-bam-data/processed/short-read/Methylseq/batch2_4/`. `aws s3 sync` en boucle jusqu'à local = S3, sans `--recursive`.
+- [ ] **Methylseq — taille d'insert des 5 samples batch1** — NA dans la gsheet pour Colon_12, Colon_13, Colon_50, Healthy_637, Lung_13 (pas de `.stats` publié). `samtools stats` sur BAM dédup, après avoir vérifié sur Colon_3 que la valeur = celle du `.stats` pipeline (pré-dédup).
+- [ ] **short-read — filtres de `NREADS` dans le bootstrap mVAF v1.4** — `mvaf14_short_read/05_bootstrap.sh:24` compte en `-q 20 -F 3844` alors que rastair per-read garde `-f 3 -F 3852 -q 1` (paires propres, MAPQ ≥ 1) : le dénominateur inclut des reads non utilisées. Mesurer l'écart sur EPIC et aligner si besoin.
 - [ ] **Explorer MethylBERT** — Transformer read-level (Nat Comm 2025) pour améliorer sensibilité basse VAF (<5%). Nécessite GPU. ~2-3 jours.
 
 ## Basse priorité
